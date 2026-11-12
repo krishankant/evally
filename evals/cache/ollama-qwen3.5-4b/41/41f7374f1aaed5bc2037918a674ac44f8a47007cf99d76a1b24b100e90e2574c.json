@@ -1,0 +1,160 @@
+{
+ "request": {
+  "messages": [
+   {
+    "role": "user",
+    "text": "Do you have Quiet Rivers in stock? The ISBN is 9780000000028.",
+    "tool_calls": [],
+    "tool_results": []
+   },
+   {
+    "role": "assistant",
+    "text": "",
+    "tool_calls": [
+     {
+      "arguments": {
+       "isbn": "9780000000028"
+      },
+      "id": "call_fjppitx5",
+      "name": "check_stock"
+     }
+    ],
+    "tool_results": []
+   },
+   {
+    "role": "user",
+    "text": "",
+    "tool_calls": [],
+    "tool_results": [
+     {
+      "content": "inventory service timeout",
+      "is_error": true,
+      "tool_call_id": "call_fjppitx5"
+     }
+    ]
+   },
+   {
+    "role": "assistant",
+    "text": "",
+    "tool_calls": [
+     {
+      "arguments": {
+       "summary": "Customer requested stock check for ISBN 9780000000028 but inventory service timed out."
+      },
+      "id": "call_sg1u3a42",
+      "name": "escalate_to_human"
+     }
+    ],
+    "tool_results": []
+   },
+   {
+    "role": "user",
+    "text": "",
+    "tool_calls": [],
+    "tool_results": [
+     {
+      "content": "{\"ticket\": \"T-1\", \"summary\": \"Customer requested stock check for ISBN 9780000000028 but inventory service timed out.\"}",
+      "is_error": false,
+      "tool_call_id": "call_sg1u3a42"
+     }
+    ]
+   }
+  ],
+  "model": "qwen3.5:4b",
+  "system": "You are the customer support assistant for Bramble Books, an online bookstore.\nAnswer the customer's question using the policy excerpts below.\nUse the tools to look up orders, check stock, start returns, or hand over to a human.\n\nPolicy excerpts:\n[shipping.md]\n# Shipping\n\nUpdated: October 2026\n\n| Option | Delivery time | Price |\n| --- | --- | --- |\n| Standard | 3-5 business days | $4.99, free on orders over $35 |\n| Express | 1-2 business days | $12.99 |\n\nOrders placed before 2 pm Eastern on a business day ship the same day. We ship to all 50 US states. Each order gets a tracking link by email when it ships.\n\nBooks that are out of stock ship when they come back in; we email you a date.",
+  "tools": [
+   {
+    "description": "Look up an order. Needs the order id (like BB-1001) and the email on the order.",
+    "name": "lookup_order",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email address on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id, like BB-1001",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Check how many copies of a book are in stock, by ISBN.",
+    "name": "check_stock",
+    "parameters": {
+     "properties": {
+      "isbn": {
+       "description": "13-digit ISBN",
+       "type": "string"
+      }
+     },
+     "required": [
+      "isbn"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Start a return for a delivered order.",
+    "name": "start_return",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id",
+       "type": "string"
+      },
+      "reason": {
+       "description": "Why it's being returned",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email",
+      "reason"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Hand the conversation to a human agent.",
+    "name": "escalate_to_human",
+    "parameters": {
+     "properties": {
+      "summary": {
+       "description": "One-line summary of the problem",
+       "type": "string"
+      }
+     },
+     "required": [
+      "summary"
+     ],
+     "type": "object"
+    }
+   }
+  ]
+ },
+ "response": {
+  "message": {
+   "role": "assistant",
+   "text": "I attempted to check the availability of *Quiet Rivers* (ISBN: 9780000000028) for you, but the system experienced a timeout and could not retrieve the current inventory levels.\n\nThis is being escalated to a human agent who can verify the stock status for you.",
+   "tool_calls": [],
+   "tool_results": []
+  },
+  "stop_reason": "end_turn",
+  "usage": {
+   "input_tokens": 962,
+   "output_tokens": 156
+  }
+ }
+}

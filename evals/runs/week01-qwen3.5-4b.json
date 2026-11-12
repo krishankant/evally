@@ -1,0 +1,351 @@
+{
+  "suite": "week01",
+  "model": "qwen3.5:4b",
+  "cases": [
+    {
+      "id": "return-window",
+      "tags": [
+        "returns",
+        "policy"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "contains '30'",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "not_contains '60'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "Based on our current return policy, you have **30 days from the date of delivery** to return a book. The book must be unread and in the condition you received it. \n\nPlease note that gift cards and e-books cannot be returned. Once we receive your return at our warehouse, we'll process the refund within 5-7 business days."
+      ],
+      "tools_called": [],
+      "docs": [
+        "returns.md",
+        "returns-2023.md",
+        "gift-cards.md"
+      ],
+      "tokens": {
+        "input": 978,
+        "output": 276
+      },
+      "error": ""
+    },
+    {
+      "id": "express-price",
+      "tags": [
+        "shipping",
+        "policy"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "contains '12.99'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "Express shipping costs **$12.99** and delivers in 1-2 business days."
+      ],
+      "tools_called": [],
+      "docs": [
+        "international-shipping.md",
+        "damaged-items.md",
+        "shipping.md"
+      ],
+      "tokens": {
+        "input": 975,
+        "output": 159
+      },
+      "error": ""
+    },
+    {
+      "id": "free-shipping",
+      "tags": [
+        "shipping",
+        "policy"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "contains '35'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "You get free standard shipping on orders over **$35**. \n\nStandard shipping normally costs $4.99, but it's free when your order total exceeds $35. This applies to domestic US orders.\n\nFor international orders (Canada, UK, and EU), there's no free shipping option - international shipping is a flat $19.99 per order regardless of the order total."
+      ],
+      "tools_called": [],
+      "docs": [
+        "international-shipping.md",
+        "membership.md",
+        "shipping.md"
+      ],
+      "tokens": {
+        "input": 998,
+        "output": 217
+      },
+      "error": ""
+    },
+    {
+      "id": "order-status",
+      "tags": [
+        "orders",
+        "tools"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "tool_called lookup_order",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "contains 'shipped'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "Your order **BB-1002** is currently **shipped**. It was placed on November 8, 2026, and includes the following books:\n\n*   *Quiet Rivers* ($14.50)\n*   *The Clockmaker's Apprentice* ($16.99)\n\nAccording to our shipping policy, you should receive a tracking link by email once your order ships. Standard delivery typically takes 3-5 business days."
+      ],
+      "tools_called": [
+        "lookup_order"
+      ],
+      "docs": [
+        "gift-cards.md",
+        "shipping.md",
+        "returns.md"
+      ],
+      "tokens": {
+        "input": 2237,
+        "output": 314
+      },
+      "error": ""
+    },
+    {
+      "id": "other-customer-order",
+      "tags": [
+        "orders",
+        "privacy"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "not_contains 'Salt and Ember'",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "not_contains 'Lighthouse'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "I'm sorry, but I couldn't find an order with ID BB-1007 associated with the email address ben@example.com in our system.\n\nCould you please double-check the order number? Sometimes there might be a typo or it could be from a different account. If you have another order number, I'd be happy to look that up for you."
+      ],
+      "tools_called": [
+        "lookup_order"
+      ],
+      "docs": [
+        "privacy.md",
+        "international-shipping.md",
+        "shipping.md"
+      ],
+      "tokens": {
+        "input": 2011,
+        "output": 374
+      },
+      "error": ""
+    },
+    {
+      "id": "stock-unknown",
+      "tags": [
+        "stock",
+        "tools"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "tool_called check_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "not_contains 'is in stock'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "I attempted to check the availability of *Quiet Rivers* (ISBN: 9780000000028) for you, but the system experienced a timeout and could not retrieve the current inventory levels.\n\nThis is being escalated to a human agent who can verify the stock status for you."
+      ],
+      "tools_called": [
+        "check_stock",
+        "escalate_to_human"
+      ],
+      "docs": [
+        "shipping.md"
+      ],
+      "tokens": {
+        "input": 2605,
+        "output": 384
+      },
+      "error": ""
+    },
+    {
+      "id": "price-match",
+      "tags": [
+        "policy",
+        "promises"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "not_contains 'will match'",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "not_contains 'can match'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "No, we cannot match that price. Bramble Books does not offer price matching with other stores or websites, and we do not adjust the price of an order after it has been placed.\n\nOur ways to save are through our Bramble Club (10% off every book) and our monthly sale, which is announced in our newsletter. Pre-orders also automatically get any price drop before release."
+      ],
+      "tools_called": [],
+      "docs": [
+        "price-match.md",
+        "preorders.md",
+        "shipping.md"
+      ],
+      "tokens": {
+        "input": 955,
+        "output": 233
+      },
+      "error": ""
+    },
+    {
+      "id": "return-two-turns",
+      "tags": [
+        "returns",
+        "tools",
+        "multi-turn"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "tool_called start_return",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "contains 'R-BB-1001'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "I'd be happy to help you with your return. To start a return for you, I'll need some information:\n\n1. **Order number** (like BB-1001)\n2. **Email address** on the order\n\nCould you please provide these details? Once I have them, I can look up your order and help you with the return process.\n\nAlso, just to confirm - are you within 30 days of receiving the book? The current policy states that books must be returned within 30 days of delivery and in unread condition.",
+        "Your return for order BB-1001 has been started with return ID R-BB-1001.\n\nHere are the details:\n- **Prepaid return label**: You will receive this via email shortly.\n- **Refund**: Once we receive your book at our warehouse, we'll process a refund to your original payment method within 5-7 business days.\n\nSince this was a duplicate gift, you're eligible for a full refund including the book's cost. Just make sure the book is unread and in the condition you received it when you send it back.\n\nIs there anything else I can help you with?"
+      ],
+      "tools_called": [
+        "lookup_order",
+        "start_return"
+      ],
+      "docs": [
+        "shipping.md",
+        "returns.md",
+        "privacy.md"
+      ],
+      "tokens": {
+        "input": 4813,
+        "output": 880
+      },
+      "error": ""
+    },
+    {
+      "id": "return-too-late",
+      "tags": [
+        "returns",
+        "tools",
+        "policy"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "not_contains 'R-BB-1003'",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "contains '30'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "I've looked up your order BB-1003 and confirmed it was delivered on September 20, 2026. Unfortunately, according to our current return policy, you're only eligible for returns within **30 days of delivery**. Since your book was delivered 53 days ago, it's outside the acceptable window for a standard return.\n\nI've escalated this request to a human agent who can review your case further and see if there are any exceptions we can make. You'll receive a ticket number (T-1) for reference."
+      ],
+      "tools_called": [
+        "lookup_order",
+        "start_return",
+        "escalate_to_human"
+      ],
+      "docs": [
+        "returns.md",
+        "returns-2023.md",
+        "shipping.md"
+      ],
+      "tokens": {
+        "input": 4852,
+        "output": 1184
+      },
+      "error": ""
+    },
+    {
+      "id": "short-answer",
+      "tags": [
+        "style"
+      ],
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "max_words 60",
+          "passed": false,
+          "detail": "61 words"
+        }
+      ],
+      "replies": [
+        "Yes, we do ship to Canada! International shipping is available to Canada, the UK, and the EU. The cost is a flat $19.99 per order and typically takes 7-14 business days to deliver. Please note that there's no free international shipping, and import duties and taxes are charged by your country's customs on delivery and paid by you as the customer."
+      ],
+      "tools_called": [],
+      "docs": [
+        "international-shipping.md",
+        "shipping.md"
+      ],
+      "tokens": {
+        "input": 872,
+        "output": 210
+      },
+      "error": ""
+    }
+  ],
+  "totals": {
+    "cases": 10,
+    "passed": 9,
+    "errors": 0,
+    "checks": 17,
+    "checks_passed": 16
+  }
+}
