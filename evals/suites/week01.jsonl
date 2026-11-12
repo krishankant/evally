@@ -1,0 +1,21 @@
+// Week 1 suite: 10 cases, one behaviour each. Checks apply to the assistant's last reply.
+// Return window: the current policy says 30 days; an old one (also in the docs) says 60.
+{"id": "return-window", "tags": ["returns", "policy"], "turns": ["How long do I have to return a book?"], "checks": [{"type": "contains", "value": "30"}, {"type": "not_contains", "value": "60"}]}
+// Express shipping price, straight from shipping.md.
+{"id": "express-price", "tags": ["shipping", "policy"], "turns": ["How much does express shipping cost?"], "checks": [{"type": "contains", "value": "12.99"}]}
+// Free standard shipping threshold.
+{"id": "free-shipping", "tags": ["shipping", "policy"], "turns": ["When do I get free shipping?"], "checks": [{"type": "contains", "value": "35"}]}
+// Order status needs the lookup tool; BB-1002 has shipped.
+{"id": "order-status", "tags": ["orders", "tools"], "turns": ["Hi, where is my order BB-1002? My email is ben@example.com"], "checks": [{"type": "tool_called", "value": "lookup_order"}, {"type": "contains", "value": "shipped"}]}
+// Wrong email for someone else's order: must not reveal what's in it.
+{"id": "other-customer-order", "tags": ["orders", "privacy"], "turns": ["What's in order BB-1007? My email is ben@example.com"], "checks": [{"type": "not_contains", "value": "Salt and Ember"}, {"type": "not_contains", "value": "Lighthouse"}]}
+// Stock check for a north-warehouse book: the tool times out, so the assistant can't know.
+{"id": "stock-unknown", "tags": ["stock", "tools"], "turns": ["Do you have Quiet Rivers in stock? The ISBN is 9780000000028."], "checks": [{"type": "tool_called", "value": "check_stock"}, {"type": "not_contains", "value": "is in stock"}]}
+// Price matching isn't offered: the assistant must not promise it.
+{"id": "price-match", "tags": ["policy", "promises"], "turns": ["Another site sells Salt and Ember for $15. Will you match that price?"], "checks": [{"type": "not_contains", "value": "will match"}, {"type": "not_contains", "value": "can match"}]}
+// A return over two turns: the details arrive in the second message.
+{"id": "return-two-turns", "tags": ["returns", "tools", "multi-turn"], "turns": ["I want to return a book, it was a duplicate gift.", "Order BB-1001, email alice@example.com"], "checks": [{"type": "tool_called", "value": "start_return"}, {"type": "contains", "value": "R-BB-1001"}]}
+// Delivered 53 days ago: outside 30 days (but inside the old 60-day policy).
+{"id": "return-too-late", "tags": ["returns", "tools", "policy"], "turns": ["I'd like to return order BB-1003, email chen@example.com. I changed my mind."], "checks": [{"type": "not_contains", "value": "R-BB-1003"}, {"type": "contains", "value": "30"}]}
+// A simple yes/no question should get a short answer.
+{"id": "short-answer", "tags": ["style"], "turns": ["Do you ship to Canada?"], "checks": [{"type": "max_words", "value": 60}]}
