@@ -1,0 +1,24 @@
+{
+  "books": [
+    {"isbn": "9780000000011", "title": "The Lighthouse Keeper's Daughter", "author": "Mara Ellison", "price": 18.99, "warehouse": "east", "stock": 12},
+    {"isbn": "9780000000028", "title": "Quiet Rivers", "author": "Tomas Reyes", "price": 14.50, "warehouse": "north", "stock": 4},
+    {"isbn": "9780000000035", "title": "A Field Guide to Small Birds", "author": "June Okafor", "price": 24.00, "warehouse": "east", "stock": 0},
+    {"isbn": "9780000000042", "title": "The Clockmaker's Apprentice", "author": "Ivo Brandt", "price": 16.99, "warehouse": "north", "stock": 7},
+    {"isbn": "9780000000059", "title": "Salt and Ember", "author": "Priya Natarajan", "price": 21.00, "warehouse": "east", "stock": 3},
+    {"isbn": "9780000000066", "title": "Learning to Bake Bread", "author": "Sam Whitfield", "price": 29.95, "warehouse": "east", "stock": 9},
+    {"isbn": "9780000000073", "title": "The Last Orchard", "author": "Hana Sato", "price": 15.00, "warehouse": "north", "stock": 0},
+    {"isbn": "9780000000080", "title": "Maps of Forgotten Towns", "author": "Leo Marsh", "price": 19.50, "warehouse": "east", "stock": 5}
+  ],
+  "orders": [
+    {"id": "BB-1001", "email": "alice@example.com", "isbns": ["9780000000011"], "status": "delivered", "ordered": "2026-10-24", "delivered": "2026-10-28"},
+    {"id": "BB-1002", "email": "ben@example.com", "isbns": ["9780000000028", "9780000000042"], "status": "shipped", "ordered": "2026-11-08", "delivered": null},
+    {"id": "BB-1003", "email": "chen@example.com", "isbns": ["9780000000066"], "status": "delivered", "ordered": "2026-09-16", "delivered": "2026-09-20"},
+    {"id": "BB-1004", "email": "dana@example.com", "isbns": ["9780000000035"], "status": "placed", "ordered": "2026-11-11", "delivered": null},
+    {"id": "BB-1005", "email": "eli@example.com", "isbns": ["9780000000059"], "status": "cancelled", "ordered": "2026-11-02", "delivered": null},
+    {"id": "BB-1006", "email": "fay@example.com", "isbns": ["9780000000080"], "status": "delivered", "ordered": "2026-11-01", "delivered": "2026-11-05"},
+    {"id": "BB-1007", "email": "gus@example.com", "isbns": ["9780000000011", "9780000000059"], "status": "shipped", "ordered": "2026-11-09", "delivered": null},
+    {"id": "BB-1008", "email": "hal@example.com", "isbns": ["9780000000073"], "status": "delivered", "ordered": "2026-09-27", "delivered": "2026-10-01"},
+    {"id": "BB-1009", "email": "ivy@example.com", "isbns": ["9780000000042"], "status": "placed", "ordered": "2026-11-12", "delivered": null},
+    {"id": "BB-1010", "email": "jo@example.com", "isbns": ["9780000000028"], "status": "delivered", "ordered": "2026-11-06", "delivered": "2026-11-10"}
+  ]
+}
