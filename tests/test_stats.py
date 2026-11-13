@@ -1,6 +1,6 @@
 from evally import cli
 from evally.datasets.dimensions import DIMENSIONS
-from evally.datasets.stats import coverage, format_by_tag, format_coverage
+from evally.datasets.stats import coverage, format_by_check, format_by_tag, format_coverage
 from evally.evals_core.cases import Case
 from evally.evals_core.runner import CaseResult, RunResult
 
@@ -64,7 +64,7 @@ def test_run_by_unknown_dimension_message(tmp_path, monkeypatch, capsys):
     suite.write_text('{"id": "a", "turns": ["hi"], "checks": []}\n')
     assert cli.main(["run", "--suite", str(suite), "--by", "mood"]) == 1
     out = capsys.readouterr().out.strip()
-    assert out == "unknown dimension 'mood' (known: topic, difficulty, category, source)"
+    assert out == "unknown dimension 'mood' (known: topic, difficulty, category, source, check)"
 
 
 def test_dataset_stats_cli(tmp_path, monkeypatch, capsys):
@@ -78,3 +78,33 @@ def test_dataset_stats_cli(tmp_path, monkeypatch, capsys):
     (tmp_path / "evals/suites/bramble-v1-test.jsonl").write_text("")
     assert cli.main(["dataset", "stats", "bramble-v1"]) == 0
     assert "returns" in capsys.readouterr().out
+
+
+def cr(cid, *checks):
+    from evally.evals_core.checks import CheckResult
+    res = [CheckResult(name, ok, "") for name, ok in checks]
+    return CaseResult(cid, [], "PASS" if all(ok for _, ok in checks) else "FAIL", res)
+
+
+def test_by_check_counts_and_order():
+    text = format_by_check(run(cr("a", ("contains '30'", True), ("tool_called x", False)),
+                               cr("b", ("contains '5'", False), ("tool_called x", False)),
+                               cr("c", ("regex 'a'", True))))
+    lines = text.splitlines()
+    assert lines[0] == "by check type"
+    body = [l.split() for l in lines[2:]]
+    assert body == [["tool_called", "0/2", "0%", "1"], ["contains", "1/2", "50%", "0"], ["regex", "1/1", "100%", "0"]]
+
+
+def test_by_check_sole_fail_column():
+    text = format_by_check(run(cr("a", ("contains '30'", False), ("not_regex 'x'", False)),
+                               cr("b", ("contains '30'", False), ("not_regex 'x'", True))))
+    rows = {l.split()[0]: l.split() for l in text.splitlines()[2:]}
+    assert rows["contains"][3] == "1" and rows["not_regex"][3] == "0"
+
+
+def test_run_by_check_accepted(tmp_path, capsys):
+    suite = tmp_path / "s.jsonl"
+    suite.write_text('{"id": "a", "turns": ["hi"], "checks": []}\n')
+    assert cli.main(["run", "--suite", str(suite), "--by", "nope"]) == 1
+    assert "(known: topic, difficulty, category, source, check)" in capsys.readouterr().out

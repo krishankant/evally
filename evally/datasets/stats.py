@@ -46,3 +46,23 @@ def format_by_tag(result, dim: str) -> str:
     lines = [f"by {dim}", f"  {'value':<{w}}  passed   rate"]
     lines += [f"  {v:<{w}}  {f'{p}/{n}':>6}  {round(100 * p / n):>4}%" for v, p, n in rows]
     return "\n".join(lines)
+
+
+def format_by_check(result) -> str:
+    """Pass rates per check type, most failing first. `sole fail` counts the cases where this
+    type is the only failing check: the cases this check alone decides."""
+    counts: dict[str, list[int]] = {}
+    for case in result.cases:
+        failing = {c.name.split(" ", 1)[0] for c in case.checks if not c.passed}
+        for c in case.checks:
+            kind = c.name.split(" ", 1)[0]
+            row = counts.setdefault(kind, [0, 0, 0])
+            row[0] += c.passed
+            row[1] += 1
+        if len(failing) == 1:
+            counts[failing.pop()][2] += 1
+    rows = sorted(counts.items(), key=lambda kv: (kv[1][0] / kv[1][1], kv[0]))
+    w = max([len("type")] + [len(k) for k in counts])
+    lines = ["by check type", f"  {'type':<{w}}  passed   rate  sole fail"]
+    lines += [f"  {k:<{w}}  {f'{p}/{n}':>6}  {round(100 * p / n):>4}%  {sole:>9}" for k, (p, n, sole) in rows]
+    return "\n".join(lines)

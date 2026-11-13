@@ -12,7 +12,7 @@
     evally refusals <run>                which replies the refusal detector flags
     evally dataset build [--manifest F]  merge sources, split dev/test, write the lock file
     evally dataset stats bramble-v1      coverage per tag, dev vs test
-    evally run --suite S --by category   pass rates per tag value after the table
+    evally run --suite S --by category   pass rates per tag value after the table (--by check: per check type)
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ from evally.evals_core.traces import format_case_list, format_conversation, run_
 from evally.datasets.build import build
 from evally.datasets.dimensions import DIMENSIONS
 from evally.graders.refusal import refusal_match
-from evally.datasets.stats import coverage, format_by_tag, format_coverage
+from evally.datasets.stats import coverage, format_by_check, format_by_tag, format_coverage
 from evally.datasets.generate import generate, sample_combinations
 from evally.datasets.review import decisions_path, load_candidates, load_decisions, review_loop, save_decision, survival_report
 from evally.llm.cache import CachedModel, ReplayMiss
@@ -58,8 +58,8 @@ def _suite_path(name: str, cfg) -> Path:
 
 
 def cmd_run(args, cfg) -> int:
-    if args.by and args.by not in DIMENSIONS:
-        print(f"unknown dimension {args.by!r} (known: {', '.join(DIMENSIONS)})")
+    if args.by and args.by not in (*DIMENSIONS, "check"):
+        print(f"unknown dimension {args.by!r} (known: {', '.join(DIMENSIONS)}, check)")
         return 1
     model = _model(args, cfg)
     path = _suite_path(args.suite, cfg)
@@ -71,7 +71,7 @@ def cmd_run(args, cfg) -> int:
     result = run_suite(path.stem, cases, lambda: Assistant(model, Store.from_seed(), Retriever.from_dir()), model.name)
     print(format_table(result))
     if args.by:
-        print("\n" + format_by_tag(result, args.by))
+        print("\n" + (format_by_check(result) if args.by == "check" else format_by_tag(result, args.by)))
     print(f"\nsaved {save_run(result, cfg.runs_dir)}")
     return 0
 
@@ -230,7 +230,7 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--model", default=cfg.model)
         if name == "run":
             p.add_argument("--suite", required=True, help="suite name in evals/suites, or a .jsonl path")
-            p.add_argument("--by", help="also print pass rates per value of this tag dimension (e.g. category)")
+            p.add_argument("--by", help="also print pass rates per tag value (e.g. category), or per check type (check)")
         if name == "generate":
             p.add_argument("--dims", required=True, help="JSON file: dimension -> list of values")
             p.add_argument("--n", type=int, required=True, help="how many combinations to sample")
