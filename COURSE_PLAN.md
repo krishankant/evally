@@ -25,7 +25,7 @@ For each week: check out its branch, read the lesson with the code open beside i
 | :---: | --- | --- | --- |
 | **1** | [Baseline: the app and the vibe check](lessons/week01-baseline.md) | The bookstore assistant (docs, BM25 retrieval, tools, SQLite store, tool loop with trace); Ollama, OpenAI and Anthropic adapters; record/replay cache; 10 JSONL cases with five code checks; `evally chat` and `evally run`. Baseline 9/10 on local `qwen3.5:4b` | ✅ `week-01` |
 | **2** | [Error analysis](lessons/week02-error-analysis.md) | Full traces in every run; `evally traces`; `evally label` with notes, categories and a ranked report; 18 realistic conversations read and labelled (by the course author, marked as such). 10 of 18 fail, across six categories; week 1's checks partly cover two | ✅ `week-02` |
-| **3** | Test datasets | Tags, hand-written, generated and adversarial cases; dev/test split; dataset versions | coming |
+| **3** | [Test datasets](lessons/week03-test-datasets.md) | Dimension tags validated at load; `evally generate` and `evally review`; `evally dataset build` (hash-based, category-stratified dev/test split, lock file) and `dataset stats`; `run --by`. `bramble-v1`: 26 cases from four sources, 16 dev / 10 test. 4 of 7 generated messages kept (57%); coverage finds no preorders case and no privacy case in test. Dev 11/16, test 4/10 | ✅ `week-03` |
 | **4** | Code-based graders | Regex, JSON shape, tool + argument checks, refusal detection → then **DeepEval** | coming |
 | **5** | LLM as a grader | Rubric grader with structured output; pass/fail vs 1-5; grader biases → then **DeepEval G-Eval** | coming |
 | **6** | Testing the grader | Labels; accuracy, Cohen's kappa, precision/recall of "fail"; rubric tuning | coming |

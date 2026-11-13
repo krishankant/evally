@@ -1,6 +1,6 @@
 # evally
 
-**[Course Plan](COURSE_PLAN.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)** · **[Week 2: Error analysis](lessons/week02-error-analysis.md)**
+**[Course Plan](COURSE_PLAN.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)** · **[Week 2: Error analysis](lessons/week02-error-analysis.md)** · **[Week 3: Test datasets](lessons/week03-test-datasets.md)**
 
 ---
 
@@ -16,7 +16,7 @@ No agent or RAG framework: plain Python plus the official model SDKs, so everyth
 
 ```bash
 uv sync
-uv run pytest                          # 85 tests, offline, no keys
+uv run pytest                          # 130 tests, offline, no keys
 uv run evally run --suite week01       # replay the recorded baseline: no key, no cost
 ```
 
@@ -44,6 +44,11 @@ Every model reply the lessons use is recorded in `evals/cache/` and committed, s
 | `uv run evally label <run> --labeler NAME` | label each conversation pass/fail with a note; resumes where you stopped |
 | `uv run evally label <run> --code` | put each fail note in a category (reuse by number or name a new one) |
 | `uv run evally label <run> --report` | fails per category, most first |
+| `uv run evally generate --dims F --n N --seed S --out F --live` | ask the model for one customer message per sampled combination of dimensions; `--skip-unrecorded` uses only recorded replies |
+| `uv run evally review <candidates.jsonl> --reviewer NAME` | keep or drop each generated candidate (a drop needs a reason); `--report` prints the survival rate |
+| `uv run evally dataset build` | merge `evals/datasets/bramble.json`'s sources, split dev/test, write the suites and the lock file |
+| `uv run evally dataset stats bramble-v1` | coverage per dimension, dev vs test; flags values missing from test |
+| `uv run evally run --suite bramble-v1-dev --by category` | pass rates per tag value after the table |
 | `--provider ollama\|openai\|anthropic --model <id>` | override `.env` for one command |
 | `uv run pytest` | the offline test suite |
 
@@ -66,3 +71,4 @@ See [COURSE_PLAN.md](COURSE_PLAN.md) for all 15. Done so far:
 | :---: | --- | --- |
 | 1 | [Baseline: the app and the vibe check](lessons/week01-baseline.md) | `week-01` |
 | 2 | [Error analysis](lessons/week02-error-analysis.md) | `week-02` |
+| 3 | [Test datasets](lessons/week03-test-datasets.md) | `week-03` |

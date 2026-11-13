@@ -1,6 +1,6 @@
 # Week 2: Error analysis
 
-**[← Week 1: Baseline](week01-baseline.md)** · **[Course Plan](../COURSE_PLAN.md)** · **Week 3: Test datasets →** *(coming)*
+**[← Week 1: Baseline](week01-baseline.md)** · **[Course Plan](../COURSE_PLAN.md)** · **[Week 3: Test datasets →](week03-test-datasets.md)**
 
 ---
 
