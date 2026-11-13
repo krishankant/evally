@@ -53,7 +53,7 @@ def run_case(case: Case, assistant: Assistant) -> CaseResult:
             tin, tout = tin + turn.usage.input_tokens, tout + turn.usage.output_tokens
     except ReplayMiss as e:
         return CaseResult(case.id, case.tags, "ERROR", replies=replies, error=str(e), turns=turns)
-    checks = [run_check(c, turn) for c in case.checks]
+    checks = [run_check(c, turn, list(case.turns)) for c in case.checks]
     docs = next((s.data["docs"] for s in turn.trace if s.kind == "retrieve"), [])
     if not checks:
         status = "UNCHECKED"
