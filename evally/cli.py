@@ -8,6 +8,7 @@
     evally label <run> --code           group the fail notes into categories
     evally label <run> --report         fails per category, most first
     evally generate --dims F --n N --seed S --out F [--live]   candidate cases from dimensions
+    evally review <candidates.jsonl> [--report]                 keep/drop each candidate
 """
 
 from __future__ import annotations
@@ -28,6 +29,7 @@ from evally.evals_core.runner import format_table, load_run, run_suite, save_run
 from evally.evals_core.labels import append_label, code_loop, format_report, label_loop, labels_path, load_labels
 from evally.evals_core.traces import format_case_list, format_conversation, run_path
 from evally.datasets.generate import generate, sample_combinations
+from evally.datasets.review import decisions_path, load_candidates, load_decisions, review_loop, save_decision, survival_report
 from evally.llm.cache import CachedModel, ReplayMiss
 from evally.llm.factory import make_model
 from evally.types import Message
@@ -139,6 +141,23 @@ def cmd_generate(args, cfg) -> int:
     return 0
 
 
+def cmd_review(args, cfg) -> int:
+    path = Path(args.candidates)
+    if not path.exists():
+        print(f"no candidates file {path}")
+        return 1
+    candidates = load_candidates(path)
+    store = decisions_path(path)
+    existing = load_decisions(store)
+    if args.report:
+        print(survival_report(path.stem, candidates, existing))
+        return 0
+    print(f"reviewing {path.stem}: {sum(c.id in existing for c in candidates)} of {len(candidates)} "
+          f"already reviewed, saving to {store}\n")
+    review_loop(candidates, existing, args.reviewer, input, print, lambda d: save_decision(store, d))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     cfg = config_mod.load()
     parser = argparse.ArgumentParser(prog="evally")
@@ -166,7 +185,13 @@ def main(argv: list[str] | None = None) -> int:
     mode = p.add_mutually_exclusive_group()
     mode.add_argument("--code", action="store_true", help="put each fail label in a category")
     mode.add_argument("--report", action="store_true", help="print fails per category, most first")
+    p = sub.add_parser("review", help="keep or drop generated candidates")
+    p.add_argument("candidates", help="candidates .jsonl from evally generate")
+    p.add_argument("--reviewer", default="human", help="who is reviewing; recorded with every decision")
+    p.add_argument("--report", action="store_true", help="print the survival rate and drop reasons")
     args = parser.parse_args(argv)
+    if args.cmd == "review":
+        return cmd_review(args, cfg)
     if args.cmd == "traces":
         return cmd_traces(args, cfg)
     if args.cmd == "label":

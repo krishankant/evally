@@ -12,11 +12,11 @@ when a case is labelled twice, the last line wins.
 
 from __future__ import annotations
 
-import json
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Literal
 
+from evally.evals_core.jsonl_store import append_record, load_last_wins
 from evally.evals_core.traces import format_conversation
 
 Ask = Callable[[str], str]
@@ -38,22 +38,11 @@ def labels_path(run_name: str, labels_dir: Path) -> Path:
 
 
 def load_labels(path: Path) -> dict[str, Label]:
-    path = Path(path)
-    if not path.exists():
-        return {}
-    labels: dict[str, Label] = {}
-    for line in path.read_text().splitlines():
-        if line.strip():
-            label = Label(**json.loads(line))
-            labels[label.case_id] = label
-    return labels
+    return load_last_wins(path, Label, lambda lab: lab.case_id)
 
 
 def append_label(path: Path, label: Label) -> None:
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a") as f:
-        f.write(json.dumps(asdict(label), ensure_ascii=False) + "\n")
+    append_record(path, label)
 
 
 def _ask_until(ask: Ask, prompt: str, ok: Callable[[str], bool]) -> str:
@@ -90,7 +79,7 @@ def label_loop(run: dict, run_name: str, existing: dict[str, Label], labeler: st
     return done
 
 
-def _normalise(name: str) -> str:
+def normalise(name: str) -> str:
     return "-".join(name.lower().split())
 
 
@@ -117,7 +106,7 @@ def code_loop(labels: dict[str, Label], ask: Ask, say: Say, save: Callable[[Labe
             answer = _ask_until(ask, "category (number, or a new name; q to stop): ", valid)
             if answer.lower() == "q":
                 break
-            name = categories[int(answer) - 1] if answer.isdigit() else _normalise(answer)
+            name = categories[int(answer) - 1] if answer.isdigit() else normalise(answer)
             if name not in categories:
                 categories.append(name)
             new = Label(lab.run, lab.case_id, lab.verdict, lab.note, name, lab.labeler)
