@@ -1,6 +1,6 @@
 {
  "name": "bramble",
- "version": 1,
+ "version": 2,
  "sources": [
   "evals/datasets/bramble/hand.jsonl",
   "evals/datasets/bramble/traffic.jsonl",

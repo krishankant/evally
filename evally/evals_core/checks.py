@@ -95,11 +95,14 @@ def check_args_shape(turn: Turn, value: dict) -> CheckResult:
 
 
 def check_args_grounded(turn: Turn, value: dict, customer: list[str]) -> CheckResult:
-    """Every call to the tool uses argument values the customer actually wrote (no invented ids)."""
+    """Every call to the tool uses argument values the customer actually wrote (no invented ids).
+
+    A rule about the calls that happen, not a demand to call: no call passes (with a note).
+    Pair it with tool_called when a call is required."""
     tool, names = value["tool"], value["args"]
     calls = _calls(turn, tool)
     if not calls:
-        return _not_called("args_grounded", tool)
+        return CheckResult(f"args_grounded {tool} {names}", True, f"{tool} was not called")
     said = "\n".join(customer).lower()
     for args in calls:
         for k in names:

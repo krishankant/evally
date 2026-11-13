@@ -135,7 +135,6 @@ def test_args_grounded_passes_when_given():
 @pytest.mark.parametrize("ctype,value", [
     ("tool_args", {"tool": "start_return", "args": {"order_id": "BB-1001"}}),
     ("args_shape", {"tool": "start_return", "args": {"order_id": "BB-.*"}}),
-    ("args_grounded", {"tool": "start_return", "args": ["order_id"]}),
 ])
 def test_tool_checks_fail_when_tool_not_called(ctype, value):
     r = run_check({"type": ctype, "value": value}, calls(("lookup_order", {"order_id": "BB-1001"})), ["BB-1001"])
@@ -163,3 +162,11 @@ def test_non_string_args(arg):
 def test_tool_check_values_validated(tmp_path, check):
     with pytest.raises(ValueError, match=rf":2: {check['type']}: "):
         load_cases(suite_file(tmp_path, [check]))
+
+
+def test_args_grounded_passes_when_tool_not_called():
+    # grounded is a rule about calls that happen ("don't invent arguments"), not a demand to call;
+    # pair it with tool_called when a call is required
+    r = run_check({"type": "args_grounded", "value": {"tool": "start_return", "args": ["order_id"]}},
+                  calls(("lookup_order", {"order_id": "BB-1001"})), ["BB-1001"])
+    assert r.passed and r.detail == "start_return was not called"
