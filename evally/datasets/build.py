@@ -53,13 +53,6 @@ def build(manifest_path: Path, suites_dir: Path, datasets_dir: Path) -> Path:
     name, version = manifest["name"], manifest["version"]
     stem = f"{name}-v{version}"
     sources = {src: hashlib.sha256(Path(src).read_bytes()).hexdigest() for src in manifest["sources"]}
-    lock_path = Path(datasets_dir) / f"{stem}.lock.json"
-    if lock_path.exists():
-        if json.loads(lock_path.read_text())["sources"] == sources:
-            return lock_path
-        raise ValueError(f'{name} v{version} already built from different sources; '
-                         f'bump "version" in {manifest_path}')
-
     cases: list[Case] = []
     seen: dict[str, str] = {}
     for src in manifest["sources"]:
@@ -68,6 +61,13 @@ def build(manifest_path: Path, suites_dir: Path, datasets_dir: Path) -> Path:
                 raise ValueError(f"case id {c.id!r} is in both {seen[c.id]} and {src}")
             seen[c.id] = src
             cases.append(c)
+
+    lock_path = Path(datasets_dir) / f"{stem}.lock.json"
+    if lock_path.exists():
+        if json.loads(lock_path.read_text())["sources"] == sources:
+            return lock_path
+        raise ValueError(f'{name} v{version} already built from different sources; '
+                         f'bump "version" in {manifest_path}')
 
     dev, test, moved = split(cases, manifest["test_share"])
     suites_dir, datasets_dir = Path(suites_dir), Path(datasets_dir)

@@ -61,7 +61,11 @@ def cmd_run(args, cfg) -> int:
         return 1
     model = _model(args, cfg)
     path = _suite_path(args.suite, cfg)
-    cases = load_cases(path)
+    try:
+        cases = load_cases(path)
+    except ValueError as e:
+        print(e)
+        return 1
     result = run_suite(path.stem, cases, lambda: Assistant(model, Store.from_seed(), Retriever.from_dir()), model.name)
     print(format_table(result))
     if args.by:
@@ -186,8 +190,12 @@ def cmd_dataset(args, cfg) -> int:
     if not lock.exists():
         print(f"no dataset {args.name} (no {lock}); run evally dataset build")
         return 1
-    dev = load_cases(cfg.suites_dir / f"{args.name}-dev.jsonl")
-    test = load_cases(cfg.suites_dir / f"{args.name}-test.jsonl")
+    try:
+        dev = load_cases(cfg.suites_dir / f"{args.name}-dev.jsonl")
+        test = load_cases(cfg.suites_dir / f"{args.name}-test.jsonl")
+    except ValueError as e:
+        print(e)
+        return 1
     print(format_coverage(args.name, coverage(dev, test), len(dev), len(test)))
     return 0
 

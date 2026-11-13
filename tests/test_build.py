@@ -121,3 +121,13 @@ def test_dataset_build_cli(tmp_path, monkeypatch, capsys):
     assert cli.main(["dataset", "build", "--manifest", str(m)]) == 0
     assert "bramble-v1: " in capsys.readouterr().out
     assert (tmp_path / "evals/suites/bramble-v1-dev.jsonl").exists()
+
+
+def test_bad_tag_reported_before_version_check(tmp_path):
+    m, suites, ds = project(tmp_path, {"hand": [case("a"), case("b")]})
+    build(m, suites, ds)
+    bad = case("c")
+    bad["tags"] = ["topic:shippng"]
+    project(tmp_path, {"hand": [case("a"), case("b"), bad]})
+    with pytest.raises(ValueError, match="shippng"):
+        build(m, suites, ds)

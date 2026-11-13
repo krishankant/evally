@@ -57,3 +57,11 @@ def test_category_values_are_week2_taxonomy():
         "none", "cant-find-book-by-title", "goes-beyond-policy", "misses-the-relevant-policy",
         "unsupported-claims", "needless-escalation", "uses-outdated-policy",
     }
+
+
+def test_run_with_bad_tag_prints_one_line(tmp_path, capsys):
+    from evally import cli
+    p = write_case(tmp_path, ["topic:shippng"])
+    assert cli.main(["run", "--suite", str(p)]) == 1
+    out = capsys.readouterr().out.strip()
+    assert out.startswith(f"{p}:2: unknown topic 'shippng'") and "\n" not in out
