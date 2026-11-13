@@ -11,6 +11,7 @@ from typing import Callable
 
 from evally.app.assistant import Turn
 from evally.app.tools import TOOLS
+from evally.graders.refusal import refusal_match
 
 TOOL_NAMES = tuple(t.name for t in TOOLS)
 
@@ -109,6 +110,16 @@ def check_args_grounded(turn: Turn, value: dict, customer: list[str]) -> CheckRe
     return CheckResult(f"args_grounded {tool} {names}", True, "")
 
 
+def check_refuses(turn: Turn, value: bool) -> CheckResult:
+    m = refusal_match(turn.reply)
+    return CheckResult("refuses", m is not None, f"matched {m!r}" if m else "no refusal phrase found")
+
+
+def check_not_refuses(turn: Turn, value: bool) -> CheckResult:
+    m = refusal_match(turn.reply)
+    return CheckResult("not_refuses", m is None, f"refusal phrase {m!r}" if m else "")
+
+
 CHECKS = {
     "contains": check_contains,
     "not_contains": check_not_contains,
@@ -120,6 +131,8 @@ CHECKS = {
     "tool_args": check_tool_args,
     "args_shape": check_args_shape,
     "args_grounded": check_args_grounded,
+    "refuses": check_refuses,
+    "not_refuses": check_not_refuses,
 }
 
 
@@ -180,6 +193,8 @@ VALIDATORS: dict[str, Callable[[object], str | None]] = {
     "tool_args": lambda v: _tool_value(v, "values"),
     "args_shape": lambda v: _tool_value(v, "patterns"),
     "args_grounded": lambda v: _tool_value(v, "list"),
+    "refuses": lambda v: None if v is True else "value must be true",
+    "not_refuses": lambda v: None if v is True else "value must be true",
 }
 
 

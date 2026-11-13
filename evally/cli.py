@@ -9,6 +9,7 @@
     evally label <run> --report         fails per category, most first
     evally generate --dims F --n N --seed S --out F [--live]   candidate cases from dimensions
     evally review <candidates.jsonl> [--report]                 keep/drop each candidate
+    evally refusals <run>                which replies the refusal detector flags
     evally dataset build [--manifest F]  merge sources, split dev/test, write the lock file
     evally dataset stats bramble-v1      coverage per tag, dev vs test
     evally run --suite S --by category   pass rates per tag value after the table
@@ -33,6 +34,7 @@ from evally.evals_core.labels import append_label, code_loop, format_report, lab
 from evally.evals_core.traces import format_case_list, format_conversation, run_path
 from evally.datasets.build import build
 from evally.datasets.dimensions import DIMENSIONS
+from evally.graders.refusal import refusal_match
 from evally.datasets.stats import coverage, format_by_tag, format_coverage
 from evally.datasets.generate import generate, sample_combinations
 from evally.datasets.review import decisions_path, load_candidates, load_decisions, review_loop, save_decision, survival_report
@@ -173,6 +175,21 @@ def cmd_review(args, cfg) -> int:
     return 0
 
 
+def cmd_refusals(args, cfg) -> int:
+    run = _load_run(args.run, cfg)
+    if run is None:
+        return 1
+    w = max([len(c["id"]) for c in run["cases"]] + [2])
+    flagged = 0
+    for case in run["cases"]:
+        last = case["replies"][-1] if case.get("replies") else ""
+        m = refusal_match(last)
+        flagged += m is not None
+        print(f"{case['id']:<{w}}  REFUSES  \"{m}\"" if m else f"{case['id']:<{w}}  -")
+    print(f"{flagged} of {len(run['cases'])} replies flagged")
+    return 0
+
+
 def cmd_dataset(args, cfg) -> int:
     if args.action == "build":
         try:
@@ -234,6 +251,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("candidates", help="candidates .jsonl from evally generate")
     p.add_argument("--reviewer", default="human", help="who is reviewing; recorded with every decision")
     p.add_argument("--report", action="store_true", help="print the survival rate and drop reasons")
+    p = sub.add_parser("refusals", help="list which saved replies the refusal detector flags")
+    p.add_argument("run", help="run name in evals/runs or a .json path")
     p = sub.add_parser("dataset", help="build and inspect versioned datasets")
     dsub = p.add_subparsers(dest="action", required=True)
     b = dsub.add_parser("build", help="merge sources, split dev/test, write the lock file")
@@ -243,6 +262,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.cmd == "dataset":
         return cmd_dataset(args, cfg)
+    if args.cmd == "refusals":
+        return cmd_refusals(args, cfg)
     if args.cmd == "review":
         return cmd_review(args, cfg)
     if args.cmd == "traces":
