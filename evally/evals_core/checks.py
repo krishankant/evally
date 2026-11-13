@@ -61,6 +61,54 @@ def check_not_regex(turn: Turn, value: str) -> CheckResult:
     return CheckResult(f"not_regex {value!r}", m is None, "" if m is None else f"reply matches: {m.group(0)!r}")
 
 
+def _calls(turn: Turn, tool: str) -> list[dict]:
+    return [s.data.get("arguments") or {} for s in turn.trace if s.kind == "tool" and s.data["name"] == tool]
+
+
+def _not_called(kind: str, tool: str) -> CheckResult:
+    return CheckResult(f"{kind} {tool}", False, f"{tool} was not called")
+
+
+def check_tool_args(turn: Turn, value: dict) -> CheckResult:
+    """Some call to the tool has every listed argument with exactly this value."""
+    tool, want = value["tool"], value["args"]
+    calls = _calls(turn, tool)
+    if not calls:
+        return _not_called("tool_args", tool)
+    ok = any(all(k in args and args[k] == v for k, v in want.items()) for args in calls)
+    return CheckResult(f"tool_args {tool} {want}", ok, "" if ok else f"calls: {calls}")
+
+
+def check_args_shape(turn: Turn, value: dict) -> CheckResult:
+    """Every call to the tool has every listed argument as text fully matching its pattern."""
+    tool, shape = value["tool"], value["args"]
+    calls = _calls(turn, tool)
+    if not calls:
+        return _not_called("args_shape", tool)
+    for args in calls:
+        for k, pattern in shape.items():
+            v = args.get(k)
+            if not isinstance(v, str) or re.fullmatch(pattern, v) is None:
+                return CheckResult(f"args_shape {tool}", False, f"{k}={v!r} doesn't match {pattern!r}")
+    return CheckResult(f"args_shape {tool}", True, "")
+
+
+def check_args_grounded(turn: Turn, value: dict, customer: list[str]) -> CheckResult:
+    """Every call to the tool uses argument values the customer actually wrote (no invented ids)."""
+    tool, names = value["tool"], value["args"]
+    calls = _calls(turn, tool)
+    if not calls:
+        return _not_called("args_grounded", tool)
+    said = "\n".join(customer).lower()
+    for args in calls:
+        for k in names:
+            v = args.get(k)
+            if isinstance(v, bool) or not isinstance(v, (str, int, float)) or str(v).lower() not in said:
+                return CheckResult(f"args_grounded {tool} {names}", False,
+                                   f"{k}={v!r} isn't in anything the customer wrote")
+    return CheckResult(f"args_grounded {tool} {names}", True, "")
+
+
 CHECKS = {
     "contains": check_contains,
     "not_contains": check_not_contains,
@@ -69,6 +117,9 @@ CHECKS = {
     "max_words": check_max_words,
     "regex": check_regex,
     "not_regex": check_not_regex,
+    "tool_args": check_tool_args,
+    "args_shape": check_args_shape,
+    "args_grounded": check_args_grounded,
 }
 
 
@@ -97,6 +148,25 @@ def _pattern(value) -> str | None:
     return None
 
 
+def _tool_value(value, args_kind: str) -> str | None:
+    if not isinstance(value, dict) or "tool" not in value or "args" not in value:
+        return 'value must be {"tool": ..., "args": ...}'
+    if err := _tool(value["tool"]):
+        return err
+    args = value["args"]
+    if args_kind == "list":
+        if not isinstance(args, list) or not args or not all(isinstance(a, str) for a in args):
+            return "args must be a list of argument names"
+        return None
+    if not isinstance(args, dict) or not args:
+        return "args must be an object of argument: value"
+    if args_kind == "patterns":
+        for k, pattern in args.items():
+            if err := _pattern(pattern):
+                return f"{k}: {err}"
+    return None
+
+
 # One validator per check type: an error message, or None. load_cases runs them, so a bad
 # value stops every command that reads the case file, naming the file and line.
 VALIDATORS: dict[str, Callable[[object], str | None]] = {
@@ -107,6 +177,9 @@ VALIDATORS: dict[str, Callable[[object], str | None]] = {
     "max_words": _count,
     "regex": _pattern,
     "not_regex": _pattern,
+    "tool_args": lambda v: _tool_value(v, "values"),
+    "args_shape": lambda v: _tool_value(v, "patterns"),
+    "args_grounded": lambda v: _tool_value(v, "list"),
 }
 
 
@@ -118,4 +191,4 @@ def run_check(check: dict, turn: Turn, customer: list[str] | None = None) -> Che
     return fn(turn, check["value"])
 
 
-NEEDS_CUSTOMER: set[str] = set()
+NEEDS_CUSTOMER = {"args_grounded"}

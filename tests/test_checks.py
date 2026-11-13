@@ -90,3 +90,76 @@ def test_week01_and_bramble_v1_still_load():
     root = Path(__file__).resolve().parent.parent
     for name in ("week01", "bramble-v1-dev", "bramble-v1-test"):
         assert load_cases(root / "evals/suites" / f"{name}.jsonl")
+
+
+# --- week 4: tool-argument checks ---------------------------------------------------------
+
+def calls(*pairs):
+    return Turn("ok", [TraceStep("tool", {"name": n, "arguments": a, "result": "", "is_error": False}) for n, a in pairs])
+
+
+RETURN = calls(("lookup_order", {"order_id": "BB-1001", "email": "alice@example.com"}),
+               ("start_return", {"order_id": "BB-1001", "email": "alice@example.com", "reason": "duplicate gift"}))
+
+
+def test_tool_args_subset_match():
+    assert run_check({"type": "tool_args", "value": {"tool": "start_return", "args": {"order_id": "BB-1001"}}}, RETURN).passed
+
+
+def test_tool_args_wrong_value_shows_actual():
+    r = run_check({"type": "tool_args", "value": {"tool": "start_return", "args": {"order_id": "BB-1002"}}}, RETURN)
+    assert not r.passed and "BB-1001" in r.detail
+    assert r.name.startswith("tool_args")
+
+
+def test_args_shape_fullmatch():
+    shape = {"type": "args_shape", "value": {"tool": "lookup_order", "args": {"order_id": r"BB-\d{4}"}}}
+    assert run_check(shape, RETURN).passed
+    r = run_check(shape, calls(("lookup_order", {"order_id": "BB-1001x"})))
+    assert not r.passed and "order_id" in r.detail and "BB-1001x" in r.detail
+
+
+def test_args_grounded_catches_invented_email():
+    turn = calls(("lookup_order", {"order_id": "BB-1001", "email": "user@example.com"}))
+    r = run_check({"type": "args_grounded", "value": {"tool": "lookup_order", "args": ["order_id", "email"]}},
+                  turn, ["my book arrived with the cover torn"])
+    assert not r.passed and "order_id" in r.detail
+
+
+def test_args_grounded_passes_when_given():
+    r = run_check({"type": "args_grounded", "value": {"tool": "start_return", "args": ["order_id", "email"]}},
+                  RETURN, ["I want to return a book.", "Order bb-1001, email Alice@example.com"])
+    assert r.passed
+
+
+@pytest.mark.parametrize("ctype,value", [
+    ("tool_args", {"tool": "start_return", "args": {"order_id": "BB-1001"}}),
+    ("args_shape", {"tool": "start_return", "args": {"order_id": "BB-.*"}}),
+    ("args_grounded", {"tool": "start_return", "args": ["order_id"]}),
+])
+def test_tool_checks_fail_when_tool_not_called(ctype, value):
+    r = run_check({"type": ctype, "value": value}, calls(("lookup_order", {"order_id": "BB-1001"})), ["BB-1001"])
+    assert not r.passed and r.detail == "start_return was not called"
+
+
+@pytest.mark.parametrize("arg", [1001, None, {"a": 1}])
+def test_non_string_args(arg):
+    turn = calls(("lookup_order", {"order_id": arg}))
+    assert not run_check({"type": "tool_args", "value": {"tool": "lookup_order", "args": {"order_id": "1001"}}}, turn).passed
+    r = run_check({"type": "args_shape", "value": {"tool": "lookup_order", "args": {"order_id": r"\d+"}}}, turn)
+    assert not r.passed and "order_id" in r.detail
+    assert not run_check({"type": "args_grounded", "value": {"tool": "lookup_order", "args": ["order_id"]}},
+                         turn, ["order 1001"]).passed or arg == 1001
+
+
+@pytest.mark.parametrize("check", [
+    {"type": "tool_args", "value": {"args": {"order_id": "BB-1"}}},
+    {"type": "tool_args", "value": {"tool": "refund_money", "args": {}}},
+    {"type": "tool_args", "value": {"tool": "lookup_order", "args": "BB-1001"}},
+    {"type": "args_shape", "value": {"tool": "lookup_order", "args": {"order_id": "(bad"}}},
+    {"type": "args_grounded", "value": {"tool": "lookup_order", "args": "order_id"}},
+    {"type": "args_grounded", "value": "lookup_order"},
+])
+def test_tool_check_values_validated(tmp_path, check):
+    with pytest.raises(ValueError, match=rf":2: {check['type']}: "):
+        load_cases(suite_file(tmp_path, [check]))
