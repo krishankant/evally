@@ -1,0 +1,5 @@
+{
+  "topic": ["returns", "shipping", "international", "orders", "stock", "membership", "gift-cards", "damaged", "preorders"],
+  "persona": ["polite", "annoyed", "confused", "in a hurry"],
+  "phrasing": ["uses the store's own words", "own casual words", "typos and no punctuation"]
+}

@@ -7,11 +7,13 @@
     evally label <run>                  label each conversation pass/fail with a note
     evally label <run> --code           group the fail notes into categories
     evally label <run> --report         fails per category, most first
+    evally generate --dims F --n N --seed S --out F [--live]   candidate cases from dimensions
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 import anthropic
@@ -25,7 +27,8 @@ from evally.evals_core.cases import load_cases
 from evally.evals_core.runner import format_table, load_run, run_suite, save_run, slug
 from evally.evals_core.labels import append_label, code_loop, format_report, label_loop, labels_path, load_labels
 from evally.evals_core.traces import format_case_list, format_conversation, run_path
-from evally.llm.cache import CachedModel
+from evally.datasets.generate import generate, sample_combinations
+from evally.llm.cache import CachedModel, ReplayMiss
 from evally.llm.factory import make_model
 from evally.types import Message
 
@@ -119,11 +122,28 @@ def cmd_label(args, cfg) -> int:
     return 0
 
 
+def cmd_generate(args, cfg) -> int:
+    dims = json.loads(Path(args.dims).read_text())
+    combos = sample_combinations(dims, args.n, args.seed)
+    try:
+        candidates, dropped = generate(_model(args, cfg), combos)
+    except ReplayMiss as e:
+        print(e)
+        return 1
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text("".join(json.dumps({"id": c.id, "text": c.text, "dims": c.dims}) + "\n" for c in candidates))
+    reasons = ", ".join(f"{k} {v}" for k, v in sorted(dropped.items()))
+    total = sum(dropped.values())
+    print(f"generated {len(candidates)}, dropped {total}" + (f" ({reasons})" if reasons else "") + f"\nsaved {out}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     cfg = config_mod.load()
     parser = argparse.ArgumentParser(prog="evally")
     sub = parser.add_subparsers(dest="cmd", required=True)
-    for name, live_default in (("run", False), ("chat", True)):
+    for name, live_default in (("run", False), ("chat", True), ("generate", False)):
         p = sub.add_parser(name)
         p.add_argument("--live", action="store_true", default=live_default,
                        help="call the model (and record new replies) instead of replaying recordings")
@@ -132,6 +152,11 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--model", default=cfg.model)
         if name == "run":
             p.add_argument("--suite", required=True, help="suite name in evals/suites, or a .jsonl path")
+        if name == "generate":
+            p.add_argument("--dims", required=True, help="JSON file: dimension -> list of values")
+            p.add_argument("--n", type=int, required=True, help="how many combinations to sample")
+            p.add_argument("--seed", type=int, default=0)
+            p.add_argument("--out", required=True, help="candidates .jsonl to write")
     p = sub.add_parser("traces", help="read saved conversations from a run")
     p.add_argument("run", help="run name in evals/runs (like week01-qwen3.5-4b) or a .json path")
     p.add_argument("--case", help="show one conversation in full")
@@ -147,6 +172,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "label":
         return cmd_label(args, cfg)
     try:
+        if args.cmd == "generate":
+            return cmd_generate(args, cfg)
         return cmd_run(args, cfg) if args.cmd == "run" else cmd_chat(args, cfg)
     except CONNECTION_ERRORS:
         where = cfg.ollama_url if args.provider == "ollama" else args.provider
