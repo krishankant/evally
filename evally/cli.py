@@ -10,6 +10,8 @@
     evally generate --dims F --n N --seed S --out F [--live]   candidate cases from dimensions
     evally review <candidates.jsonl> [--report]                 keep/drop each candidate
     evally dataset build [--manifest F]  merge sources, split dev/test, write the lock file
+    evally dataset stats bramble-v1      coverage per tag, dev vs test
+    evally run --suite S --by category   pass rates per tag value after the table
 """
 
 from __future__ import annotations
@@ -30,6 +32,8 @@ from evally.evals_core.runner import format_table, load_run, run_suite, save_run
 from evally.evals_core.labels import append_label, code_loop, format_report, label_loop, labels_path, load_labels
 from evally.evals_core.traces import format_case_list, format_conversation, run_path
 from evally.datasets.build import build
+from evally.datasets.dimensions import DIMENSIONS
+from evally.datasets.stats import coverage, format_by_tag, format_coverage
 from evally.datasets.generate import generate, sample_combinations
 from evally.datasets.review import decisions_path, load_candidates, load_decisions, review_loop, save_decision, survival_report
 from evally.llm.cache import CachedModel, ReplayMiss
@@ -52,11 +56,16 @@ def _suite_path(name: str, cfg) -> Path:
 
 
 def cmd_run(args, cfg) -> int:
+    if args.by and args.by not in DIMENSIONS:
+        print(f"unknown dimension {args.by!r} (known: {', '.join(DIMENSIONS)})")
+        return 1
     model = _model(args, cfg)
     path = _suite_path(args.suite, cfg)
     cases = load_cases(path)
     result = run_suite(path.stem, cases, lambda: Assistant(model, Store.from_seed(), Retriever.from_dir()), model.name)
     print(format_table(result))
+    if args.by:
+        print("\n" + format_by_tag(result, args.by))
     print(f"\nsaved {save_run(result, cfg.runs_dir)}")
     return 0
 
@@ -173,7 +182,14 @@ def cmd_dataset(args, cfg) -> int:
         print(f"{stem}: {len(d['dev'])} dev, {len(d['test'])} test{moved}\n"
               f"suites {cfg.suites_dir}/{stem}-dev.jsonl, {cfg.suites_dir}/{stem}-test.jsonl\nlock {lock}")
         return 0
-    return 1
+    lock = cfg.datasets_dir / f"{args.name}.lock.json"
+    if not lock.exists():
+        print(f"no dataset {args.name} (no {lock}); run evally dataset build")
+        return 1
+    dev = load_cases(cfg.suites_dir / f"{args.name}-dev.jsonl")
+    test = load_cases(cfg.suites_dir / f"{args.name}-test.jsonl")
+    print(format_coverage(args.name, coverage(dev, test), len(dev), len(test)))
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -189,6 +205,7 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--model", default=cfg.model)
         if name == "run":
             p.add_argument("--suite", required=True, help="suite name in evals/suites, or a .jsonl path")
+            p.add_argument("--by", help="also print pass rates per value of this tag dimension (e.g. category)")
         if name == "generate":
             p.add_argument("--dims", required=True, help="JSON file: dimension -> list of values")
             p.add_argument("--n", type=int, required=True, help="how many combinations to sample")
@@ -211,6 +228,8 @@ def main(argv: list[str] | None = None) -> int:
     dsub = p.add_subparsers(dest="action", required=True)
     b = dsub.add_parser("build", help="merge sources, split dev/test, write the lock file")
     b.add_argument("--manifest", default=str(cfg.datasets_dir / "bramble.json"))
+    st = dsub.add_parser("stats", help="coverage per tag dimension, dev vs test")
+    st.add_argument("name", help="dataset name and version, like bramble-v1")
     args = parser.parse_args(argv)
     if args.cmd == "dataset":
         return cmd_dataset(args, cfg)
