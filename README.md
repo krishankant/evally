@@ -1,6 +1,6 @@
 # evally
 
-**[Course Plan](COURSE_PLAN.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)**
+**[Course Plan](COURSE_PLAN.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)** · **[Week 2: Error analysis](lessons/week02-error-analysis.md)**
 
 ---
 
@@ -16,7 +16,7 @@ No agent or RAG framework: plain Python plus the official model SDKs, so everyth
 
 ```bash
 uv sync
-uv run pytest                          # 51 tests, offline, no keys
+uv run pytest                          # 85 tests, offline, no keys
 uv run evally run --suite week01       # replay the recorded baseline: no key, no cost
 ```
 
@@ -40,6 +40,10 @@ Every model reply the lessons use is recorded in `evals/cache/` and committed, s
 | `uv run evally run --suite week01 --live` | call the model, record anything new, then grade |
 | `uv run evally run --suite path/to/cases.jsonl` | run any suite file |
 | `uv run evally chat` | talk to the assistant (live); shows the docs retrieved and tools called each turn |
+| `uv run evally traces <run>` | list a saved run's conversations; add `--case ID` to read one in full (docs, tool calls, results, replies) |
+| `uv run evally label <run> --labeler NAME` | label each conversation pass/fail with a note; resumes where you stopped |
+| `uv run evally label <run> --code` | put each fail note in a category (reuse by number or name a new one) |
+| `uv run evally label <run> --report` | fails per category, most first |
 | `--provider ollama\|openai\|anthropic --model <id>` | override `.env` for one command |
 | `uv run pytest` | the offline test suite |
 
@@ -49,6 +53,8 @@ Every model reply the lessons use is recorded in `evals/cache/` and committed, s
 | `evally/llm/` | one `Model` interface; Ollama/OpenAI, Anthropic and fake adapters; record/replay cache |
 | `evally/evals_core/` | cases, checks, runner, run report |
 | `evals/suites/` | test cases (JSONL) |
+| `evals/traffic/` | unchecked conversations standing in for real traffic |
+| `evals/labels/` | labels: verdict, note, category, labeller |
 | `evals/cache/`, `evals/runs/` | recorded model replies and saved run results |
 | `lessons/` | one lesson per week |
 
@@ -59,3 +65,4 @@ See [COURSE_PLAN.md](COURSE_PLAN.md) for all 15. Done so far:
 | Week | Lesson | Branch |
 | :---: | --- | --- |
 | 1 | [Baseline: the app and the vibe check](lessons/week01-baseline.md) | `week-01` |
+| 2 | [Error analysis](lessons/week02-error-analysis.md) | `week-02` |

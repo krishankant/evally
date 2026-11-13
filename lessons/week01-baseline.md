@@ -1,6 +1,6 @@
 # Week 1: Baseline, the app and the vibe check
 
-**[← Course Plan](../COURSE_PLAN.md)** · **[Repository Home](../README.md)** · **Week 2: Error analysis →** *(coming)*
+**[← Course Plan](../COURSE_PLAN.md)** · **[Repository Home](../README.md)** · **[Week 2: Error analysis →](week02-error-analysis.md)**
 
 ---
 
