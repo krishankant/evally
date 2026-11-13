@@ -67,7 +67,7 @@ def test_no_checks_is_unchecked():
     assert result.totals["unchecked"] == 1 and result.totals["passed"] == 0
     table = format_table(result)
     assert "UNCHECKED" in table
-    assert table.splitlines()[-1].endswith(", 1 unchecked")
+    assert table.splitlines()[-1] == "passed 0/0 checked cases, 0/0 checks, 1 unchecked"
 
 
 def test_week01_table_unchanged():

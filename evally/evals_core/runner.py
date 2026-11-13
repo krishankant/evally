@@ -101,7 +101,9 @@ def format_table(result: RunResult) -> str:
         why = c.error or "; ".join(f"{k.name} ({k.detail})" for k in c.checks if not k.passed)
         lines.append(f"  {c.id:<{width}}  {c.status:<{status_w}}  {why}".rstrip())
     t = result.totals
-    lines += ["", f"passed {t['passed']}/{t['cases']} cases, {t['checks_passed']}/{t['checks']} checks"
+    unchecked = t.get("unchecked", 0)
+    scope = f"{t['cases'] - unchecked} checked cases" if unchecked else f"{t['cases']} cases"
+    lines += ["", f"passed {t['passed']}/{scope}, {t['checks_passed']}/{t['checks']} checks"
               + (f", {t['errors']} errors" if t["errors"] else "")
               + (f", {t['unchecked']} unchecked" if t.get("unchecked") else "")]
     return "\n".join(lines)
