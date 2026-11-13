@@ -10,6 +10,10 @@ dependencies = [
     "python-dotenv>=1.2.4",
 ]
 
+[project.optional-dependencies]
+# week 4: the same code checks in DeepEval, for comparison (uv sync --extra deepeval)
+deepeval = ["deepeval==4.3.2"]
+
 [project.scripts]
 evally = "evally.cli:main"
 

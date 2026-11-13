@@ -10,6 +10,7 @@
     evally generate --dims F --n N --seed S --out F [--live]   candidate cases from dimensions
     evally review <candidates.jsonl> [--report]                 keep/drop each candidate
     evally refusals <run>                which replies the refusal detector flags
+    evally deepeval <run> --suite S --case ID   the same checks in DeepEval, side by side
     evally dataset build [--manifest F]  merge sources, split dev/test, write the lock file
     evally dataset stats bramble-v1      coverage per tag, dev vs test
     evally run --suite S --by category   pass rates per tag value after the table (--by check: per check type)
@@ -190,6 +191,29 @@ def cmd_refusals(args, cfg) -> int:
     return 0
 
 
+def cmd_deepeval(args, cfg) -> int:
+    try:
+        import deepeval  # noqa: F401  (optional extra)
+    except ImportError:
+        print("DeepEval isn't installed: uv sync --extra deepeval")
+        return 1
+    from evally.graders.deepeval_side import compare, format_compare
+    run = _load_run(args.run, cfg)
+    if run is None:
+        return 1
+    try:
+        cases = {c.id: c for c in load_cases(_suite_path(args.suite, cfg))}
+    except (ValueError, FileNotFoundError) as e:
+        print(e)
+        return 1
+    recorded = next((c for c in run["cases"] if c["id"] == args.case), None)
+    if recorded is None or args.case not in cases:
+        print(f"no case {args.case} in both {args.run} and {args.suite}")
+        return 1
+    print(format_compare(args.case, compare(cases[args.case], recorded)))
+    return 0
+
+
 def cmd_dataset(args, cfg) -> int:
     if args.action == "build":
         try:
@@ -253,6 +277,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--report", action="store_true", help="print the survival rate and drop reasons")
     p = sub.add_parser("refusals", help="list which saved replies the refusal detector flags")
     p.add_argument("run", help="run name in evals/runs or a .json path")
+    p = sub.add_parser("deepeval", help="run a saved case's checks in DeepEval too, side by side")
+    p.add_argument("run", help="run name in evals/runs or a .json path")
+    p.add_argument("--suite", required=True, help="the suite the run came from (for the checks)")
+    p.add_argument("--case", required=True)
     p = sub.add_parser("dataset", help="build and inspect versioned datasets")
     dsub = p.add_subparsers(dest="action", required=True)
     b = dsub.add_parser("build", help="merge sources, split dev/test, write the lock file")
@@ -264,6 +292,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_dataset(args, cfg)
     if args.cmd == "refusals":
         return cmd_refusals(args, cfg)
+    if args.cmd == "deepeval":
+        return cmd_deepeval(args, cfg)
     if args.cmd == "review":
         return cmd_review(args, cfg)
     if args.cmd == "traces":
