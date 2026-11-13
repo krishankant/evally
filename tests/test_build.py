@@ -131,3 +131,32 @@ def test_bad_tag_reported_before_version_check(tmp_path):
     project(tmp_path, {"hand": [case("a"), case("b"), bad]})
     with pytest.raises(ValueError, match="shippng"):
         build(m, suites, ds)
+
+
+def test_pinned_cases_never_move_even_when_rebalancing():
+    cases = [mk(f"{cat}-{i}", cat) for cat in ("goes-beyond-policy", "unsupported-claims", "needless-escalation",
+                                                "uses-outdated-policy") for i in range(2)]
+    dev, test, moved = split(cases, 0.4)
+    assert moved  # v1 needed rebalancing
+    pinned = {c.id: "dev" for c in dev} | {c.id: "test" for c in test}
+    more = cases + [mk(f"{cat}-new{j}", cat) for cat in ("goes-beyond-policy", "unsupported-claims",
+                                                         "needless-escalation", "uses-outdated-policy")
+                    for j in range(3)]
+    dev2, test2, moved2 = split(more, 0.4, pinned)
+    assert {c.id for c in dev} <= {c.id for c in dev2}
+    assert {c.id for c in test} <= {c.id for c in test2}
+    assert all(m not in pinned for m in moved2)
+
+
+def test_new_version_keeps_every_old_case_in_its_half(tmp_path):
+    v1 = [case(f"cant-{i}", "cant-find-book-by-title") for i in range(2)] + \
+         [case(f"miss-{i}", "misses-the-relevant-policy") for i in range(2)] + [case(f"n{i}") for i in range(6)]
+    m, suites, ds = project(tmp_path, {"hand": v1})
+    lock1 = json.loads(build(m, suites, ds).read_text())
+    added = [case(f"cant-new{i}", "cant-find-book-by-title") for i in range(4)] + \
+            [case(f"miss-new{i}", "misses-the-relevant-policy") for i in range(4)]
+    project(tmp_path, {"hand": v1 + added}, version=2)
+    lock2 = json.loads(build(m, suites, ds).read_text())
+    assert set(lock1["dev"]) <= set(lock2["dev"]) and set(lock1["test"]) <= set(lock2["test"])
+    assert lock2["pinned_from"] == 1
+    assert not set(lock2["moved"]) & set(lock1["dev"] + lock1["test"])

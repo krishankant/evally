@@ -16,7 +16,7 @@ No agent or RAG framework: plain Python plus the official model SDKs, so everyth
 
 ```bash
 uv sync
-uv run pytest                          # 130 tests, offline, no keys
+uv run pytest                          # 132 tests, offline, no keys
 uv run evally run --suite week01       # replay the recorded baseline: no key, no cost
 ```
 

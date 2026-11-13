@@ -9,7 +9,7 @@
 
 **You're done when:**
 
-1. `uv run pytest` passes (130 tests, offline, no keys needed),
+1. `uv run pytest` passes (132 tests, offline, no keys needed),
 2. you've reviewed the seven generated candidates yourself with `evally review` and compared your keep/drop calls with the course's, and
 3. you can explain, using the coverage table in section 9, why the dev and test pass rates in section 10 can't be compared as single numbers.
 
@@ -145,12 +145,13 @@ suites evals/suites/bramble-v1-dev.jsonl, evals/suites/bramble-v1-test.jsonl
 lock evals/datasets/bramble-v1.lock.json
 ```
 
-There are two rules, in this order:
+There are three rules, in this order:
 
-1. **Per case, by a hash of its id.** A case goes to test when the first 8 hex digits of `sha256(id)`, read as a fraction, fall below `test_share` (0.4). The rule never looks at the other cases, so **adding a case never moves an existing one** between dev and test. A random shuffle would reshuffle everything each time a case is added, and the test set would quietly stop being held out.
+1. **Per case, by a hash of its id.** A case goes to test when the first 8 hex digits of `sha256(id)`, read as a fraction, fall below `test_share` (0.4). The rule never looks at the other cases, so the same id always lands in the same half. A random shuffle would reshuffle everything each time a case is added, and the test set would quietly stop being held out.
 2. **Every category in both halves.** With 26 cases, the hash alone can put both of a category's cases on one side. So for any category with two or more cases and none in one half, the case closest to the line moves across. This time it moved 4: `t-refund-timing`, `stock-unknown`, `t-send-back-six-weeks` and `t-bird-guide-stock`. The moves are recorded in the lock file.
+3. **Earlier versions are pinned.** Rule 2 looks at the other cases in a category, so on its own it could undo rule 1's promise. Add a new `cant-find-book-by-title` case that hashes to test, and `t-bird-guide-stock` would no longer need moving, so it would drop back to dev. So when you build `bramble-v2`, every case `bramble-v1` had keeps its v1 half, and only new cases are hashed or moved. That's what makes **adding a case never moves an existing one** true. (The course's final review caught this: the first version of the build only had rules 1 and 2, and its stability test never added a case to a rebalanced category.)
 
-The first build put both of `cant-find-book-by-title`'s cases in dev, and back then that category had just one case. The stop check for this week is "every week 2 category has a case in test", so before anything was recorded, the second conversation from week 2 (`t-clockmaker-stock`) was added, along with `t-fast-to-toronto` for `misses-the-relevant-policy`.
+The first preview of the split had `cant-find-book-by-title`'s only case in dev. The stop check for this week is "every week 2 category has a case in test", so before anything was recorded, the second conversation from week 2 (`t-clockmaker-stock`) was added, along with `t-fast-to-toronto` for `misses-the-relevant-policy`.
 
 ## 9. Versioning, the lock file, and coverage
 
@@ -206,7 +207,7 @@ source           dev  test
 That's three findings before any model runs:
 - **Nothing tests preorders.**
 - **Privacy is never in test.** A fix that leaks order contents wouldn't show in a headline number.
-- **Every failure category has 1 to 3 cases per half.** Section 10 shows what that does to the numbers.
+- **Every failure category has 1 to 3 cases per half, and `needless-escalation` has none in dev.** It has only one case (`t-recommend-mystery`), so rule 2 can't balance it. A fix for it can't be tuned on dev until v2 adds a second case. Section 10 shows what such small counts do to the numbers.
 
 ## 10. First per-category pass rates
 
@@ -272,13 +273,13 @@ Asking for the order details first is a reasonable reply. The check was written 
 Write your answers in `NOTES.md`.
 
 1. **Review the candidates yourself.** Copy `evals/datasets/candidates/week03-generated.jsonl` into a folder of your own (its decisions file doesn't come with it), then run `uv run evally review <your copy> --reviewer "your name"`. Where do you disagree with the course's keep/drop calls? Is your survival rate higher or lower?
-2. **Build v2.** Fix `gen-3649b7b3`'s check (section 10) and add one `topic:preorders` case to `evals/datasets/bramble/hand.jsonl`, then run `uv run evally dataset build`. What does the build say? Bump the version and build `bramble-v2`. Did any v1 case change halves?
+2. **Build v2.** Fix `gen-3649b7b3`'s check (section 10) and add one `topic:preorders` case to `evals/datasets/bramble/hand.jsonl`, then run `uv run evally dataset build`. What does the build say? Bump the version and build `bramble-v2`. Compare `bramble-v2.lock.json` with v1's: did any v1 case change halves? What does `pinned_from` say?
 3. **Generate more** (needs Ollama). Run `evally generate` with `--n 6 --seed 7 --live` into a new file, review the results, and compare their survival rate with the course's 57%. Which persona or phrasing gets dropped most?
 4. **Write an attack.** Write one adversarial case for a flaw that isn't covered yet, such as the stock timeout (F2) or replies running long (F5). Which check type catches it, and which failure would still get through?
 
 ## 13. In one minute
 
-An eval is only as good as its test cases. We turned two weeks of work into a dataset of 26 test cases from four sources: hand-written, real failures, model-generated and adversarial. Every case is tagged by topic, difficulty and failure type. The model generated 7 candidate messages and we kept 4 (57%). The split into dev and test is decided by a hash, so adding a case never moves another, and every failure type lands in both halves. The coverage table found what we'd never noticed: nothing tests preorders, and privacy never appears in the held-out test set.
+An eval is only as good as its test cases. We turned two weeks of work into a dataset of 26 test cases from four sources: hand-written, real failures, model-generated and adversarial. Every case is tagged by topic, difficulty and failure type. The model generated 7 candidate messages and we kept 4 (57%). The split into dev and test is decided by a hash, and each new version keeps the old cases where they were, so adding a case never moves another. Every failure type has a case in the held-out test set. The coverage table found what we'd never noticed: nothing tests preorders, and privacy never appears in the held-out test set.
 
 ---
 
