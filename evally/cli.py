@@ -5,6 +5,8 @@
     evally chat                         talk to the bookstore assistant (live)
     evally traces <run> [--case ID]     read saved conversations
     evally label <run>                  label each conversation pass/fail with a note
+    evally label <run> --code           group the fail notes into categories
+    evally label <run> --report         fails per category, most first
 """
 
 from __future__ import annotations
@@ -21,7 +23,7 @@ from evally.app.retrieval import Retriever
 from evally.app.store import Store
 from evally.evals_core.cases import load_cases
 from evally.evals_core.runner import format_table, load_run, run_suite, save_run, slug
-from evally.evals_core.labels import append_label, label_loop, labels_path, load_labels
+from evally.evals_core.labels import append_label, code_loop, format_report, label_loop, labels_path, load_labels
 from evally.evals_core.traces import format_case_list, format_conversation, run_path
 from evally.llm.cache import CachedModel
 from evally.llm.factory import make_model
@@ -106,6 +108,12 @@ def cmd_label(args, cfg) -> int:
     name = run_path(args.run, cfg.runs_dir).stem
     path = labels_path(name, cfg.labels_dir)
     existing = load_labels(path)
+    if args.report:
+        print(format_report(name, existing, {c["id"] for c in run["cases"]}))
+        return 0
+    if args.code:
+        code_loop(existing, input, print, lambda lab: append_label(path, lab))
+        return 0
     print(f"labelling {name}: {len(existing)} of {len(run['cases'])} already labelled, saving to {path}\n")
     label_loop(run, name, existing, args.labeler, input, print, lambda lab: append_label(path, lab))
     return 0
@@ -130,6 +138,9 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("label", help="label saved conversations (error analysis)")
     p.add_argument("run", help="run name in evals/runs or a .json path")
     p.add_argument("--labeler", default="human", help="who is labelling; recorded with every label")
+    mode = p.add_mutually_exclusive_group()
+    mode.add_argument("--code", action="store_true", help="put each fail label in a category")
+    mode.add_argument("--report", action="store_true", help="print fails per category, most first")
     args = parser.parse_args(argv)
     if args.cmd == "traces":
         return cmd_traces(args, cfg)

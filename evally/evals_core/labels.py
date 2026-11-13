@@ -86,3 +86,67 @@ def label_loop(run: dict, run_name: str, existing: dict[str, Label], labeler: st
         pass
     say(f"labelled {done}, {len(todo) - done} left")
     return done
+
+
+def _normalise(name: str) -> str:
+    return "-".join(name.lower().split())
+
+
+def code_loop(labels: dict[str, Label], ask: Ask, say: Say, save: Callable[[Label], None]) -> int:
+    """Axial coding: give every fail label a category, reusing earlier ones by number."""
+    categories = sorted({lab.category for lab in labels.values() if lab.category})
+    todo = [lab for lab in labels.values() if lab.verdict == "fail" and not lab.category]
+    done = 0
+
+    def valid(a: str) -> bool:
+        if a.isdigit():
+            return 1 <= int(a) <= len(categories)
+        return bool(a)
+
+    try:
+        for lab in todo:
+            listing = "\n".join(f"  {i}. {c}" for i, c in enumerate(categories, 1)) or "  (none yet)"
+            say(f"{lab.case_id}: {lab.note}\ncategories so far:\n{listing}")
+            answer = _ask_until(ask, "category (number, or a new name; q to stop): ", valid)
+            if answer.lower() == "q":
+                break
+            name = categories[int(answer) - 1] if answer.isdigit() else _normalise(answer)
+            if name not in categories:
+                categories.append(name)
+            new = Label(lab.run, lab.case_id, lab.verdict, lab.note, name, lab.labeler)
+            labels[lab.case_id] = new
+            save(new)
+            done += 1
+    except (EOFError, KeyboardInterrupt):
+        pass
+    say(f"categorised {done}, {len(todo) - done} left")
+    return done
+
+
+def category_counts(labels: dict[str, Label], case_ids: set[str]) -> tuple[list[tuple[str, int]], int]:
+    """Fail counts per category, most first (ties by name), and how many labels are stale."""
+    counts: dict[str, int] = {}
+    stale = 0
+    for lab in labels.values():
+        if lab.case_id not in case_ids:
+            stale += 1
+        elif lab.verdict == "fail":
+            name = lab.category or "uncategorised"
+            counts[name] = counts.get(name, 0) + 1
+    return sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])), stale
+
+
+def format_report(run_name: str, labels: dict[str, Label], case_ids: set[str]) -> str:
+    counts, stale = category_counts(labels, case_ids)
+    current = [lab for lab in labels.values() if lab.case_id in case_ids]
+    labelers = ", ".join(sorted({lab.labeler for lab in current})) or "none"
+    fails = sum(lab.verdict == "fail" for lab in current)
+    lines = [f"labels for {run_name} (labeller: {labelers})", "",
+             f"  {len(current)} labelled · {len(current) - fails} pass · {fails} fail"]
+    if counts:
+        w = max(len("category"), *(len(name) for name, _ in counts))
+        lines += ["", f"  {'category':<{w}}  {'fails':>5}"]
+        lines += [f"  {name:<{w}}  {n:>5}" for name, n in counts]
+    if stale:
+        lines += ["", f"  {stale} stale label{'s' if stale != 1 else ''} ignored (case not in this run)"]
+    return "\n".join(lines)

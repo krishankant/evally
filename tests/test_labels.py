@@ -91,3 +91,86 @@ def test_last_line_wins(tmp_path):
 
 def test_load_missing_file_is_empty(tmp_path):
     assert load_labels(tmp_path / "none.jsonl") == {}
+
+
+from evally.evals_core.labels import category_counts, code_loop, format_report  # noqa: E402
+
+FAILS = {
+    "c1": Label("t-m", "c1", "fail", "made up a website"),
+    "c2": Label("t-m", "c2", "pass", ""),
+    "c3": Label("t-m", "c3", "fail", "quoted 60 days"),
+    "c4": Label("t-m", "c4", "fail", "invented an opening time"),
+}
+
+
+def code(answers, labels=FAILS):
+    answers, shown, saved = list(answers), [], []
+
+    def ask(prompt):
+        if not answers:
+            raise EOFError
+        return answers.pop(0)
+
+    n = code_loop(dict(labels), ask, shown.append, saved.append)
+    return n, shown, saved
+
+
+def test_code_new_name_normalised():
+    _, _, saved = code(["Invents Facts"])
+    assert saved[0].category == "invents-facts" and saved[0].case_id == "c1"
+
+
+def test_code_picks_existing_by_number():
+    _, shown, saved = code(["invents-facts", "stale policy", "1"])
+    assert [l.category for l in saved] == ["invents-facts", "stale-policy", "invents-facts"]
+    assert any("1. invents-facts" in s and "2. stale-policy" in s for s in shown)
+
+
+def test_bad_category_number_reprompts():
+    _, _, saved = code(["invents-facts", "7", "", "1", "q"])
+    assert [l.category for l in saved] == ["invents-facts", "invents-facts"]
+
+
+def test_code_skips_passes_and_categorised():
+    labels = dict(FAILS, c1=Label("t-m", "c1", "fail", "made up a website", "invents-facts"))
+    n, shown, saved = code(["stale-policy", "1"], labels)
+    assert [l.case_id for l in saved] == ["c3", "c4"]
+    assert not any("c2" in s for s in shown)
+    assert any("1. invents-facts" in s for s in shown)
+
+
+def _labels(*rows):
+    return {cid: Label("t-m", cid, verdict, "n", cat, "course-author (AI)") for cid, verdict, cat in rows}
+
+
+def test_counts_ranked_with_ties_by_name():
+    labels = _labels(("a", "fail", "zeta"), ("b", "fail", "beta"), ("c", "fail", "zeta"), ("d", "fail", "alpha"))
+    counts, stale = category_counts(labels, {"a", "b", "c", "d"})
+    assert counts == [("zeta", 2), ("alpha", 1), ("beta", 1)] and stale == 0
+
+
+def test_uncategorised_fail_counted():
+    counts, _ = category_counts(_labels(("a", "fail", ""), ("b", "pass", "")), {"a", "b"})
+    assert counts == [("uncategorised", 1)]
+
+
+def test_report_ignores_and_counts_stale_labels():
+    labels = _labels(("a", "fail", "x"), ("gone", "fail", "x"))
+    counts, stale = category_counts(labels, {"a"})
+    assert counts == [("x", 1)] and stale == 1
+    report = format_report("t-m", labels, {"a"})
+    assert "1 labelled · 0 pass · 1 fail" in report
+    assert report.splitlines()[-1] == "  1 stale label ignored (case not in this run)"
+
+
+def test_report_layout():
+    labels = _labels(("c1", "pass", ""), ("c2", "fail", "invents-facts"), ("c3", "fail", "too-long"))
+    assert format_report("t-m", labels, {"c1", "c2", "c3"}) == (
+        "labels for t-m (labeller: course-author (AI))\n"
+        "\n"
+        "  3 labelled · 1 pass · 2 fail\n"
+        "\n"
+        "  category       fails\n"
+        "  invents-facts      1\n"
+        "  too-long           1"
+    )
