@@ -1,0 +1,108 @@
+{
+ "request": {
+  "messages": [
+   {
+    "role": "user",
+    "text": "If I pre-order a book today, when do you take the money?",
+    "tool_calls": [],
+    "tool_results": []
+   }
+  ],
+  "model": "qwen3.5:4b",
+  "system": "You are the customer support assistant for Bramble Books, an online bookstore.\nAnswer the customer's question using the policy excerpts below.\nUse the tools to look up orders, check stock, start returns, or hand over to a human.\n\nPolicy excerpts:\n[preorders.md]\n# Pre-orders\n\nUpdated: July 2026\n\nYou can pre-order books up to 6 months before release. We charge your card when the book ships, not when you order. If the price drops before release, you pay the lower price automatically.\n\nYou can cancel a pre-order any time before it ships, from your account page or by asking support.\n\n[price-match.md]\n# Price matching\n\nUpdated: May 2026\n\nBramble Books **does not offer price matching** with other stores or websites, and we don't adjust the price of an order after it has been placed.\n\nOur ways to save are Bramble Club (10% off every book) and our monthly sale, announced in our newsletter. Pre-orders automatically get any price drop before release.\n\n[returns.md]\n# Returns and refunds\n\nUpdated: September 2026\n\nYou can return any book within **30 days of delivery**. Books must be unread and in the condition you received them. Gift cards and e-books can't be returned.\n\nTo start a return, give us your order number and the email on the order. We'll email a prepaid return label.\n\nOnce the book reaches our warehouse, we refund the original payment method within **5-7 business days**. Original shipping costs aren't refunded unless the book arrived damaged or we sent the wrong item.\n\nReturns after 30 days are not accepted.",
+  "tools": [
+   {
+    "description": "Look up an order. Needs the order id (like BB-1001) and the email on the order.",
+    "name": "lookup_order",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email address on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id, like BB-1001",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Check how many copies of a book are in stock, by ISBN.",
+    "name": "check_stock",
+    "parameters": {
+     "properties": {
+      "isbn": {
+       "description": "13-digit ISBN",
+       "type": "string"
+      }
+     },
+     "required": [
+      "isbn"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Start a return for a delivered order.",
+    "name": "start_return",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id",
+       "type": "string"
+      },
+      "reason": {
+       "description": "Why it's being returned",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email",
+      "reason"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Hand the conversation to a human agent.",
+    "name": "escalate_to_human",
+    "parameters": {
+     "properties": {
+      "summary": {
+       "description": "One-line summary of the problem",
+       "type": "string"
+      }
+     },
+     "required": [
+      "summary"
+     ],
+     "type": "object"
+    }
+   }
+  ]
+ },
+ "response": {
+  "message": {
+   "role": "assistant",
+   "text": "According to our pre-order policy, we charge your card **when the book ships**, not when you place the order. This means you won't be charged until the book is actually sent out from our warehouse.",
+   "tool_calls": [],
+   "tool_results": []
+  },
+  "stop_reason": "end_turn",
+  "usage": {
+   "input_tokens": 949,
+   "output_tokens": 161
+  }
+ }
+}

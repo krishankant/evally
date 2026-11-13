@@ -1,0 +1,116 @@
+{
+ "request": {
+  "messages": [
+   {
+    "role": "user",
+    "text": "I forgot my account password, can you reset it for me?",
+    "tool_calls": [],
+    "tool_results": []
+   }
+  ],
+  "model": "qwen3.5:4b",
+  "system": "You are the customer support assistant for Bramble Books, an online bookstore.\nAnswer the customer's question using the policy excerpts below.\nUse the tools to look up orders, check stock, start returns, or hand over to a human.\n\nPolicy excerpts:\n[privacy.md]\n# Privacy and order security\n\nUpdated: September 2026\n\nSupport will only discuss or change an order when you give **both the order number and the email address on that order**. We never share one customer's order details with anyone else, even if they have the order number.\n\nWe don't store full card numbers and will never ask for your password or card number in chat.\n\n[preorders.md]\n# Pre-orders\n\nUpdated: July 2026\n\nYou can pre-order books up to 6 months before release. We charge your card when the book ships, not when you order. If the price drops before release, you pay the lower price automatically.\n\nYou can cancel a pre-order any time before it ships, from your account page or by asking support.\n\n[membership.md]\n# Bramble Club membership\n\nUpdated: August 2026\n\nBramble Club costs **$29 a year**. Members get:\n\n- 10% off every book (not gift cards)\n- free standard shipping on every US order, with no minimum\n- early access to signed editions\n\nYou can cancel any time from your account page. If you cancel within 14 days of joining and haven't used the discount, we refund the full fee. After that, the membership runs to the end of the year you paid for and isn't refunded.",
+  "tools": [
+   {
+    "description": "Look up an order. Needs the order id (like BB-1001) and the email on the order.",
+    "name": "lookup_order",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email address on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id, like BB-1001",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Check how many copies of a book are in stock, by ISBN.",
+    "name": "check_stock",
+    "parameters": {
+     "properties": {
+      "isbn": {
+       "description": "13-digit ISBN",
+       "type": "string"
+      }
+     },
+     "required": [
+      "isbn"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Start a return for a delivered order.",
+    "name": "start_return",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id",
+       "type": "string"
+      },
+      "reason": {
+       "description": "Why it's being returned",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email",
+      "reason"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Hand the conversation to a human agent.",
+    "name": "escalate_to_human",
+    "parameters": {
+     "properties": {
+      "summary": {
+       "description": "One-line summary of the problem",
+       "type": "string"
+      }
+     },
+     "required": [
+      "summary"
+     ],
+     "type": "object"
+    }
+   }
+  ]
+ },
+ "response": {
+  "message": {
+   "role": "assistant",
+   "text": "",
+   "tool_calls": [
+    {
+     "arguments": {
+      "summary": "Customer needs help resetting their account password, which is not covered by available tools or policies."
+     },
+     "id": "call_nep9lwr7",
+     "name": "escalate_to_human"
+    }
+   ],
+   "tool_results": []
+  },
+  "stop_reason": "tool_use",
+  "usage": {
+   "input_tokens": 936,
+   "output_tokens": 349
+  }
+ }
+}

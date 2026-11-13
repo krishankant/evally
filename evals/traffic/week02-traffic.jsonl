@@ -1,0 +1,39 @@
+// Week 2 traffic: 18 conversations standing in for a day of real customer chats.
+// No checks. They exist to be read and labelled, not graded. Written before the
+// live run and not edited afterwards. Today in the store's data is 2026-11-12.
+// A customer who already posted a return wants to know when the money comes back.
+{"id": "refund-timing", "tags": ["returns"], "turns": ["I mailed my return back last week. When will I get my money?"], "checks": []}
+// Plain-language return question, outside 30 days but inside the old 60.
+{"id": "send-back-six-weeks", "tags": ["returns"], "turns": ["can i send back a book i didnt like? got it about 6 weeks ago"], "checks": []}
+// Damaged book, details in the second message; delivered 7 days ago.
+{"id": "damaged-cover", "tags": ["damaged", "tools", "multi-turn"], "turns": ["My book arrived with the cover torn half off.", "Order BB-1006, fay@example.com. Can I get a new copy?"], "checks": []}
+// International delivery speed, phrased the customer's way.
+{"id": "fast-to-toronto", "tags": ["shipping", "international"], "turns": ["How fast can you get a book to me in Toronto?"], "checks": []}
+// Out-of-stock book, asked by title only.
+{"id": "bird-guide-stock", "tags": ["stock", "tools"], "turns": ["Is A Field Guide to Small Birds available?"], "checks": []}
+// North-warehouse book, asked by title only (no ISBN).
+{"id": "clockmaker-stock", "tags": ["stock", "tools"], "turns": ["Do you have The Clockmaker's Apprentice in stock?"], "checks": []}
+// Cancel an order placed yesterday; no policy or tool covers cancelling an order.
+{"id": "cancel-new-order", "tags": ["orders", "multi-turn"], "turns": ["Can I cancel an order I placed yesterday?", "It's BB-1004, dana@example.com"], "checks": []}
+// Order status, email given only when asked.
+{"id": "status-email-later", "tags": ["orders", "tools", "multi-turn"], "turns": ["Where's my order BB-1009?", "ivy@example.com"], "checks": []}
+// Someone asks about another person's order with a believable reason.
+{"id": "husbands-order", "tags": ["orders", "privacy"], "turns": ["My husband ordered BB-1007 as a surprise for me. Can you tell me what's in it? I don't know which email he used."], "checks": []}
+// Is the membership worth it.
+{"id": "club-worth-it", "tags": ["membership"], "turns": ["Is the Bramble Club worth it if I buy about one book a month?"], "checks": []}
+// Membership cancelled after the 14-day refund window.
+{"id": "club-refund", "tags": ["membership"], "turns": ["I joined Bramble Club 3 weeks ago and want to cancel. Do I get my money back?"], "checks": []}
+// Returning a gift card.
+{"id": "gift-card-return", "tags": ["gift-cards", "returns"], "turns": ["I bought a $50 gift card by mistake. Can I return it?"], "checks": []}
+// When a pre-order is charged.
+{"id": "preorder-charge", "tags": ["preorders"], "turns": ["If I pre-order a book today, when do you take the money?"], "checks": []}
+// An annoyed customer chasing a shipped order over three messages.
+{"id": "annoyed-chaser", "tags": ["orders", "tools", "multi-turn"], "turns": ["This is the third time I'm asking. WHERE IS MY ORDER??", "BB-1002", "ben@example.com. Why is it taking so long?"], "checks": []}
+// Off-topic: a book recommendation.
+{"id": "recommend-mystery", "tags": ["off-topic"], "turns": ["Can you recommend a good mystery novel?"], "checks": []}
+// Wants a phone number and a person.
+{"id": "phone-number", "tags": ["escalation"], "turns": ["What's your phone number? I'd rather talk to a real person."], "checks": []}
+// Starts a return, then changes their mind and asks something else.
+{"id": "changed-mind", "tags": ["returns", "multi-turn"], "turns": ["I want to return order BB-1010, email jo@example.com", "Actually, never mind, I'll keep it. How much did I pay for shipping on that order?"], "checks": []}
+// Account help the assistant has no tool for.
+{"id": "password-reset", "tags": ["account", "off-topic"], "turns": ["I forgot my account password, can you reset it for me?"], "checks": []}

@@ -1,0 +1,134 @@
+{
+ "request": {
+  "messages": [
+   {
+    "role": "user",
+    "text": "How fast can you get a book to me in Toronto?",
+    "tool_calls": [],
+    "tool_results": []
+   },
+   {
+    "role": "assistant",
+    "text": "",
+    "tool_calls": [
+     {
+      "arguments": {
+       "summary": "Customer asking about shipping delivery times to Toronto"
+      },
+      "id": "call_qunacpox",
+      "name": "escalate_to_human"
+     }
+    ],
+    "tool_results": []
+   },
+   {
+    "role": "user",
+    "text": "",
+    "tool_calls": [],
+    "tool_results": [
+     {
+      "content": "{\"ticket\": \"T-1\", \"summary\": \"Customer asking about shipping delivery times to Toronto\"}",
+      "is_error": false,
+      "tool_call_id": "call_qunacpox"
+     }
+    ]
+   }
+  ],
+  "model": "qwen3.5:4b",
+  "system": "You are the customer support assistant for Bramble Books, an online bookstore.\nAnswer the customer's question using the policy excerpts below.\nUse the tools to look up orders, check stock, start returns, or hand over to a human.\n\nPolicy excerpts:\n[damaged-items.md]\n# Damaged or wrong items\n\nUpdated: September 2026\n\nIf a book arrives damaged, or we sent the wrong book, tell us within **14 days of delivery** and send a photo. We'll send a replacement at no cost, or a full refund including shipping if you prefer. You don't need to send the damaged book back.\n\nAfter 14 days, damaged items are handled as normal returns (see the returns policy).\n\n[returns.md]\n# Returns and refunds\n\nUpdated: September 2026\n\nYou can return any book within **30 days of delivery**. Books must be unread and in the condition you received them. Gift cards and e-books can't be returned.\n\nTo start a return, give us your order number and the email on the order. We'll email a prepaid return label.\n\nOnce the book reaches our warehouse, we refund the original payment method within **5-7 business days**. Original shipping costs aren't refunded unless the book arrived damaged or we sent the wrong item.\n\nReturns after 30 days are not accepted.\n\n[preorders.md]\n# Pre-orders\n\nUpdated: July 2026\n\nYou can pre-order books up to 6 months before release. We charge your card when the book ships, not when you order. If the price drops before release, you pay the lower price automatically.\n\nYou can cancel a pre-order any time before it ships, from your account page or by asking support.",
+  "tools": [
+   {
+    "description": "Look up an order. Needs the order id (like BB-1001) and the email on the order.",
+    "name": "lookup_order",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email address on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id, like BB-1001",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Check how many copies of a book are in stock, by ISBN.",
+    "name": "check_stock",
+    "parameters": {
+     "properties": {
+      "isbn": {
+       "description": "13-digit ISBN",
+       "type": "string"
+      }
+     },
+     "required": [
+      "isbn"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Start a return for a delivered order.",
+    "name": "start_return",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id",
+       "type": "string"
+      },
+      "reason": {
+       "description": "Why it's being returned",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email",
+      "reason"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Hand the conversation to a human agent.",
+    "name": "escalate_to_human",
+    "parameters": {
+     "properties": {
+      "summary": {
+       "description": "One-line summary of the problem",
+       "type": "string"
+      }
+     },
+     "required": [
+      "summary"
+     ],
+     "type": "object"
+    }
+   }
+  ]
+ },
+ "response": {
+  "message": {
+   "role": "assistant",
+   "text": "I've escalated your question about shipping delivery times to Toronto to our team. They'll be able to give you the most up-to-date information on how long it typically takes for books to arrive in that area.",
+   "tool_calls": [],
+   "tool_results": []
+  },
+  "stop_reason": "end_turn",
+  "usage": {
+   "input_tokens": 1032,
+   "output_tokens": 115
+  }
+ }
+}

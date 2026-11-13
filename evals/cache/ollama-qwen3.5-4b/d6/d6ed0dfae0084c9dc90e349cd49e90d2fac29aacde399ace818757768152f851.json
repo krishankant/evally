@@ -1,0 +1,108 @@
+{
+ "request": {
+  "messages": [
+   {
+    "role": "user",
+    "text": "I want to return order BB-1010, email jo@example.com",
+    "tool_calls": [],
+    "tool_results": []
+   }
+  ],
+  "model": "qwen3.5:4b",
+  "system": "You are the customer support assistant for Bramble Books, an online bookstore.\nAnswer the customer's question using the policy excerpts below.\nUse the tools to look up orders, check stock, start returns, or hand over to a human.\n\nPolicy excerpts:\n[returns.md]\n# Returns and refunds\n\nUpdated: September 2026\n\nYou can return any book within **30 days of delivery**. Books must be unread and in the condition you received them. Gift cards and e-books can't be returned.\n\nTo start a return, give us your order number and the email on the order. We'll email a prepaid return label.\n\nOnce the book reaches our warehouse, we refund the original payment method within **5-7 business days**. Original shipping costs aren't refunded unless the book arrived damaged or we sent the wrong item.\n\nReturns after 30 days are not accepted.\n\n[returns-2023.md]\n# Return policy\n\nEffective: March 2023\n\nBramble Books accepts returns within **60 days** of delivery for a full refund. Books should be in resaleable condition.\n\nRefunds are issued as store credit by default, or to your original payment method on request. Please allow 10 business days for processing.\n\nContact support with your order number to receive a return label.\n\n[shipping.md]\n# Shipping\n\nUpdated: October 2026\n\n| Option | Delivery time | Price |\n| --- | --- | --- |\n| Standard | 3-5 business days | $4.99, free on orders over $35 |\n| Express | 1-2 business days | $12.99 |\n\nOrders placed before 2 pm Eastern on a business day ship the same day. We ship to all 50 US states. Each order gets a tracking link by email when it ships.\n\nBooks that are out of stock ship when they come back in; we email you a date.",
+  "tools": [
+   {
+    "description": "Look up an order. Needs the order id (like BB-1001) and the email on the order.",
+    "name": "lookup_order",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email address on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id, like BB-1001",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Check how many copies of a book are in stock, by ISBN.",
+    "name": "check_stock",
+    "parameters": {
+     "properties": {
+      "isbn": {
+       "description": "13-digit ISBN",
+       "type": "string"
+      }
+     },
+     "required": [
+      "isbn"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Start a return for a delivered order.",
+    "name": "start_return",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id",
+       "type": "string"
+      },
+      "reason": {
+       "description": "Why it's being returned",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email",
+      "reason"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Hand the conversation to a human agent.",
+    "name": "escalate_to_human",
+    "parameters": {
+     "properties": {
+      "summary": {
+       "description": "One-line summary of the problem",
+       "type": "string"
+      }
+     },
+     "required": [
+      "summary"
+     ],
+     "type": "object"
+    }
+   }
+  ]
+ },
+ "response": {
+  "message": {
+   "role": "assistant",
+   "text": "I can help you with your return. To start a return for order BB-1010, I'll need to know the reason for the return. \n\nCould you please let me know why you're returning this book? For example:\n- The book arrived damaged\n- We sent the wrong item\n- Other reasons\n\nOnce you provide the reason, I can start the return process for you.",
+   "tool_calls": [],
+   "tool_results": []
+  },
+  "stop_reason": "end_turn",
+  "usage": {
+   "input_tokens": 1007,
+   "output_tokens": 273
+  }
+ }
+}
