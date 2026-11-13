@@ -174,3 +174,17 @@ def test_report_layout():
         "  invents-facts      1\n"
         "  too-long           1"
     )
+
+
+def test_q_at_note_prompt_quits_without_saving():
+    n, _, saved = drive(["f", "q"])
+    assert n == 0 and saved == []
+
+
+def test_code_skips_stale_labels():
+    labels = dict(FAILS, gone=Label("t-m", "gone", "fail", "old run"))
+    answers, shown, saved = ["x-cat", "1", "1", "1"], [], []
+    code_loop(labels, lambda p: answers.pop(0) if answers else (_ for _ in ()).throw(EOFError()),
+              shown.append, saved.append, case_ids={"c1", "c2", "c3", "c4"})
+    assert [l.case_id for l in saved] == ["c1", "c3", "c4"]
+    assert not any("gone" in s for s in shown)

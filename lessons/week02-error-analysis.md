@@ -103,9 +103,16 @@ Read only the reply and this looks like a cautious, polite assistant. The `docs:
 
 ```
 $ uv run evally label week02-traffic-qwen3.5-4b --labeler "your name"
-verdict [p]ass / [f]ail / [s]kip / [q]uit:
-note (what went wrong, or what was good):
+labelling week02-traffic-qwen3.5-4b: 0 of 18 already labelled, saving to evals/labels/week02-traffic-qwen3.5-4b.jsonl
+
+── refund-timing ─────────────────────── UNCHECKED
+customer> I mailed my return back last week. When will I get my money?
+...
+verdict [p]ass / [f]ail / [s]kip / [q]uit: f
+note (what went wrong, or what was good; q to quit): Blends the 2023 policy into the answer: ...
 ```
+
+(An interactive session, shortened where you see `...`; the text after each prompt is what you type.)
 
 A fail needs a note. Write what you saw, specifically, before you have any categories. Three of this week's notes:
 
@@ -122,12 +129,14 @@ Every fact in a note was checked against `evally/app/docs/` and the store's seed
 `evally label <run> --code` shows each fail note in turn with the categories made so far, numbered. You pick one by number or type a new name:
 
 ```
-damaged-cover: Wrong process for a damaged book: ...
+damaged-cover: Wrong process for a damaged book: starts a normal return and tells her to post it back in its packaging, ...
 categories so far:
   1. uses-outdated-policy
   2. misses-the-relevant-policy
-category (number, or a new name; q to stop):
+category (number, or a new name; q to stop): goes beyond policy
 ```
+
+(Shortened at `...`. A new name is saved in lowercase with dashes, so this becomes `goes-beyond-policy`.)
 
 Name a category for what the **customer** experienced, not for the code you suspect. "misses-the-relevant-policy" is what happened; "BM25 is weak on synonyms" is a guess about why, and it belongs in the fix, not the label. The six categories this pass produced:
 
@@ -168,7 +177,7 @@ Now compare the list with week 1's checks:
 | `misses-the-relevant-policy` | No. Week 1's questions use the docs' own words, so retrieval always found the right file. |
 | `unsupported-claims` | No. No check looks at numbers or features the reply invents. |
 | `needless-escalation` | No. `tool_not_called` exists but no case uses it. |
-| `uses-outdated-policy` | Partly: `return-window` fails if the reply says "60". `refund-timing`'s "10 business days" would get through. |
+| `uses-outdated-policy` | Partly. `return-window`'s check fails any reply containing "60". It would catch `refund-timing`, but only because that reply also quoted the 60-day window; a reply giving just the old "10 business days" refund time would get through. |
 
 Week 1's suite tested the failures its author imagined. Of the six that real-looking traffic shows, it partly covers two.
 
@@ -198,4 +207,4 @@ Writing your eval checks before you've read your app's conversations means you o
 
 ---
 
-**Tested with:** Python 3.11.8, openai 3.49.0, anthropic 2.8.0, python-dotenv 1.2.4, pytest 9.2.0, Ollama 0.40.16 with `qwen3.5:4b`, on an Apple M2 with 8 GB of RAM. All outputs above are copied from real runs. No new libraries this week.
+**Tested with:** Python 3.11.8, openai 3.49.0, anthropic 2.8.0, python-dotenv 1.2.4, pytest 9.2.0, Ollama 0.40.16 with `qwen3.5:4b`, on an Apple M2 with 8 GB of RAM. All outputs above are copied from real runs; `...` marks where a long output was shortened. No new libraries this week.

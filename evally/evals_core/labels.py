@@ -78,8 +78,10 @@ def label_loop(run: dict, run_name: str, existing: dict[str, Label], labeler: st
             if verdict == "s":
                 continue
             needs_note = verdict == "f"
-            note = _ask_until(ask, "note (what went wrong, or what was good): ",
+            note = _ask_until(ask, "note (what went wrong, or what was good; q to quit): ",
                               lambda a: bool(a) or not needs_note)
+            if note.lower() == "q":
+                break
             save(Label(run_name, case["id"], "pass" if verdict == "p" else "fail", note, "", labeler))
             done += 1
     except (EOFError, KeyboardInterrupt):
@@ -92,10 +94,15 @@ def _normalise(name: str) -> str:
     return "-".join(name.lower().split())
 
 
-def code_loop(labels: dict[str, Label], ask: Ask, say: Say, save: Callable[[Label], None]) -> int:
-    """Axial coding: give every fail label a category, reusing earlier ones by number."""
+def code_loop(labels: dict[str, Label], ask: Ask, say: Say, save: Callable[[Label], None],
+              case_ids: set[str] | None = None) -> int:
+    """Axial coding: give every fail label a category, reusing earlier ones by number.
+
+    With `case_ids`, labels for cases no longer in the run (stale) are left alone.
+    """
     categories = sorted({lab.category for lab in labels.values() if lab.category})
-    todo = [lab for lab in labels.values() if lab.verdict == "fail" and not lab.category]
+    todo = [lab for lab in labels.values() if lab.verdict == "fail" and not lab.category
+            and (case_ids is None or lab.case_id in case_ids)]
     done = 0
 
     def valid(a: str) -> bool:

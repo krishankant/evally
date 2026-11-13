@@ -112,7 +112,7 @@ def cmd_label(args, cfg) -> int:
         print(format_report(name, existing, {c["id"] for c in run["cases"]}))
         return 0
     if args.code:
-        code_loop(existing, input, print, lambda lab: append_label(path, lab))
+        code_loop(existing, input, print, lambda lab: append_label(path, lab), {c["id"] for c in run["cases"]})
         return 0
     print(f"labelling {name}: {len(existing)} of {len(run['cases'])} already labelled, saving to {path}\n")
     label_loop(run, name, existing, args.labeler, input, print, lambda lab: append_label(path, lab))
