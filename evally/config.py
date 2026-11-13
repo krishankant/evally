@@ -17,6 +17,7 @@ class Config:
     cache_dir: Path
     runs_dir: Path
     suites_dir: Path
+    labels_dir: Path
 
 
 def load() -> Config:
@@ -28,4 +29,5 @@ def load() -> Config:
         cache_dir=Path(os.environ.get("EVALLY_CACHE_DIR") or "evals/cache"),
         runs_dir=Path(os.environ.get("EVALLY_RUNS_DIR") or "evals/runs"),
         suites_dir=Path("evals/suites"),
+        labels_dir=Path(os.environ.get("EVALLY_LABELS_DIR") or "evals/labels"),
     )

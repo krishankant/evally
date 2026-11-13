@@ -4,6 +4,7 @@
     evally run --suite week01 --live    call the model and record anything new
     evally chat                         talk to the bookstore assistant (live)
     evally traces <run> [--case ID]     read saved conversations
+    evally label <run>                  label each conversation pass/fail with a note
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ from evally.app.retrieval import Retriever
 from evally.app.store import Store
 from evally.evals_core.cases import load_cases
 from evally.evals_core.runner import format_table, load_run, run_suite, save_run, slug
+from evally.evals_core.labels import append_label, label_loop, labels_path, load_labels
 from evally.evals_core.traces import format_case_list, format_conversation, run_path
 from evally.llm.cache import CachedModel
 from evally.llm.factory import make_model
@@ -97,6 +99,18 @@ def cmd_traces(args, cfg) -> int:
     return 0
 
 
+def cmd_label(args, cfg) -> int:
+    run = _load_run(args.run, cfg)
+    if run is None:
+        return 1
+    name = run_path(args.run, cfg.runs_dir).stem
+    path = labels_path(name, cfg.labels_dir)
+    existing = load_labels(path)
+    print(f"labelling {name}: {len(existing)} of {len(run['cases'])} already labelled, saving to {path}\n")
+    label_loop(run, name, existing, args.labeler, input, print, lambda lab: append_label(path, lab))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     cfg = config_mod.load()
     parser = argparse.ArgumentParser(prog="evally")
@@ -113,9 +127,14 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("traces", help="read saved conversations from a run")
     p.add_argument("run", help="run name in evals/runs (like week01-qwen3.5-4b) or a .json path")
     p.add_argument("--case", help="show one conversation in full")
+    p = sub.add_parser("label", help="label saved conversations (error analysis)")
+    p.add_argument("run", help="run name in evals/runs or a .json path")
+    p.add_argument("--labeler", default="human", help="who is labelling; recorded with every label")
     args = parser.parse_args(argv)
     if args.cmd == "traces":
         return cmd_traces(args, cfg)
+    if args.cmd == "label":
+        return cmd_label(args, cfg)
     try:
         return cmd_run(args, cfg) if args.cmd == "run" else cmd_chat(args, cfg)
     except CONNECTION_ERRORS:
