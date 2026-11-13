@@ -1,6 +1,6 @@
 # Week 3: Test datasets
 
-**[← Week 2: Error analysis](week02-error-analysis.md)** · **[Course Plan](../COURSE_PLAN.md)** · **Week 4: Code-based evals →** *(coming)*
+**[← Week 2: Error analysis](week02-error-analysis.md)** · **[Course Plan](../COURSE_PLAN.md)** · **[Week 4: Code-based graders →](week04-code-graders.md)**
 
 ---
 

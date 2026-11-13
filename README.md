@@ -1,6 +1,6 @@
 # evally
 
-**[Course Plan](COURSE_PLAN.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)** · **[Week 2: Error analysis](lessons/week02-error-analysis.md)** · **[Week 3: Test datasets](lessons/week03-test-datasets.md)**
+**[Course Plan](COURSE_PLAN.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)** · **[Week 2: Error analysis](lessons/week02-error-analysis.md)** · **[Week 3: Test datasets](lessons/week03-test-datasets.md)** · **[Week 4: Code-based graders](lessons/week04-code-graders.md)**
 
 ---
 
@@ -34,6 +34,8 @@ Every model reply the lessons use is recorded in `evals/cache/` and committed, s
 
 ## Cheat sheet
 
+Check types for a case's `checks`: `contains`, `not_contains`, `regex`, `not_regex`, `tool_called`, `tool_not_called`, `tool_args`, `args_shape`, `args_grounded`, `refuses`, `not_refuses`, `max_words`. See [week 4](lessons/week04-code-graders.md) for what each one passes.
+
 | Command | What it does |
 | --- | --- |
 | `uv run evally run --suite week01` | run a suite by replaying recordings; prints the table, saves `evals/runs/<suite>-<model>.json` |
@@ -48,7 +50,10 @@ Every model reply the lessons use is recorded in `evals/cache/` and committed, s
 | `uv run evally review <candidates.jsonl> --reviewer NAME` | keep or drop each generated candidate (a drop needs a reason); `--report` prints the survival rate |
 | `uv run evally dataset build` | merge `evals/datasets/bramble.json`'s sources, split dev/test, write the suites and the lock file |
 | `uv run evally dataset stats bramble-v1` | coverage per dimension, dev vs test; flags values missing from test |
-| `uv run evally run --suite bramble-v1-dev --by category` | pass rates per tag value after the table |
+| `uv run evally run --suite bramble-v2-dev --by category` | pass rates per tag value after the table; `--by check` gives pass rates per check type |
+| `uv run evally refusals <run>` | which saved replies the refusal detector flags, and the phrase it matched |
+| `uv sync --extra deepeval` | install the optional DeepEval extra (week 4) |
+| `uv run evally deepeval <run> --suite S --case ID` | run a recorded case's checks in DeepEval too, side by side |
 | `--provider ollama\|openai\|anthropic --model <id>` | override `.env` for one command |
 | `uv run pytest` | the offline test suite |
 
@@ -57,6 +62,8 @@ Every model reply the lessons use is recorded in `evals/cache/` and committed, s
 | `evally/app/` | the app under test: policies, BM25 retrieval, store, tools, the tool loop |
 | `evally/llm/` | one `Model` interface; Ollama/OpenAI, Anthropic and fake adapters; record/replay cache |
 | `evally/evals_core/` | cases, checks, runner, run report |
+| `evally/graders/` | the refusal detector; the DeepEval side-by-side |
+| `evally/datasets/` | dimensions, generation, review, dataset build, coverage |
 | `evals/suites/` | test cases (JSONL) |
 | `evals/traffic/` | unchecked conversations standing in for real traffic |
 | `evals/labels/` | labels: verdict, note, category, labeller |
@@ -72,3 +79,4 @@ See [COURSE_PLAN.md](COURSE_PLAN.md) for all 15. Done so far:
 | 1 | [Baseline: the app and the vibe check](lessons/week01-baseline.md) | `week-01` |
 | 2 | [Error analysis](lessons/week02-error-analysis.md) | `week-02` |
 | 3 | [Test datasets](lessons/week03-test-datasets.md) | `week-03` |
+| 4 | [Code-based graders](lessons/week04-code-graders.md) | `week-04` |
