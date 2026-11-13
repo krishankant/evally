@@ -9,6 +9,7 @@
     evally label <run> --report         fails per category, most first
     evally generate --dims F --n N --seed S --out F [--live]   candidate cases from dimensions
     evally review <candidates.jsonl> [--report]                 keep/drop each candidate
+    evally dataset build [--manifest F]  merge sources, split dev/test, write the lock file
 """
 
 from __future__ import annotations
@@ -28,6 +29,7 @@ from evally.evals_core.cases import load_cases
 from evally.evals_core.runner import format_table, load_run, run_suite, save_run, slug
 from evally.evals_core.labels import append_label, code_loop, format_report, label_loop, labels_path, load_labels
 from evally.evals_core.traces import format_case_list, format_conversation, run_path
+from evally.datasets.build import build
 from evally.datasets.generate import generate, sample_combinations
 from evally.datasets.review import decisions_path, load_candidates, load_decisions, review_loop, save_decision, survival_report
 from evally.llm.cache import CachedModel, ReplayMiss
@@ -158,6 +160,22 @@ def cmd_review(args, cfg) -> int:
     return 0
 
 
+def cmd_dataset(args, cfg) -> int:
+    if args.action == "build":
+        try:
+            lock = build(Path(args.manifest), cfg.suites_dir, cfg.datasets_dir)
+        except (ValueError, FileNotFoundError) as e:
+            print(f"build failed: {e}")
+            return 1
+        d = json.loads(lock.read_text())
+        stem = f"{d['name']}-v{d['version']}"
+        moved = f", {len(d['moved'])} moved to balance categories" if d["moved"] else ""
+        print(f"{stem}: {len(d['dev'])} dev, {len(d['test'])} test{moved}\n"
+              f"suites {cfg.suites_dir}/{stem}-dev.jsonl, {cfg.suites_dir}/{stem}-test.jsonl\nlock {lock}")
+        return 0
+    return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     cfg = config_mod.load()
     parser = argparse.ArgumentParser(prog="evally")
@@ -189,7 +207,13 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("candidates", help="candidates .jsonl from evally generate")
     p.add_argument("--reviewer", default="human", help="who is reviewing; recorded with every decision")
     p.add_argument("--report", action="store_true", help="print the survival rate and drop reasons")
+    p = sub.add_parser("dataset", help="build and inspect versioned datasets")
+    dsub = p.add_subparsers(dest="action", required=True)
+    b = dsub.add_parser("build", help="merge sources, split dev/test, write the lock file")
+    b.add_argument("--manifest", default=str(cfg.datasets_dir / "bramble.json"))
     args = parser.parse_args(argv)
+    if args.cmd == "dataset":
+        return cmd_dataset(args, cfg)
     if args.cmd == "review":
         return cmd_review(args, cfg)
     if args.cmd == "traces":

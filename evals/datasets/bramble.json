@@ -1,0 +1,11 @@
+{
+ "name": "bramble",
+ "version": 1,
+ "sources": [
+  "evals/datasets/bramble/hand.jsonl",
+  "evals/datasets/bramble/traffic.jsonl",
+  "evals/datasets/bramble/generated.jsonl",
+  "evals/datasets/bramble/adversarial.jsonl"
+ ],
+ "test_share": 0.4
+}

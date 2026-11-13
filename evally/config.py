@@ -18,6 +18,7 @@ class Config:
     runs_dir: Path
     suites_dir: Path
     labels_dir: Path
+    datasets_dir: Path
 
 
 def load() -> Config:
@@ -30,4 +31,5 @@ def load() -> Config:
         runs_dir=Path(os.environ.get("EVALLY_RUNS_DIR") or "evals/runs"),
         suites_dir=Path("evals/suites"),
         labels_dir=Path(os.environ.get("EVALLY_LABELS_DIR") or "evals/labels"),
+        datasets_dir=Path("evals/datasets"),
     )
