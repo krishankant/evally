@@ -1061,6 +1061,11 @@
           "detail": ""
         },
         {
+          "name": "not_contains 'we ship to Australia'",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "not_regex '\\\\bship(s|ping)? to australia (is|costs|takes)\\\\b'",
           "passed": true,
           "detail": ""
@@ -1302,8 +1307,8 @@
     "cases": 16,
     "passed": 10,
     "errors": 0,
-    "checks": 34,
-    "checks_passed": 26,
+    "checks": 35,
+    "checks_passed": 27,
     "unchecked": 0
   }
 }

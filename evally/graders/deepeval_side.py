@@ -19,7 +19,8 @@ PLACEHOLDER_KEY = "sk-placeholder-deepeval-makes-no-call"
 @contextmanager
 def _deepeval_env():
     saved = {k: os.environ.get(k) for k in ("OPENAI_API_KEY", "DEEPEVAL_TELEMETRY_OPT_OUT")}
-    os.environ.setdefault("OPENAI_API_KEY", PLACEHOLDER_KEY)
+    if not os.environ.get("OPENAI_API_KEY"):  # unset or blank (.env.example's `OPENAI_API_KEY=`)
+        os.environ["OPENAI_API_KEY"] = PLACEHOLDER_KEY
     os.environ["DEEPEVAL_TELEMETRY_OPT_OUT"] = "1"
     try:
         yield
@@ -39,7 +40,11 @@ def compare(case: Case, recorded: dict) -> list[tuple[str, str, str]]:
     """(check, evally verdict, DeepEval verdict) for each of the case's checks.
 
     `recorded` is the case from a saved run (its last turn's reply and tool calls, and evally's
-    verdicts in the same order as `case.checks`)."""
+    verdicts in the same order as `case.checks`). Raises ValueError if the two don't line up."""
+    kinds = [c["type"] for c in case.checks]
+    names = [c["name"].split(" ", 1)[0] for c in recorded["checks"]]
+    if kinds != names:
+        raise ValueError(f"the run's checks ({', '.join(names)}) don't match the suite's ({', '.join(kinds)})")
     with _deepeval_env():
         from deepeval.metrics import PatternMatchMetric, ToolCorrectnessMetric
         from deepeval.test_case import LLMTestCase, ToolCall, ToolCallParams

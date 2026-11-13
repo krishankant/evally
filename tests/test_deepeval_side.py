@@ -78,3 +78,39 @@ def test_env_restored_after_compare(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "real-key")
     compare(ORDER, REC)
     assert os.environ["OPENAI_API_KEY"] == "real-key"
+
+
+def test_blank_key_gets_placeholder(monkeypatch):
+    pytest.importorskip("deepeval")
+    from evally.graders.deepeval_side import compare
+    monkeypatch.setenv("OPENAI_API_KEY", "")  # what .env.example's `OPENAI_API_KEY=` loads as
+    assert compare(ORDER, REC)
+    assert os.environ["OPENAI_API_KEY"] == ""
+
+
+def test_mismatched_run_and_suite_refused(tmp_path, monkeypatch, capsys):
+    pytest.importorskip("deepeval")
+    import json
+    monkeypatch.setenv("EVALLY_RUNS_DIR", str(tmp_path))
+    suite = tmp_path / "s-v2.jsonl"
+    suite.write_text(json.dumps({"id": "c", "turns": ORDER.turns, "checks": ORDER.checks}) + "\n")
+    run = {"suite": "s-v1", "model": "m", "totals": {}, "cases": [dict(REC, checks=REC["checks"][:2])]}
+    (tmp_path / "r.json").write_text(json.dumps(run))
+    assert cli.main(["deepeval", "r", "--suite", str(suite), "--case", "c"]) == 1
+    assert "run r came from suite s-v1, not s-v2" in capsys.readouterr().out
+
+
+def test_probe_import_runs_with_telemetry_off(monkeypatch):
+    pytest.importorskip("deepeval")
+    seen = {}
+    import builtins
+    real = builtins.__import__
+
+    def spy(name, *a, **k):
+        if name == "deepeval" and "probe" not in seen:
+            seen["probe"] = os.environ.get("DEEPEVAL_TELEMETRY_OPT_OUT")
+        return real(name, *a, **k)
+    monkeypatch.setattr(builtins, "__import__", spy)
+    monkeypatch.delenv("DEEPEVAL_TELEMETRY_OPT_OUT", raising=False)
+    cli.main(["deepeval", "no-such-run", "--suite", "week01", "--case", "x"])
+    assert seen.get("probe") == "1"

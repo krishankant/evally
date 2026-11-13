@@ -192,17 +192,22 @@ def cmd_refusals(args, cfg) -> int:
 
 
 def cmd_deepeval(args, cfg) -> int:
-    try:
-        import deepeval  # noqa: F401  (optional extra)
-    except ImportError:
-        print("DeepEval isn't installed: uv sync --extra deepeval")
-        return 1
-    from evally.graders.deepeval_side import compare, format_compare
+    from evally.graders.deepeval_side import _deepeval_env, compare, format_compare
+    with _deepeval_env():  # even the "is it installed?" import runs with telemetry off
+        try:
+            import deepeval  # noqa: F401  (optional extra)
+        except ImportError:
+            print("DeepEval isn't installed: uv sync --extra deepeval")
+            return 1
     run = _load_run(args.run, cfg)
     if run is None:
         return 1
+    suite_path = _suite_path(args.suite, cfg)
+    if run.get("suite") != suite_path.stem:
+        print(f"run {args.run} came from suite {run.get('suite')}, not {suite_path.stem}")
+        return 1
     try:
-        cases = {c.id: c for c in load_cases(_suite_path(args.suite, cfg))}
+        cases = {c.id: c for c in load_cases(suite_path)}
     except (ValueError, FileNotFoundError) as e:
         print(e)
         return 1
@@ -210,7 +215,12 @@ def cmd_deepeval(args, cfg) -> int:
     if recorded is None or args.case not in cases:
         print(f"no case {args.case} in both {args.run} and {args.suite}")
         return 1
-    print(format_compare(args.case, compare(cases[args.case], recorded)))
+    try:
+        rows = compare(cases[args.case], recorded)
+    except ValueError as e:
+        print(e)
+        return 1
+    print(format_compare(args.case, rows))
     return 0
 
 
