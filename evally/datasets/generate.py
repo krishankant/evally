@@ -12,6 +12,7 @@ import json
 import random
 from dataclasses import dataclass
 
+from evally.llm.cache import ReplayMiss
 from evally.types import Message
 
 GEN_SYSTEM = (
@@ -51,11 +52,20 @@ def _clean(text: str) -> str:
     return "" if text in QUOTES else text
 
 
-def generate(model, combos: list[dict[str, str]]) -> tuple[list[Candidate], dict[str, int]]:
+def generate(model, combos: list[dict[str, str]], skip_unrecorded: bool = False
+             ) -> tuple[list[Candidate], dict[str, int]]:
+    """With skip_unrecorded, a combination with no recording is counted as "not recorded"
+    instead of stopping the run (for when the live model can't finish every request)."""
     candidates, dropped = [], {}
     for combo in combos:
         prompt = f"Topic: {combo['topic']}\nPersona: {combo['persona']}\nPhrasing: {combo['phrasing']}"
-        reply = model.complete([Message("user", prompt)], [], GEN_SYSTEM)
+        try:
+            reply = model.complete([Message("user", prompt)], [], GEN_SYSTEM)
+        except ReplayMiss:
+            if not skip_unrecorded:
+                raise
+            dropped["not recorded"] = dropped.get("not recorded", 0) + 1
+            continue
         text = _clean(reply.message.text or "")
         if not text:
             dropped["empty"] = dropped.get("empty", 0) + 1

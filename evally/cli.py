@@ -139,7 +139,7 @@ def cmd_generate(args, cfg) -> int:
     dims = json.loads(Path(args.dims).read_text())
     combos = sample_combinations(dims, args.n, args.seed)
     try:
-        candidates, dropped = generate(_model(args, cfg), combos)
+        candidates, dropped = generate(_model(args, cfg), combos, args.skip_unrecorded)
     except ReplayMiss as e:
         print(e)
         return 1
@@ -211,6 +211,8 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument("--n", type=int, required=True, help="how many combinations to sample")
             p.add_argument("--seed", type=int, default=0)
             p.add_argument("--out", required=True, help="candidates .jsonl to write")
+            p.add_argument("--skip-unrecorded", action="store_true",
+                           help="replay: skip combinations with no recording (counted) instead of stopping")
     p = sub.add_parser("traces", help="read saved conversations from a run")
     p.add_argument("run", help="run name in evals/runs (like week01-qwen3.5-4b) or a .json path")
     p.add_argument("--case", help="show one conversation in full")

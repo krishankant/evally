@@ -77,3 +77,18 @@ def test_generate_cli_replay_miss_message(tmp_path, monkeypatch, capsys):
                      "--provider", "ollama", "--model", "m"]) == 1
     assert "Re-run with --live" in capsys.readouterr().out
     assert not out.exists()
+
+
+def test_skip_unrecorded_counts_and_keeps_the_rest(tmp_path, monkeypatch, capsys):
+    from evally.llm.cache import CachedModel
+    monkeypatch.setenv("EVALLY_CACHE_DIR", str(tmp_path / "cache"))
+    dims = tmp_path / "dims.json"
+    dims.write_text(json.dumps(DIMS))
+    combos = sample_combinations(DIMS, 3, seed=3)
+    rec = CachedModel(ScriptedModel([text_reply("only one")]), tmp_path / "cache" / "ollama-m", "record")
+    generate(rec, combos[1:2])
+    out = tmp_path / "c.jsonl"
+    assert cli.main(["generate", "--dims", str(dims), "--n", "3", "--seed", "3", "--out", str(out),
+                     "--provider", "ollama", "--model", "m", "--skip-unrecorded"]) == 0
+    assert "generated 1, dropped 2 (not recorded 2)" in capsys.readouterr().out
+    assert [json.loads(l)["id"] for l in out.read_text().splitlines()] == [candidate_id(combos[1])]
