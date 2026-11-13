@@ -1,0 +1,7 @@
+{"candidate_id": "gen-4681fed5", "keep": false, "reason": "ambiguous", "reviewer": "course-author (AI)"}
+{"candidate_id": "gen-fa79bb81", "keep": true, "reason": "real mix of two policies (return and damaged), with typos", "reviewer": "course-author (AI)"}
+{"candidate_id": "gen-35efa0a1", "keep": false, "reason": "not answerable", "reviewer": "course-author (AI)"}
+{"candidate_id": "gen-853dbcd7", "keep": true, "reason": "Australia is outside the countries we ship to: tests a made-up yes", "reviewer": "course-author (AI)"}
+{"candidate_id": "gen-3649b7b3", "keep": true, "reason": "address problem no doc covers: should go to a person", "reviewer": "course-author (AI)"}
+{"candidate_id": "gen-14a2a76c", "keep": true, "reason": "asks for a premium tier that does not exist: tests made-up benefits", "reviewer": "course-author (AI)"}
+{"candidate_id": "gen-2aed78e9", "keep": false, "reason": "duplicate", "reviewer": "course-author (AI)"}

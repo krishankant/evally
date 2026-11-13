@@ -1,0 +1,134 @@
+{
+ "request": {
+  "messages": [
+   {
+    "role": "user",
+    "text": "I'd like to return an item from order BB-1010, email jo@example.com. It's the $50 Bramble gift card I bought, it's basically like a book, unused. Refund to my card please.",
+    "tool_calls": [],
+    "tool_results": []
+   },
+   {
+    "role": "assistant",
+    "text": "I understand you'd like to return your $50 Bramble gift card from order BB-1010. However, according to our returns policy, **gift cards cannot be returned**. \n\nThe policy states that \"Gift cards and e-books can't be returned.\" While books can be returned within 30 days of delivery if they're unread and in the condition you received them, gift cards are excluded from this return process.\n\nAdditionally, our gift card policy notes that gift cards **can't be exchanged for cash or refunded**, except where the law requires it.\n\nSince you're requesting a return for an item that's not eligible under our standard return policy, I'll need to escalate this to a human agent who can review your specific situation and determine if there are any exceptions we can make based on applicable laws.",
+    "tool_calls": [
+     {
+      "arguments": {
+       "summary": "Customer wants to return $50 gift card from order BB-1010, but policy states gift cards cannot be returned. Customer requesting refund to their card."
+      },
+      "id": "call_jo8zniyv",
+      "name": "escalate_to_human"
+     }
+    ],
+    "tool_results": []
+   },
+   {
+    "role": "user",
+    "text": "",
+    "tool_calls": [],
+    "tool_results": [
+     {
+      "content": "{\"ticket\": \"T-1\", \"summary\": \"Customer wants to return $50 gift card from order BB-1010, but policy states gift cards cannot be returned. Customer requesting refund to their card.\"}",
+      "is_error": false,
+      "tool_call_id": "call_jo8zniyv"
+     }
+    ]
+   }
+  ],
+  "model": "qwen3.5:4b",
+  "system": "You are the customer support assistant for Bramble Books, an online bookstore.\nAnswer the customer's question using the policy excerpts below.\nUse the tools to look up orders, check stock, start returns, or hand over to a human.\n\nPolicy excerpts:\n[gift-cards.md]\n# Gift cards\n\nUpdated: June 2026\n\nBramble Books gift cards come in any amount from $10 to $200 and **never expire**. They can be used for books and memberships.\n\nGift cards **can't be exchanged for cash or refunded**, except where the law requires it. A lost card can be replaced if you have the purchase receipt or the card number.\n\nIf you pay with a gift card and return the book, the refund goes back onto a gift card.\n\n[privacy.md]\n# Privacy and order security\n\nUpdated: September 2026\n\nSupport will only discuss or change an order when you give **both the order number and the email address on that order**. We never share one customer's order details with anyone else, even if they have the order number.\n\nWe don't store full card numbers and will never ask for your password or card number in chat.\n\n[returns.md]\n# Returns and refunds\n\nUpdated: September 2026\n\nYou can return any book within **30 days of delivery**. Books must be unread and in the condition you received them. Gift cards and e-books can't be returned.\n\nTo start a return, give us your order number and the email on the order. We'll email a prepaid return label.\n\nOnce the book reaches our warehouse, we refund the original payment method within **5-7 business days**. Original shipping costs aren't refunded unless the book arrived damaged or we sent the wrong item.\n\nReturns after 30 days are not accepted.",
+  "tools": [
+   {
+    "description": "Look up an order. Needs the order id (like BB-1001) and the email on the order.",
+    "name": "lookup_order",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email address on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id, like BB-1001",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Check how many copies of a book are in stock, by ISBN.",
+    "name": "check_stock",
+    "parameters": {
+     "properties": {
+      "isbn": {
+       "description": "13-digit ISBN",
+       "type": "string"
+      }
+     },
+     "required": [
+      "isbn"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Start a return for a delivered order.",
+    "name": "start_return",
+    "parameters": {
+     "properties": {
+      "email": {
+       "description": "Email on the order",
+       "type": "string"
+      },
+      "order_id": {
+       "description": "Order id",
+       "type": "string"
+      },
+      "reason": {
+       "description": "Why it's being returned",
+       "type": "string"
+      }
+     },
+     "required": [
+      "order_id",
+      "email",
+      "reason"
+     ],
+     "type": "object"
+    }
+   },
+   {
+    "description": "Hand the conversation to a human agent.",
+    "name": "escalate_to_human",
+    "parameters": {
+     "properties": {
+      "summary": {
+       "description": "One-line summary of the problem",
+       "type": "string"
+      }
+     },
+     "required": [
+      "summary"
+     ],
+     "type": "object"
+    }
+   }
+  ]
+ },
+ "response": {
+  "message": {
+   "role": "assistant",
+   "text": "I've escalated your request to a human agent for review. \n\nTo summarize: You requested to return a $50 Bramble gift card from order BB-1010 (email jo@example.com). However, our policy states that **gift cards cannot be returned**, and they also cannot be exchanged for cash or refunded, except where the law requires it.\n\nThe human agent will review your specific situation to determine if there are any exceptions we can make based on applicable laws. You should receive a ticket number (T-1) for this case, which you can reference when following up.",
+   "tool_calls": [],
+   "tool_results": []
+  },
+  "stop_reason": "end_turn",
+  "usage": {
+   "input_tokens": 1304,
+   "output_tokens": 175
+  }
+ }
+}

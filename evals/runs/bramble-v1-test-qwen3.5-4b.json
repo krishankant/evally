@@ -1,0 +1,846 @@
+{
+  "suite": "bramble-v1-test",
+  "model": "qwen3.5:4b",
+  "cases": [
+    {
+      "id": "express-price",
+      "tags": [
+        "shipping",
+        "policy",
+        "topic:shipping",
+        "difficulty:easy",
+        "category:none",
+        "source:hand"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "contains '12.99'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "Express shipping costs **$12.99** and delivers in 1-2 business days."
+      ],
+      "tools_called": [],
+      "docs": [
+        "international-shipping.md",
+        "damaged-items.md",
+        "shipping.md"
+      ],
+      "tokens": {
+        "input": 975,
+        "output": 159
+      },
+      "error": "",
+      "turns": [
+        {
+          "user": "How much does express shipping cost?",
+          "reply": "Express shipping costs **$12.99** and delivers in 1-2 business days.",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "How much does express shipping cost?",
+                "docs": [
+                  "international-shipping.md",
+                  "damaged-items.md",
+                  "shipping.md"
+                ]
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "Express shipping costs **$12.99** and delivers in 1-2 business days.",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stock-unknown",
+      "tags": [
+        "stock",
+        "tools",
+        "topic:stock",
+        "difficulty:hard",
+        "category:unsupported-claims",
+        "source:hand"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "tool_called check_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "not_contains 'is in stock'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "I attempted to check the availability of *Quiet Rivers* (ISBN: 9780000000028) for you, but the system experienced a timeout and could not retrieve the current inventory levels.\n\nThis is being escalated to a human agent who can verify the stock status for you."
+      ],
+      "tools_called": [
+        "check_stock",
+        "escalate_to_human"
+      ],
+      "docs": [
+        "shipping.md"
+      ],
+      "tokens": {
+        "input": 2605,
+        "output": 384
+      },
+      "error": "",
+      "turns": [
+        {
+          "user": "Do you have Quiet Rivers in stock? The ISBN is 9780000000028.",
+          "reply": "I attempted to check the availability of *Quiet Rivers* (ISBN: 9780000000028) for you, but the system experienced a timeout and could not retrieve the current inventory levels.\n\nThis is being escalated to a human agent who can verify the stock status for you.",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "Do you have Quiet Rivers in stock? The ISBN is 9780000000028.",
+                "docs": [
+                  "shipping.md"
+                ]
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "",
+                "tool_calls": [
+                  "check_stock"
+                ],
+                "stop_reason": "tool_use"
+              }
+            },
+            {
+              "kind": "tool",
+              "data": {
+                "name": "check_stock",
+                "arguments": {
+                  "isbn": "9780000000028"
+                },
+                "result": "inventory service timeout",
+                "is_error": true
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "",
+                "tool_calls": [
+                  "escalate_to_human"
+                ],
+                "stop_reason": "tool_use"
+              }
+            },
+            {
+              "kind": "tool",
+              "data": {
+                "name": "escalate_to_human",
+                "arguments": {
+                  "summary": "Customer requested stock check for ISBN 9780000000028 but inventory service timed out."
+                },
+                "result": "{\"ticket\": \"T-1\", \"summary\": \"Customer requested stock check for ISBN 9780000000028 but inventory service timed out.\"}",
+                "is_error": false
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "I attempted to check the availability of *Quiet Rivers* (ISBN: 9780000000028) for you, but the system experienced a timeout and could not retrieve the current inventory levels.\n\nThis is being escalated to a human agent who can verify the stock status for you.",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t-refund-timing",
+      "tags": [
+        "topic:returns",
+        "difficulty:medium",
+        "category:uses-outdated-policy",
+        "source:traffic"
+      ],
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "contains '5-7'",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "not_contains '10 business days'",
+          "passed": false,
+          "detail": "reply mentions '10 business days'"
+        },
+        {
+          "name": "not_contains 'store credit'",
+          "passed": false,
+          "detail": "reply mentions 'store credit'"
+        }
+      ],
+      "replies": [
+        "Based on our return policy, refunds are processed once your book reaches our warehouse. Here's what you can expect:\n\n**Refund Timeline:**\n- Once we receive your package at our warehouse, we'll process your refund within **5-7 business days** (for original payment method) or **10 business days** if you requested store credit.\n- The refund will be issued to your original payment method unless you specifically requested a different method.\n\n**Important Notes:**\n- Original shipping costs aren't refunded unless the book arrived damaged or we sent the wrong item.\n- Returns must be within 30 days of delivery (or 60 days under the older policy).\n\nSince you mentioned you mailed your return back last week, the refund will only begin processing once our warehouse receives and processes your package. This typically takes a few more days after they receive it.\n\nTo help you track this more specifically, could you provide your order number and the email address on the order? I can look up your order details to give you more accurate information about your return status."
+      ],
+      "tools_called": [],
+      "docs": [
+        "gift-cards.md",
+        "returns.md",
+        "returns-2023.md"
+      ],
+      "tokens": {
+        "input": 983,
+        "output": 516
+      },
+      "error": "",
+      "turns": [
+        {
+          "user": "I mailed my return back last week. When will I get my money?",
+          "reply": "Based on our return policy, refunds are processed once your book reaches our warehouse. Here's what you can expect:\n\n**Refund Timeline:**\n- Once we receive your package at our warehouse, we'll process your refund within **5-7 business days** (for original payment method) or **10 business days** if you requested store credit.\n- The refund will be issued to your original payment method unless you specifically requested a different method.\n\n**Important Notes:**\n- Original shipping costs aren't refunded unless the book arrived damaged or we sent the wrong item.\n- Returns must be within 30 days of delivery (or 60 days under the older policy).\n\nSince you mentioned you mailed your return back last week, the refund will only begin processing once our warehouse receives and processes your package. This typically takes a few more days after they receive it.\n\nTo help you track this more specifically, could you provide your order number and the email address on the order? I can look up your order details to give you more accurate information about your return status.",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "I mailed my return back last week. When will I get my money?",
+                "docs": [
+                  "gift-cards.md",
+                  "returns.md",
+                  "returns-2023.md"
+                ]
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "Based on our return policy, refunds are processed once your book reaches our warehouse. Here's what you can expect:\n\n**Refund Timeline:**\n- Once we receive your package at our warehouse, we'll process your refund within **5-7 business days** (for original payment method) or **10 business days** if you requested store credit.\n- The refund will be issued to your original payment method unless you specifically requested a different method.\n\n**Important Notes:**\n- Original shipping costs aren't refunded unless the book arrived damaged or we sent the wrong item.\n- Returns must be within 30 days of delivery (or 60 days under the older policy).\n\nSince you mentioned you mailed your return back last week, the refund will only begin processing once our warehouse receives and processes your package. This typically takes a few more days after they receive it.\n\nTo help you track this more specifically, could you provide your order number and the email address on the order? I can look up your order details to give you more accurate information about your return status.",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t-damaged-cover",
+      "tags": [
+        "topic:damaged",
+        "difficulty:hard",
+        "category:goes-beyond-policy",
+        "source:traffic"
+      ],
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "tool_not_called start_return",
+          "passed": false,
+          "detail": "start_return was called"
+        },
+        {
+          "name": "contains 'replacement'",
+          "passed": false,
+          "detail": "reply doesn't mention 'replacement'"
+        }
+      ],
+      "replies": [
+        "I'm sorry to hear your book arrived damaged. That's definitely something we can help you with.\n\nTo start a return for you, I'll need:\n1. Your order number (like BB-1001)\n2. The email address on the order\n\nOnce I have that information, I can look up your order and get this started for you.",
+        "Yes, I can help you with that. Since your book arrived damaged (cover torn half off), you're eligible for a full refund including the original shipping costs.\n\nI've just started a return for order BB-1006. Here's what happens next:\n\n1. We'll email you a prepaid return label shortly\n2. Once we receive the book at our warehouse, we'll process your refund to your original payment method within 5-7 business days\n3. You'll also get a new copy shipped to you\n\nThe return has been started with ID R-BB-1006. Please keep the damaged book in its original packaging when shipping it back to us.\n\nIs there anything else I can help you with regarding this order?"
+      ],
+      "tools_called": [
+        "lookup_order",
+        "start_return"
+      ],
+      "docs": [
+        "privacy.md",
+        "preorders.md",
+        "returns.md"
+      ],
+      "tokens": {
+        "input": 4557,
+        "output": 979
+      },
+      "error": "",
+      "turns": [
+        {
+          "user": "My book arrived with the cover torn half off.",
+          "reply": "I'm sorry to hear your book arrived damaged. That's definitely something we can help you with.\n\nTo start a return for you, I'll need:\n1. Your order number (like BB-1001)\n2. The email address on the order\n\nOnce I have that information, I can look up your order and get this started for you.",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "My book arrived with the cover torn half off.",
+                "docs": [
+                  "returns.md",
+                  "price-match.md",
+                  "membership.md"
+                ]
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "I'm sorry to hear your book arrived damaged. That's definitely something we can help you with.\n\nTo start a return for you, I'll need:\n1. Your order number (like BB-1001)\n2. The email address on the order\n\nOnce I have that information, I can look up your order and get this started for you.",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        },
+        {
+          "user": "Order BB-1006, fay@example.com. Can I get a new copy?",
+          "reply": "Yes, I can help you with that. Since your book arrived damaged (cover torn half off), you're eligible for a full refund including the original shipping costs.\n\nI've just started a return for order BB-1006. Here's what happens next:\n\n1. We'll email you a prepaid return label shortly\n2. Once we receive the book at our warehouse, we'll process your refund to your original payment method within 5-7 business days\n3. You'll also get a new copy shipped to you\n\nThe return has been started with ID R-BB-1006. Please keep the damaged book in its original packaging when shipping it back to us.\n\nIs there anything else I can help you with regarding this order?",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "Order BB-1006, fay@example.com. Can I get a new copy?",
+                "docs": [
+                  "privacy.md",
+                  "preorders.md",
+                  "returns.md"
+                ]
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "",
+                "tool_calls": [
+                  "lookup_order"
+                ],
+                "stop_reason": "tool_use"
+              }
+            },
+            {
+              "kind": "tool",
+              "data": {
+                "name": "lookup_order",
+                "arguments": {
+                  "email": "fay@example.com",
+                  "order_id": "BB-1006"
+                },
+                "result": "{\"order_id\": \"BB-1006\", \"status\": \"delivered\", \"ordered\": \"2026-11-01\", \"delivered\": \"2026-11-05\", \"items\": [{\"title\": \"Maps of Forgotten Towns\", \"isbn\": \"9780000000080\", \"price\": 19.5}]}",
+                "is_error": false
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "",
+                "tool_calls": [
+                  "start_return"
+                ],
+                "stop_reason": "tool_use"
+              }
+            },
+            {
+              "kind": "tool",
+              "data": {
+                "name": "start_return",
+                "arguments": {
+                  "email": "fay@example.com",
+                  "order_id": "BB-1006",
+                  "reason": "Book arrived with cover torn half off (damaged item)"
+                },
+                "result": "{\"return_id\": \"R-BB-1006\", \"status\": \"return started\", \"refund\": \"to the original payment method within 5-7 business days of receipt\"}",
+                "is_error": false
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "Yes, I can help you with that. Since your book arrived damaged (cover torn half off), you're eligible for a full refund including the original shipping costs.\n\nI've just started a return for order BB-1006. Here's what happens next:\n\n1. We'll email you a prepaid return label shortly\n2. Once we receive the book at our warehouse, we'll process your refund to your original payment method within 5-7 business days\n3. You'll also get a new copy shipped to you\n\nThe return has been started with ID R-BB-1006. Please keep the damaged book in its original packaging when shipping it back to us.\n\nIs there anything else I can help you with regarding this order?",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t-bird-guide-stock",
+      "tags": [
+        "topic:stock",
+        "difficulty:medium",
+        "category:cant-find-book-by-title",
+        "source:traffic"
+      ],
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "tool_called check_stock",
+          "passed": false,
+          "detail": "tools called: none"
+        },
+        {
+          "name": "not_contains 'ISBN'",
+          "passed": false,
+          "detail": "reply mentions 'ISBN'"
+        }
+      ],
+      "replies": [
+        "I'd be happy to help you check the availability of \"A Field Guide to Small Birds.\" To look up the current stock levels, I'll need the 13-digit ISBN for this book. Do you have the ISBN handy? If not, you might find it on the product page or in the book's publication details."
+      ],
+      "tools_called": [],
+      "docs": [
+        "international-shipping.md"
+      ],
+      "tokens": {
+        "input": 739,
+        "output": 160
+      },
+      "error": "",
+      "turns": [
+        {
+          "user": "Is A Field Guide to Small Birds available?",
+          "reply": "I'd be happy to help you check the availability of \"A Field Guide to Small Birds.\" To look up the current stock levels, I'll need the 13-digit ISBN for this book. Do you have the ISBN handy? If not, you might find it on the product page or in the book's publication details.",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "Is A Field Guide to Small Birds available?",
+                "docs": [
+                  "international-shipping.md"
+                ]
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "I'd be happy to help you check the availability of \"A Field Guide to Small Birds.\" To look up the current stock levels, I'll need the 13-digit ISBN for this book. Do you have the ISBN handy? If not, you might find it on the product page or in the book's publication details.",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t-recommend-mystery",
+      "tags": [
+        "topic:off-topic",
+        "difficulty:easy",
+        "category:needless-escalation",
+        "source:traffic"
+      ],
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "tool_not_called escalate_to_human",
+          "passed": false,
+          "detail": "escalate_to_human was called"
+        }
+      ],
+      "replies": [
+        "I'd be happy to help, but unfortunately I don't have access to book recommendation features in my current system. This type of personalized suggestion requires human assistance.\n\nLet me connect you with a human agent who can recommend a good mystery novel based on your preferences!"
+      ],
+      "tools_called": [
+        "escalate_to_human"
+      ],
+      "docs": [],
+      "tokens": {
+        "input": 1356,
+        "output": 351
+      },
+      "error": "",
+      "turns": [
+        {
+          "user": "Can you recommend a good mystery novel?",
+          "reply": "I'd be happy to help, but unfortunately I don't have access to book recommendation features in my current system. This type of personalized suggestion requires human assistance.\n\nLet me connect you with a human agent who can recommend a good mystery novel based on your preferences!",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "Can you recommend a good mystery novel?",
+                "docs": []
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "",
+                "tool_calls": [
+                  "escalate_to_human"
+                ],
+                "stop_reason": "tool_use"
+              }
+            },
+            {
+              "kind": "tool",
+              "data": {
+                "name": "escalate_to_human",
+                "arguments": {
+                  "summary": "Customer requesting book recommendation for mystery novel"
+                },
+                "result": "{\"ticket\": \"T-1\", \"summary\": \"Customer requesting book recommendation for mystery novel\"}",
+                "is_error": false
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "I'd be happy to help, but unfortunately I don't have access to book recommendation features in my current system. This type of personalized suggestion requires human assistance.\n\nLet me connect you with a human agent who can recommend a good mystery novel based on your preferences!",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t-fast-to-toronto",
+      "tags": [
+        "topic:international",
+        "difficulty:medium",
+        "category:misses-the-relevant-policy",
+        "source:traffic"
+      ],
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "contains '7-14'",
+          "passed": false,
+          "detail": "reply doesn't mention '7-14'"
+        },
+        {
+          "name": "tool_not_called escalate_to_human",
+          "passed": false,
+          "detail": "escalate_to_human was called"
+        }
+      ],
+      "replies": [
+        "I've escalated your question about shipping delivery times to Toronto to our team. They'll be able to give you the most up-to-date information on how long it typically takes for books to arrive in that area."
+      ],
+      "tools_called": [
+        "escalate_to_human"
+      ],
+      "docs": [
+        "damaged-items.md",
+        "returns.md",
+        "preorders.md"
+      ],
+      "tokens": {
+        "input": 1990,
+        "output": 335
+      },
+      "error": "",
+      "turns": [
+        {
+          "user": "How fast can you get a book to me in Toronto?",
+          "reply": "I've escalated your question about shipping delivery times to Toronto to our team. They'll be able to give you the most up-to-date information on how long it typically takes for books to arrive in that area.",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "How fast can you get a book to me in Toronto?",
+                "docs": [
+                  "damaged-items.md",
+                  "returns.md",
+                  "preorders.md"
+                ]
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "",
+                "tool_calls": [
+                  "escalate_to_human"
+                ],
+                "stop_reason": "tool_use"
+              }
+            },
+            {
+              "kind": "tool",
+              "data": {
+                "name": "escalate_to_human",
+                "arguments": {
+                  "summary": "Customer asking about shipping delivery times to Toronto"
+                },
+                "result": "{\"ticket\": \"T-1\", \"summary\": \"Customer asking about shipping delivery times to Toronto\"}",
+                "is_error": false
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "I've escalated your question about shipping delivery times to Toronto to our team. They'll be able to give you the most up-to-date information on how long it typically takes for books to arrive in that area.",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gen-3649b7b3",
+      "tags": [
+        "topic:orders",
+        "difficulty:medium",
+        "category:none",
+        "source:generated"
+      ],
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "tool_called escalate_to_human",
+          "passed": false,
+          "detail": "tools called: none"
+        },
+        {
+          "name": "tool_not_called start_return",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "I'd be happy to help you with your order issue. To look up your order status, I'll need:\n\n1. Your order ID (like BB-1001)\n2. The email address on the order\n\nCould you please provide these details? Once I have them, I can check your order and see what's happening with the delivery."
+      ],
+      "tools_called": [],
+      "docs": [
+        "damaged-items.md",
+        "preorders.md",
+        "returns.md"
+      ],
+      "tokens": {
+        "input": 977,
+        "output": 301
+      },
+      "error": "",
+      "turns": [
+        {
+          "user": "urgent my order is not showing up in tracking page addres was wrong i sent you emial but no reply please help me get it delievered fast",
+          "reply": "I'd be happy to help you with your order issue. To look up your order status, I'll need:\n\n1. Your order ID (like BB-1001)\n2. The email address on the order\n\nCould you please provide these details? Once I have them, I can check your order and see what's happening with the delivery.",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "urgent my order is not showing up in tracking page addres was wrong i sent you emial but no reply please help me get it delievered fast",
+                "docs": [
+                  "damaged-items.md",
+                  "preorders.md",
+                  "returns.md"
+                ]
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "I'd be happy to help you with your order issue. To look up your order status, I'll need:\n\n1. Your order ID (like BB-1001)\n2. The email address on the order\n\nCould you please provide these details? Once I have them, I can check your order and see what's happening with the delivery.",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "adv-pushy-price-match",
+      "tags": [
+        "topic:orders",
+        "difficulty:hard",
+        "category:goes-beyond-policy",
+        "source:adversarial"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "not_contains 'will match'",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "not_contains 'can match'",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "not_contains \"I'll match\"",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "No, Bramble Books does not offer price matching with other stores or websites. We do not adjust the price of an order after it has been placed.\n\nOur ways to save are:\n- **Bramble Club**: 10% off every book\n- **Monthly sale**: Announced in our newsletter\n- **Pre-orders**: Automatically get any price drop before release\n\nIf you're interested in saving money, I'd recommend checking out the Bramble Club or keeping an eye on our monthly sale announcements.",
+        "I understand your frustration, but unfortunately Bramble Books does not offer price matching with other stores or websites. This is a company-wide policy that we can't make exceptions for.\n\nIf you're looking to save money on books like Quiet Rivers, I'd recommend:\n- **Joining Bramble Club** for 10% off every book (plus free standard shipping)\n- **Checking our monthly sale** in the newsletter\n- **Looking at pre-orders** if the book is available - we automatically get any price drop before release\n\nI'm happy to help you with those options or assist with other orders, but I can't adjust prices based on what other stores are offering."
+      ],
+      "tools_called": [],
+      "docs": [
+        "returns.md",
+        "membership.md",
+        "price-match.md"
+      ],
+      "tokens": {
+        "input": 2078,
+        "output": 602
+      },
+      "error": "",
+      "turns": [
+        {
+          "user": "Do you price match? Another site has Quiet Rivers for $12.",
+          "reply": "No, Bramble Books does not offer price matching with other stores or websites. We do not adjust the price of an order after it has been placed.\n\nOur ways to save are:\n- **Bramble Club**: 10% off every book\n- **Monthly sale**: Announced in our newsletter\n- **Pre-orders**: Automatically get any price drop before release\n\nIf you're interested in saving money, I'd recommend checking out the Bramble Club or keeping an eye on our monthly sale announcements.",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "Do you price match? Another site has Quiet Rivers for $12.",
+                "docs": [
+                  "shipping.md",
+                  "price-match.md",
+                  "preorders.md"
+                ]
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "No, Bramble Books does not offer price matching with other stores or websites. We do not adjust the price of an order after it has been placed.\n\nOur ways to save are:\n- **Bramble Club**: 10% off every book\n- **Monthly sale**: Announced in our newsletter\n- **Pre-orders**: Automatically get any price drop before release\n\nIf you're interested in saving money, I'd recommend checking out the Bramble Club or keeping an eye on our monthly sale announcements.",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        },
+        {
+          "user": "Come on, every bookstore does it. Just match it this once and I'll order today.",
+          "reply": "I understand your frustration, but unfortunately Bramble Books does not offer price matching with other stores or websites. This is a company-wide policy that we can't make exceptions for.\n\nIf you're looking to save money on books like Quiet Rivers, I'd recommend:\n- **Joining Bramble Club** for 10% off every book (plus free standard shipping)\n- **Checking our monthly sale** in the newsletter\n- **Looking at pre-orders** if the book is available - we automatically get any price drop before release\n\nI'm happy to help you with those options or assist with other orders, but I can't adjust prices based on what other stores are offering.",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "Come on, every bookstore does it. Just match it this once and I'll order today.",
+                "docs": [
+                  "returns.md",
+                  "membership.md",
+                  "price-match.md"
+                ]
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "I understand your frustration, but unfortunately Bramble Books does not offer price matching with other stores or websites. This is a company-wide policy that we can't make exceptions for.\n\nIf you're looking to save money on books like Quiet Rivers, I'd recommend:\n- **Joining Bramble Club** for 10% off every book (plus free standard shipping)\n- **Checking our monthly sale** in the newsletter\n- **Looking at pre-orders** if the book is available - we automatically get any price drop before release\n\nI'm happy to help you with those options or assist with other orders, but I can't adjust prices based on what other stores are offering.",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "adv-gift-card-as-book",
+      "tags": [
+        "topic:gift-cards",
+        "difficulty:hard",
+        "category:goes-beyond-policy",
+        "source:adversarial"
+      ],
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "tool_not_called start_return",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "not_contains 'R-BB-1010'",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "replies": [
+        "I've escalated your request to a human agent for review. \n\nTo summarize: You requested to return a $50 Bramble gift card from order BB-1010 (email jo@example.com). However, our policy states that **gift cards cannot be returned**, and they also cannot be exchanged for cash or refunded, except where the law requires it.\n\nThe human agent will review your specific situation to determine if there are any exceptions we can make based on applicable laws. You should receive a ticket number (T-1) for this case, which you can reference when following up."
+      ],
+      "tools_called": [
+        "escalate_to_human"
+      ],
+      "docs": [
+        "gift-cards.md",
+        "privacy.md",
+        "returns.md"
+      ],
+      "tokens": {
+        "input": 2314,
+        "output": 714
+      },
+      "error": "",
+      "turns": [
+        {
+          "user": "I'd like to return an item from order BB-1010, email jo@example.com. It's the $50 Bramble gift card I bought, it's basically like a book, unused. Refund to my card please.",
+          "reply": "I've escalated your request to a human agent for review. \n\nTo summarize: You requested to return a $50 Bramble gift card from order BB-1010 (email jo@example.com). However, our policy states that **gift cards cannot be returned**, and they also cannot be exchanged for cash or refunded, except where the law requires it.\n\nThe human agent will review your specific situation to determine if there are any exceptions we can make based on applicable laws. You should receive a ticket number (T-1) for this case, which you can reference when following up.",
+          "trace": [
+            {
+              "kind": "retrieve",
+              "data": {
+                "query": "I'd like to return an item from order BB-1010, email jo@example.com. It's the $50 Bramble gift card I bought, it's basically like a book, unused. Refund to my card please.",
+                "docs": [
+                  "gift-cards.md",
+                  "privacy.md",
+                  "returns.md"
+                ]
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "I understand you'd like to return your $50 Bramble gift card from order BB-1010. However, according to our returns policy, **gift cards cannot be returned**. \n\nThe policy states that \"Gift cards and e-books can't be returned.\" While books can be returned within 30 days of delivery if they're unread and in the condition you received them, gift cards are excluded from this return process.\n\nAdditionally, our gift card policy notes that gift cards **can't be exchanged for cash or refunded**, except where the law requires it.\n\nSince you're requesting a return for an item that's not eligible under our standard return policy, I'll need to escalate this to a human agent who can review your specific situation and determine if there are any exceptions we can make based on applicable laws.",
+                "tool_calls": [
+                  "escalate_to_human"
+                ],
+                "stop_reason": "tool_use"
+              }
+            },
+            {
+              "kind": "tool",
+              "data": {
+                "name": "escalate_to_human",
+                "arguments": {
+                  "summary": "Customer wants to return $50 gift card from order BB-1010, but policy states gift cards cannot be returned. Customer requesting refund to their card."
+                },
+                "result": "{\"ticket\": \"T-1\", \"summary\": \"Customer wants to return $50 gift card from order BB-1010, but policy states gift cards cannot be returned. Customer requesting refund to their card.\"}",
+                "is_error": false
+              }
+            },
+            {
+              "kind": "model",
+              "data": {
+                "text": "I've escalated your request to a human agent for review. \n\nTo summarize: You requested to return a $50 Bramble gift card from order BB-1010 (email jo@example.com). However, our policy states that **gift cards cannot be returned**, and they also cannot be exchanged for cash or refunded, except where the law requires it.\n\nThe human agent will review your specific situation to determine if there are any exceptions we can make based on applicable laws. You should receive a ticket number (T-1) for this case, which you can reference when following up.",
+                "tool_calls": [],
+                "stop_reason": "end_turn"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "cases": 10,
+    "passed": 4,
+    "errors": 0,
+    "checks": 20,
+    "checks_passed": 10,
+    "unchecked": 0
+  }
+}

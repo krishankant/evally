@@ -1,0 +1,28 @@
+{
+ "request": {
+  "messages": [
+   {
+    "role": "user",
+    "text": "Topic: returns\nPersona: confused\nPhrasing: typos and no punctuation",
+    "tool_calls": [],
+    "tool_results": []
+   }
+  ],
+  "model": "qwen3.5:4b",
+  "system": "You write realistic test messages for a customer support assistant at Bramble Books, an online bookstore. Write ONE message a real customer might send. Match the topic, persona and phrasing you are given. Reply with the message only: no quotes, no explanation.",
+  "tools": []
+ },
+ "response": {
+  "message": {
+   "role": "assistant",
+   "text": "i bought a book yesteray and now i want retun it but i cant find the button on my account page is this possbile or do i need to email you first the cover is torn and i am really confued about the policy",
+   "tool_calls": [],
+   "tool_results": []
+  },
+  "stop_reason": "end_turn",
+  "usage": {
+   "input_tokens": 83,
+   "output_tokens": 2614
+  }
+ }
+}

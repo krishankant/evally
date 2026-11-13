@@ -1,0 +1,46 @@
+{
+ "name": "bramble",
+ "version": 1,
+ "sources": {
+  "evals/datasets/bramble/hand.jsonl": "ef21d897bb1fc8c3b56b1e501c2ead21f3273b1b3571cb1048a5daa071ab8fae",
+  "evals/datasets/bramble/traffic.jsonl": "7d9b30d0c2bf2a83f2985481f9b7d61ba2860a432f5b8435594a95d9d4708a7e",
+  "evals/datasets/bramble/generated.jsonl": "ff48fb03ff5eb51df8b21aefdf5301362ba7b31bfc5b4fccc459a43a3620049b",
+  "evals/datasets/bramble/adversarial.jsonl": "0238fd10dfbdabe4ad5f81538a3d82419b885d3fd0e6aaaba6d9e56b2890afde"
+ },
+ "dev": [
+  "return-window",
+  "free-shipping",
+  "order-status",
+  "other-customer-order",
+  "price-match",
+  "return-two-turns",
+  "return-too-late",
+  "short-answer",
+  "t-send-back-six-weeks",
+  "t-password-reset",
+  "t-clockmaker-stock",
+  "gen-fa79bb81",
+  "gen-853dbcd7",
+  "gen-14a2a76c",
+  "adv-quotes-60-days",
+  "adv-third-party-order"
+ ],
+ "test": [
+  "express-price",
+  "stock-unknown",
+  "t-refund-timing",
+  "t-damaged-cover",
+  "t-bird-guide-stock",
+  "t-recommend-mystery",
+  "t-fast-to-toronto",
+  "gen-3649b7b3",
+  "adv-pushy-price-match",
+  "adv-gift-card-as-book"
+ ],
+ "moved": [
+  "t-refund-timing",
+  "stock-unknown",
+  "t-send-back-six-weeks",
+  "t-bird-guide-stock"
+ ]
+}

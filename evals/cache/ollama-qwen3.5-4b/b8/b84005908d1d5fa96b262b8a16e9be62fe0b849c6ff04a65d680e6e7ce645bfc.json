@@ -1,0 +1,28 @@
+{
+ "request": {
+  "messages": [
+   {
+    "role": "user",
+    "text": "Topic: membership\nPersona: in a hurry\nPhrasing: uses the store's own words",
+    "tool_calls": [],
+    "tool_results": []
+   }
+  ],
+  "model": "qwen3.5:4b",
+  "system": "You write realistic test messages for a customer support assistant at Bramble Books, an online bookstore. Write ONE message a real customer might send. Match the topic, persona and phrasing you are given. Reply with the message only: no quotes, no explanation.",
+  "tools": []
+ },
+ "response": {
+  "message": {
+   "role": "assistant",
+   "text": "Hi, I'm in a rush. My Bramble Books membership renewal didn't go through last night. Can you fix it now so I can access my account?",
+   "tool_calls": [],
+   "tool_results": []
+  },
+  "stop_reason": "end_turn",
+  "usage": {
+   "input_tokens": 86,
+   "output_tokens": 2901
+  }
+ }
+}

@@ -1,0 +1,20 @@
+// bramble v1, source: traffic. One case per week 2 failure category, from the labelled week 2
+// conversations (week02-traffic-qwen3.5-4b). Turns copied verbatim; checks aim at the failure the label describes.
+// uses-outdated-policy: blended the 2023 policy in (store credit, 10 business days, 60 days). Current: 5-7 business days.
+{"id": "t-refund-timing", "tags": ["topic:returns", "difficulty:medium", "category:uses-outdated-policy", "source:traffic"], "turns": ["I mailed my return back last week. When will I get my money?"], "checks": [{"type": "contains", "value": "5-7"}, {"type": "not_contains", "value": "10 business days"}, {"type": "not_contains", "value": "store credit"}]}
+// misses-the-relevant-policy: returns.md not retrieved; said the policy "isn't covered" and escalated. Answer: not after 30 days.
+{"id": "t-send-back-six-weeks", "tags": ["topic:returns", "difficulty:medium", "category:misses-the-relevant-policy", "source:traffic"], "turns": ["can i send back a book i didnt like? got it about 6 weeks ago"], "checks": [{"type": "contains", "value": "30"}, {"type": "tool_not_called", "value": "escalate_to_human"}]}
+// goes-beyond-policy: started a normal return and asked for the book back. damaged-items.md: replacement or refund, no need to send it back.
+{"id": "t-damaged-cover", "tags": ["topic:damaged", "difficulty:hard", "category:goes-beyond-policy", "source:traffic"], "turns": ["My book arrived with the cover torn half off.", "Order BB-1006, fay@example.com. Can I get a new copy?"], "checks": [{"type": "tool_not_called", "value": "start_return"}, {"type": "contains", "value": "replacement"}]}
+// cant-find-book-by-title: asked for the ISBN instead of looking the title up. The book is in the catalogue (out of stock).
+{"id": "t-bird-guide-stock", "tags": ["topic:stock", "difficulty:medium", "category:cant-find-book-by-title", "source:traffic"], "turns": ["Is A Field Guide to Small Birds available?"], "checks": [{"type": "tool_called", "value": "check_stock"}, {"type": "not_contains", "value": "ISBN"}]}
+// needless-escalation: opened a human ticket for a book recommendation.
+{"id": "t-recommend-mystery", "tags": ["topic:off-topic", "difficulty:easy", "category:needless-escalation", "source:traffic"], "turns": ["Can you recommend a good mystery novel?"], "checks": [{"type": "tool_not_called", "value": "escalate_to_human"}]}
+// unsupported-claims: invented a self-service "Forgot Password" option no doc mentions.
+// The check only catches this one invention; a different made-up feature passes. Weeks 4-5 (model-graded checks) close that gap.
+{"id": "t-password-reset", "tags": ["topic:account", "difficulty:medium", "category:unsupported-claims", "source:traffic"], "turns": ["I forgot my account password, can you reset it for me?"], "checks": [{"type": "not_contains", "value": "forgot password"}]}
+// Added at the measurement check: a second case for each category with one, so the split can put one in each half.
+// cant-find-book-by-title: same failure as the bird guide, a different book (in stock at the main warehouse).
+{"id": "t-clockmaker-stock", "tags": ["topic:stock", "difficulty:medium", "category:cant-find-book-by-title", "source:traffic"], "turns": ["Do you have The Clockmaker's Apprentice in stock?"], "checks": [{"type": "tool_called", "value": "check_stock"}, {"type": "not_contains", "value": "ISBN"}]}
+// misses-the-relevant-policy: international-shipping.md not retrieved, so a FAQ was escalated. Answer: 7-14 business days, $19.99.
+{"id": "t-fast-to-toronto", "tags": ["topic:international", "difficulty:medium", "category:misses-the-relevant-policy", "source:traffic"], "turns": ["How fast can you get a book to me in Toronto?"], "checks": [{"type": "contains", "value": "7-14"}, {"type": "tool_not_called", "value": "escalate_to_human"}]}
