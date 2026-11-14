@@ -17,6 +17,7 @@
     evally grade <run> [--rubric R] [--scale binary|1-5] [--case ID]   LLM grader, one verdict per rubric
     evally pad <run>                     a copy of the run with one sentence of filler on each last reply
     evally bias <run-a> <run-b>          which reply is better, asked in both orders (grader biases)
+    evally geval <run> --rubric R --case ID   our grader and DeepEval's G-Eval, side by side
 """
 
 from __future__ import annotations
@@ -39,7 +40,7 @@ from evally.evals_core.labels import append_label, code_loop, format_report, lab
 from evally.evals_core.traces import format_case_list, format_conversation, run_path
 from evally.datasets.build import build
 from evally.datasets.dimensions import DIMENSIONS
-from evally.graders.judge import format_case_verdicts, format_grades, grade_run, policy_reference, save_grades
+from evally.graders.judge import format_case_verdicts, format_grades, grade_run, judge_case, policy_reference, save_grades
 from evally.graders.pairwise import bias_test, format_bias, pad_run
 from evally.graders.refusal import refusal_match
 from evally.graders.rubrics import load_rubrics
@@ -48,6 +49,7 @@ from evally.datasets.generate import generate, sample_combinations
 from evally.datasets.review import decisions_path, load_candidates, load_decisions, review_loop, save_decision, survival_report
 from evally.llm.cache import CachedModel, ReplayMiss
 from evally.llm.factory import make_model
+from evally.llm.prices import format_cost
 from evally.types import Message
 
 CONNECTION_ERRORS = (openai.APIConnectionError, anthropic.APIConnectionError)
@@ -316,6 +318,49 @@ def cmd_bias(args, cfg) -> int:
     return 0
 
 
+def cmd_geval(args, cfg) -> int:
+    from evally.graders.deepeval_side import _deepeval_env
+    with _deepeval_env():
+        try:
+            import deepeval  # noqa: F401  (optional extra)
+        except ImportError:
+            print("DeepEval isn't installed: uv sync --extra deepeval")
+            return 1
+    from evally.graders.deepeval_geval import THRESHOLD, geval_case
+    run = _load_run(args.run, cfg)
+    if run is None:
+        return 1
+    rubrics = load_rubrics()
+    if args.rubric not in rubrics:
+        print(f"unknown rubric {args.rubric!r} (known: {', '.join(rubrics)})")
+        return 1
+    case = next((c for c in run["cases"] if c["id"] == args.case), None)
+    if case is None or case.get("status") == "ERROR":
+        print(f"no case {args.case} in {args.run}" if case is None else f"case {args.case} errored in {args.run}")
+        return 1
+    if args.live and (msg := _missing_key(args.grader_provider)):
+        print(msg)
+        return 1
+    rubric, reference = rubrics[args.rubric], policy_reference()
+    try:
+        ours = judge_case(_grader_model(args, cfg), rubric, case, reference)
+        theirs = geval_case(_grader_model(args, cfg), rubric, case, reference)
+    except ReplayMiss as e:
+        print(e)
+        return 1
+    word = {"pass": "pass", "fail": "FAIL", "error": "error"}
+    tin = ours.tokens["input"] + theirs["tokens"]["input"]
+    tout = ours.tokens["output"] + theirs["tokens"]["output"]
+    lines = [f"{args.case} · rubric {rubric.name} · grader {args.grader_model}", "",
+             f"  evally   {word[ours.verdict]}  {ours.reason}",
+             f"  G-Eval   {'pass' if theirs['passed'] else 'FAIL'}  {theirs['score']:.2f} (threshold {THRESHOLD})  {theirs['reason']}",
+             "", "G-Eval's steps (it wrote them from the rubric):"]
+    lines += [f"  {i}. {step}" for i, step in enumerate(theirs["steps"], 1)]
+    lines += ["", format_cost(args.grader_model, tin, tout)]
+    print("\n".join(lines))
+    return 0
+
+
 def _add_grader_args(p, cfg) -> None:
     p.add_argument("--live", action="store_true", help="call the grader (and record new replies)")
     p.add_argument("--grader-provider", default=cfg.grader_provider, choices=["ollama", "openai", "anthropic"])
@@ -401,6 +446,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("run_a", help="run A (name in evals/runs or a .json path)")
     p.add_argument("run_b", help="run B, from the same suite")
     _add_grader_args(p, cfg)
+    p = sub.add_parser("geval", help="one case, one rubric: our grader and DeepEval's G-Eval side by side")
+    p.add_argument("run", help="run name in evals/runs or a .json path")
+    p.add_argument("--rubric", required=True)
+    p.add_argument("--case", required=True)
+    _add_grader_args(p, cfg)
     p = sub.add_parser("dataset", help="build and inspect versioned datasets")
     dsub = p.add_subparsers(dest="action", required=True)
     b = dsub.add_parser("build", help="merge sources, split dev/test, write the lock file")
@@ -429,6 +479,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_grade(args, cfg)
         if args.cmd == "bias":
             return cmd_bias(args, cfg)
+        if args.cmd == "geval":
+            return cmd_geval(args, cfg)
         return cmd_run(args, cfg) if args.cmd == "run" else cmd_chat(args, cfg)
     except CONNECTION_ERRORS:
         provider = getattr(args, "grader_provider", None) or args.provider
