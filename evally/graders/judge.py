@@ -13,13 +13,15 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Literal
 
 from evally.app.retrieval import DOCS_DIR
+from evally.evals_core.runner import slug
 from evally.graders.rubrics import Rubric
 from evally.llm.base import Model
+from evally.llm.prices import format_cost
 from evally.types import Message, ModelResponse, ToolSpec
 
 Scale = Literal["binary", "1-5"]
@@ -128,3 +130,60 @@ def judge_case(model: Model, rubric: Rubric, case: dict, reference: str, scale: 
     verdict, reason, score = parse_verdict(response, scale)
     tokens = {"input": response.usage.input_tokens, "output": response.usage.output_tokens}
     return Verdict(case["id"], rubric.name, verdict, reason, score, tokens)
+
+
+def grade_run(model: Model, run: dict, rubrics: list[Rubric], reference: str, scale: Scale = "binary") -> list[Verdict]:
+    """Every case against every rubric. A case that errored in the run is never sent to the grader."""
+    verdicts = []
+    for case in run["cases"]:
+        for rubric in rubrics:
+            if case.get("status") == "ERROR":
+                verdicts.append(Verdict(case["id"], rubric.name, "error", "case errored"))
+            else:
+                verdicts.append(judge_case(model, rubric, case, reference, scale))
+    return verdicts
+
+
+def _cell(v: Verdict) -> str:
+    word = {"pass": "pass", "fail": "FAIL", "error": "error"}[v.verdict]
+    return f"{word} {v.score}" if v.score is not None else word
+
+
+def format_grades(run_name: str, grader: str, scale: str, verdicts: list[Verdict]) -> str:
+    rubrics = list(dict.fromkeys(v.rubric for v in verdicts))
+    cases = list(dict.fromkeys(v.case_id for v in verdicts))
+    cell = {(v.case_id, v.rubric): v for v in verdicts}
+    w = max([len(c) for c in cases] + [4])
+    lines = [f"grades for {run_name} · grader {grader} · {scale}", "",
+             "  " + " " * w + "  " + "  ".join(rubrics)]
+    for c in cases:
+        lines.append(f"  {c:<{w}}  " + "  ".join(f"{_cell(cell[c, r]):<{len(r)}}" for r in rubrics).rstrip())
+    lines.append("")
+    rw = max(len(r) for r in rubrics) if rubrics else 0
+    for r in rubrics:
+        mine = [v for v in verdicts if v.rubric == r]
+        errors = sum(v.verdict == "error" for v in mine)
+        fails = sum(v.verdict == "fail" for v in mine)
+        lines.append(f"  {r:<{rw}}  fails {fails}/{len(mine) - errors}" + (f", {errors} errors" if errors else ""))
+    tin = sum(v.tokens.get("input", 0) for v in verdicts)
+    tout = sum(v.tokens.get("output", 0) for v in verdicts)
+    lines += ["", format_cost(grader, tin, tout)]
+    return "\n".join(lines)
+
+
+def format_case_verdicts(case_id: str, verdicts: list[Verdict]) -> str:
+    w = max(len(v.rubric) for v in verdicts)
+    lines = [f"{case_id}"]
+    for v in verdicts:
+        lines.append(f"  {v.rubric:<{w}}  {_cell(v)}  {v.reason}")
+    return "\n".join(lines)
+
+
+def save_grades(grades_dir: Path, run_name: str, grader: str, scale: str,
+                rubrics: list[Rubric], verdicts: list[Verdict]) -> Path:
+    path = Path(grades_dir) / f"{run_name}__{slug(grader)}__{scale}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"run": run_name, "grader": grader, "scale": scale,
+                                "rubrics": [r.name for r in rubrics],
+                                "verdicts": [asdict(v) for v in verdicts]}, indent=2) + "\n")
+    return path

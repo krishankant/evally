@@ -19,6 +19,9 @@ class Config:
     suites_dir: Path
     labels_dir: Path
     datasets_dir: Path
+    grader_provider: str = "ollama"
+    grader_model: str = "qwen3.5:4b"
+    grades_dir: Path = Path("evals/grades")
 
 
 def load() -> Config:
@@ -32,4 +35,8 @@ def load() -> Config:
         suites_dir=Path("evals/suites"),
         labels_dir=Path(os.environ.get("EVALLY_LABELS_DIR") or "evals/labels"),
         datasets_dir=Path("evals/datasets"),
+        # The grader is set apart from the app: a different model can judge the app's replies.
+        grader_provider=os.environ.get("EVALLY_GRADER_PROVIDER") or "ollama",
+        grader_model=os.environ.get("EVALLY_GRADER_MODEL") or "qwen3.5:4b",
+        grades_dir=Path(os.environ.get("EVALLY_GRADES_DIR") or "evals/grades"),
     )

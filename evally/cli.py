@@ -14,12 +14,14 @@
     evally dataset build [--manifest F]  merge sources, split dev/test, write the lock file
     evally dataset stats bramble-v1      coverage per tag, dev vs test
     evally run --suite S --by category   pass rates per tag value after the table (--by check: per check type)
+    evally grade <run> [--rubric R] [--scale binary|1-5] [--case ID]   LLM grader, one verdict per rubric
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import anthropic
@@ -35,7 +37,9 @@ from evally.evals_core.labels import append_label, code_loop, format_report, lab
 from evally.evals_core.traces import format_case_list, format_conversation, run_path
 from evally.datasets.build import build
 from evally.datasets.dimensions import DIMENSIONS
+from evally.graders.judge import format_case_verdicts, format_grades, grade_run, policy_reference, save_grades
 from evally.graders.refusal import refusal_match
+from evally.graders.rubrics import load_rubrics
 from evally.datasets.stats import coverage, format_by_check, format_by_tag, format_coverage
 from evally.datasets.generate import generate, sample_combinations
 from evally.datasets.review import decisions_path, load_candidates, load_decisions, review_loop, save_decision, survival_report
@@ -50,6 +54,24 @@ def _model(args, cfg) -> CachedModel:
     cache_dir = cfg.cache_dir / f"{args.provider}-{slug(args.model)}"
     if args.live:
         return CachedModel(make_model(args.provider, args.model), cache_dir, "record")
+    return CachedModel(None, cache_dir, "replay")
+
+
+KEY_VARS = {"anthropic": "ANTHROPIC_API_KEY", "openai": "OPENAI_API_KEY"}
+
+
+def _missing_key(provider: str) -> str | None:
+    var = KEY_VARS.get(provider)
+    if var and not os.environ.get(var, "").strip():
+        return f"{var} isn't set: add it to .env"
+    return None
+
+
+def _grader_model(args, cfg) -> CachedModel:
+    """The grader: set apart from the app model, recorded and replayed the same way."""
+    cache_dir = cfg.cache_dir / f"{args.grader_provider}-{slug(args.grader_model)}"
+    if args.live:
+        return CachedModel(make_model(args.grader_provider, args.grader_model), cache_dir, "record")
     return CachedModel(None, cache_dir, "replay")
 
 
@@ -224,6 +246,49 @@ def cmd_deepeval(args, cfg) -> int:
     return 0
 
 
+def cmd_grade(args, cfg) -> int:
+    run = _load_run(args.run, cfg)
+    if run is None:
+        return 1
+    name = run_path(args.run, cfg.runs_dir).stem
+    try:
+        rubrics = load_rubrics()
+    except ValueError as e:
+        print(e)
+        return 1
+    chosen = args.rubric or list(rubrics)
+    unknown = [r for r in chosen if r not in rubrics]
+    if unknown:
+        print(f"unknown rubric {unknown[0]!r} (known: {', '.join(rubrics)})")
+        return 1
+    cases = [c for c in run["cases"] if not args.case or c["id"] == args.case]
+    if not cases:
+        print(f"no case {args.case} in {args.run}")
+        return 1
+    if args.live and (msg := _missing_key(args.grader_provider)):
+        print(msg)
+        return 1
+    model = _grader_model(args, cfg)
+    try:  # every verdict is collected before anything is saved, so a miss writes nothing
+        verdicts = grade_run(model, {**run, "cases": cases}, [rubrics[r] for r in chosen],
+                             policy_reference(), args.scale)
+    except ReplayMiss as e:
+        print(e)
+        return 1
+    if args.case:  # one case is a look, not a result: it never overwrites the run's grades
+        print(format_case_verdicts(args.case, verdicts))
+        return 0
+    print(format_grades(name, args.grader_model, args.scale, verdicts))
+    print(f"\nsaved {save_grades(cfg.grades_dir, name, args.grader_model, args.scale, [rubrics[r] for r in chosen], verdicts)}")
+    return 0
+
+
+def _add_grader_args(p, cfg) -> None:
+    p.add_argument("--live", action="store_true", help="call the grader (and record new replies)")
+    p.add_argument("--grader-provider", default=cfg.grader_provider, choices=["ollama", "openai", "anthropic"])
+    p.add_argument("--grader-model", default=cfg.grader_model)
+
+
 def cmd_dataset(args, cfg) -> int:
     if args.action == "build":
         try:
@@ -291,6 +356,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("run", help="run name in evals/runs or a .json path")
     p.add_argument("--suite", required=True, help="the suite the run came from (for the checks)")
     p.add_argument("--case", required=True)
+    p = sub.add_parser("grade", help="grade a saved run with an LLM grader, one verdict per rubric")
+    p.add_argument("run", help="run name in evals/runs or a .json path")
+    p.add_argument("--rubric", action="append", help="a rubric in evals/rubrics (repeatable; default: all)")
+    p.add_argument("--scale", choices=["binary", "1-5"], default="binary")
+    p.add_argument("--case", help="grade one case and show every reason (saves nothing)")
+    _add_grader_args(p, cfg)
     p = sub.add_parser("dataset", help="build and inspect versioned datasets")
     dsub = p.add_subparsers(dest="action", required=True)
     b = dsub.add_parser("build", help="merge sources, split dev/test, write the lock file")
@@ -313,9 +384,12 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.cmd == "generate":
             return cmd_generate(args, cfg)
+        if args.cmd == "grade":
+            return cmd_grade(args, cfg)
         return cmd_run(args, cfg) if args.cmd == "run" else cmd_chat(args, cfg)
     except CONNECTION_ERRORS:
-        where = cfg.ollama_url if args.provider == "ollama" else args.provider
+        provider = getattr(args, "grader_provider", None) or args.provider
+        where = cfg.ollama_url if provider == "ollama" else provider
         print(f"Can't reach the model at {where}. Is Ollama running? (ollama serve)"
-              if args.provider == "ollama" else f"Can't reach {where}. Check your network and API key.")
+              if provider == "ollama" else f"Can't reach {where}. Check your network and API key.")
         return 1
