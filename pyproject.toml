@@ -27,6 +27,8 @@ packages = ["evally"]
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+# DeepEval's pytest plugin imports DeepEval at startup with telemetry on; evally doesn't use it.
+addopts = "-p no:deepeval"
 
 [dependency-groups]
 dev = [

@@ -4,7 +4,14 @@ import sys
 import pytest
 
 from evally import cli
+from evally.graders.deepeval_side import deepeval_installed
 from evally.evals_core.cases import Case
+
+
+def needs_deepeval():
+    # importorskip would import DeepEval with telemetry on; this probe doesn't
+    if not deepeval_installed():
+        pytest.skip("needs the deepeval extra")
 
 
 def recorded(reply, calls, checks):
@@ -32,7 +39,7 @@ def test_deepeval_missing_message(monkeypatch, tmp_path, capsys):
 
 
 def test_pattern_match_is_fullmatch():
-    pytest.importorskip("deepeval")
+    needs_deepeval()
     from evally.graders.deepeval_side import _deepeval_env
     with _deepeval_env():
         from deepeval.metrics import PatternMatchMetric
@@ -43,7 +50,7 @@ def test_pattern_match_is_fullmatch():
 
 
 def test_tool_correctness_default_threshold_passes_wrong_arg():
-    pytest.importorskip("deepeval")
+    needs_deepeval()
     from evally.graders.deepeval_side import _deepeval_env
     with _deepeval_env():
         from deepeval.metrics import ToolCorrectnessMetric
@@ -57,7 +64,7 @@ def test_tool_correctness_default_threshold_passes_wrong_arg():
 
 
 def test_compare_rows():
-    pytest.importorskip("deepeval")
+    needs_deepeval()
     from evally.graders.deepeval_side import compare
     rows = compare(ORDER, REC)
     assert [r[0] for r in rows] == [
@@ -69,7 +76,7 @@ def test_compare_rows():
 
 
 def test_env_restored_after_compare(monkeypatch):
-    pytest.importorskip("deepeval")
+    needs_deepeval()
     from evally.graders.deepeval_side import compare
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("DEEPEVAL_TELEMETRY_OPT_OUT", raising=False)
@@ -81,7 +88,7 @@ def test_env_restored_after_compare(monkeypatch):
 
 
 def test_blank_key_gets_placeholder(monkeypatch):
-    pytest.importorskip("deepeval")
+    needs_deepeval()
     from evally.graders.deepeval_side import compare
     monkeypatch.setenv("OPENAI_API_KEY", "")  # what .env.example's `OPENAI_API_KEY=` loads as
     assert compare(ORDER, REC)
@@ -89,7 +96,7 @@ def test_blank_key_gets_placeholder(monkeypatch):
 
 
 def test_mismatched_run_and_suite_refused(tmp_path, monkeypatch, capsys):
-    pytest.importorskip("deepeval")
+    needs_deepeval()
     import json
     monkeypatch.setenv("EVALLY_RUNS_DIR", str(tmp_path))
     suite = tmp_path / "s-v2.jsonl"
@@ -101,7 +108,7 @@ def test_mismatched_run_and_suite_refused(tmp_path, monkeypatch, capsys):
 
 
 def test_probe_import_runs_with_telemetry_off(monkeypatch):
-    pytest.importorskip("deepeval")
+    needs_deepeval()
     seen = {}
     import builtins
     real = builtins.__import__
@@ -114,3 +121,16 @@ def test_probe_import_runs_with_telemetry_off(monkeypatch):
     monkeypatch.delenv("DEEPEVAL_TELEMETRY_OPT_OUT", raising=False)
     cli.main(["deepeval", "no-such-run", "--suite", "week01", "--case", "x"])
     assert seen.get("probe") == "1"
+
+
+def test_deepeval_installed_probe_keeps_telemetry_off(tmp_path):
+    import subprocess
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    env = {k: v for k, v in os.environ.items() if k != "DEEPEVAL_TELEMETRY_OPT_OUT"}
+    env["PYTHONPATH"] = str(root)
+    code = "from evally.graders.deepeval_side import deepeval_installed\nprint(deepeval_installed())\n"
+    out = subprocess.run([sys.executable, "-c", code], cwd=tmp_path, env=env, check=True,
+                         capture_output=True, text=True).stdout.strip()
+    assert out in ("True", "False")
+    assert not (tmp_path / ".deepeval").exists()

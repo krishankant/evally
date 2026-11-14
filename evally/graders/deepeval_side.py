@@ -32,6 +32,16 @@ def _deepeval_env():
                 os.environ[k] = v
 
 
+def deepeval_installed() -> bool:
+    """Is the optional extra installed? The probe import itself runs with telemetry off."""
+    with _deepeval_env():
+        try:
+            import deepeval  # noqa: F401
+        except ImportError:
+            return False
+    return True
+
+
 def _verdict(metric) -> str:
     return f"{'PASS' if metric.success else 'FAIL'} (score {metric.score:g})"
 

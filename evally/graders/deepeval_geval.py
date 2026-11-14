@@ -22,7 +22,8 @@ THRESHOLD = 0.5
 
 def make_cached_judge(model: Model):
     """A DeepEvalBaseLLM that calls `model`. Built inside the env guard, since it imports DeepEval."""
-    from deepeval.models import DeepEvalBaseLLM
+    with _deepeval_env():  # the first import of DeepEval must already have telemetry off
+        from deepeval.models import DeepEvalBaseLLM
 
     class CachedJudge(DeepEvalBaseLLM):
         def __init__(self, inner: Model):

@@ -62,6 +62,7 @@ def _model(args, cfg) -> CachedModel:
     return CachedModel(None, cache_dir, "replay")
 
 
+DEEPEVAL_MISSING = "DeepEval isn't installed: uv sync --extra deepeval"
 KEY_VARS = {"anthropic": "ANTHROPIC_API_KEY", "openai": "OPENAI_API_KEY"}
 
 
@@ -219,13 +220,10 @@ def cmd_refusals(args, cfg) -> int:
 
 
 def cmd_deepeval(args, cfg) -> int:
-    from evally.graders.deepeval_side import _deepeval_env, compare, format_compare
-    with _deepeval_env():  # even the "is it installed?" import runs with telemetry off
-        try:
-            import deepeval  # noqa: F401  (optional extra)
-        except ImportError:
-            print("DeepEval isn't installed: uv sync --extra deepeval")
-            return 1
+    from evally.graders.deepeval_side import compare, deepeval_installed, format_compare
+    if not deepeval_installed():  # the probe runs with telemetry off
+        print(DEEPEVAL_MISSING)
+        return 1
     run = _load_run(args.run, cfg)
     if run is None:
         return 1
@@ -319,13 +317,10 @@ def cmd_bias(args, cfg) -> int:
 
 
 def cmd_geval(args, cfg) -> int:
-    from evally.graders.deepeval_side import _deepeval_env
-    with _deepeval_env():
-        try:
-            import deepeval  # noqa: F401  (optional extra)
-        except ImportError:
-            print("DeepEval isn't installed: uv sync --extra deepeval")
-            return 1
+    from evally.graders.deepeval_side import deepeval_installed
+    if not deepeval_installed():
+        print(DEEPEVAL_MISSING)
+        return 1
     from evally.graders.deepeval_geval import THRESHOLD, geval_case
     run = _load_run(args.run, cfg)
     if run is None:
