@@ -15,6 +15,8 @@
     evally dataset stats bramble-v1      coverage per tag, dev vs test
     evally run --suite S --by category   pass rates per tag value after the table (--by check: per check type)
     evally grade <run> [--rubric R] [--scale binary|1-5] [--case ID]   LLM grader, one verdict per rubric
+    evally pad <run>                     a copy of the run with one sentence of filler on each last reply
+    evally bias <run-a> <run-b>          which reply is better, asked in both orders (grader biases)
 """
 
 from __future__ import annotations
@@ -38,6 +40,7 @@ from evally.evals_core.traces import format_case_list, format_conversation, run_
 from evally.datasets.build import build
 from evally.datasets.dimensions import DIMENSIONS
 from evally.graders.judge import format_case_verdicts, format_grades, grade_run, policy_reference, save_grades
+from evally.graders.pairwise import bias_test, format_bias, pad_run
 from evally.graders.refusal import refusal_match
 from evally.graders.rubrics import load_rubrics
 from evally.datasets.stats import coverage, format_by_check, format_by_tag, format_coverage
@@ -283,6 +286,36 @@ def cmd_grade(args, cfg) -> int:
     return 0
 
 
+def cmd_pad(args, cfg) -> int:
+    run = _load_run(args.run, cfg)
+    if run is None:
+        return 1
+    out = Path(cfg.runs_dir) / f"{run_path(args.run, cfg.runs_dir).stem}-padded.json"
+    out.write_text(json.dumps(pad_run(run), indent=2) + "\n")
+    print(f"saved {out}")
+    return 0
+
+
+def cmd_bias(args, cfg) -> int:
+    run_a, run_b = _load_run(args.run_a, cfg), _load_run(args.run_b, cfg)
+    if run_a is None or run_b is None:
+        return 1
+    if run_a.get("suite") != run_b.get("suite"):
+        print(f"runs came from different suites: {run_a.get('suite')}, {run_b.get('suite')}")
+        return 1
+    if args.live and (msg := _missing_key(args.grader_provider)):
+        print(msg)
+        return 1
+    try:
+        pairs, summary = bias_test(_grader_model(args, cfg), run_a, run_b, policy_reference())
+    except ReplayMiss as e:
+        print(e)
+        return 1
+    names = [run_path(n, cfg.runs_dir).stem for n in (args.run_a, args.run_b)]
+    print(format_bias(names[0], names[1], args.grader_model, pairs, summary))
+    return 0
+
+
 def _add_grader_args(p, cfg) -> None:
     p.add_argument("--live", action="store_true", help="call the grader (and record new replies)")
     p.add_argument("--grader-provider", default=cfg.grader_provider, choices=["ollama", "openai", "anthropic"])
@@ -362,6 +395,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--scale", choices=["binary", "1-5"], default="binary")
     p.add_argument("--case", help="grade one case and show every reason (saves nothing)")
     _add_grader_args(p, cfg)
+    p = sub.add_parser("pad", help="copy a run with one sentence of filler added to each last reply")
+    p.add_argument("run", help="run name in evals/runs or a .json path")
+    p = sub.add_parser("bias", help="which reply is better, asked in both orders")
+    p.add_argument("run_a", help="run A (name in evals/runs or a .json path)")
+    p.add_argument("run_b", help="run B, from the same suite")
+    _add_grader_args(p, cfg)
     p = sub.add_parser("dataset", help="build and inspect versioned datasets")
     dsub = p.add_subparsers(dest="action", required=True)
     b = dsub.add_parser("build", help="merge sources, split dev/test, write the lock file")
@@ -371,6 +410,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.cmd == "dataset":
         return cmd_dataset(args, cfg)
+    if args.cmd == "pad":
+        return cmd_pad(args, cfg)
     if args.cmd == "refusals":
         return cmd_refusals(args, cfg)
     if args.cmd == "deepeval":
@@ -386,6 +427,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_generate(args, cfg)
         if args.cmd == "grade":
             return cmd_grade(args, cfg)
+        if args.cmd == "bias":
+            return cmd_bias(args, cfg)
         return cmd_run(args, cfg) if args.cmd == "run" else cmd_chat(args, cfg)
     except CONNECTION_ERRORS:
         provider = getattr(args, "grader_provider", None) or args.provider
