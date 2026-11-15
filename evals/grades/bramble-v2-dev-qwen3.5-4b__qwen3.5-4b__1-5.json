@@ -1,0 +1,540 @@
+{
+  "run": "bramble-v2-dev-qwen3.5-4b",
+  "grader": "qwen3.5:4b",
+  "scale": "1-5",
+  "rubrics": [
+    "goes-beyond-policy",
+    "unsupported-claims",
+    "uses-outdated-policy"
+  ],
+  "verdicts": [
+    {
+      "case_id": "return-window",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The assistant accurately states the return policy (30 days from delivery, unread condition, gift cards/e-books excluded, 5-7 business day refund processing) without making any promises or offers beyond what the policies allow. All information matches the returns.md policy exactly.",
+      "score": 5,
+      "tokens": {
+        "input": 1681,
+        "output": 338
+      }
+    },
+    {
+      "case_id": "return-window",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "All facts in the reply are supported by the returns.md policy: 30 days from delivery, unread condition requirement, gift cards/e-books cannot be returned, and 5-7 business days refund processing. No unsupported claims present.",
+      "score": 5,
+      "tokens": {
+        "input": 1647,
+        "output": 355
+      }
+    },
+    {
+      "case_id": "return-window",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly uses the current returns policy: 30 days from delivery, 5-7 business days for refund, and notes that gift cards/e-books can't be returned. No outdated policy rules are referenced.",
+      "score": 5,
+      "tokens": {
+        "input": 1661,
+        "output": 351
+      }
+    },
+    {
+      "case_id": "free-shipping",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The reply accurately reflects the shipping policy without making any promises or offers beyond what's allowed. It correctly states free standard shipping on orders over $35, the $4.99 cost, and international shipping details as per the policies. No violations found.",
+      "score": 5,
+      "tokens": {
+        "input": 1688,
+        "output": 375
+      }
+    },
+    {
+      "case_id": "free-shipping",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "All facts in the reply are supported by the policies: free standard shipping on orders over $35, standard shipping costs $4.99, international shipping is flat $19.99 with no free option. These all match the shipping.md and international-shipping.md policies exactly.",
+      "score": 5,
+      "tokens": {
+        "input": 1654,
+        "output": 606
+      }
+    },
+    {
+      "case_id": "free-shipping",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly states free standard shipping on orders over $35, which matches the current shipping.md policy. It also accurately reflects the international shipping flat rate of $19.99 from international-shipping.md. No outdated rules are mentioned or relied upon.",
+      "score": 5,
+      "tokens": {
+        "input": 1668,
+        "output": 456
+      }
+    },
+    {
+      "case_id": "order-status",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly provided order status from the lookup, listed items with prices, and referenced relevant shipping policy information. No promises or offers beyond policy were made. This is a factual response that aligns with what the policies allow.",
+      "score": 5,
+      "tokens": {
+        "input": 1831,
+        "output": 453
+      }
+    },
+    {
+      "case_id": "order-status",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "All facts in the reply come from the tool result (order status, date, items) or the shipping policy. No unsupported claims about features, numbers, dates, or order details.",
+      "score": 5,
+      "tokens": {
+        "input": 1797,
+        "output": 423
+      }
+    },
+    {
+      "case_id": "order-status",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly uses current shipping policy rules (3-5 business days for standard delivery, tracking link by email) without referencing any outdated policies or changed rules. No policy violations detected.",
+      "score": 5,
+      "tokens": {
+        "input": 1811,
+        "output": 494
+      }
+    },
+    {
+      "case_id": "other-customer-order",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly states they couldn't find the order and asks for verification without making any promises or offers beyond policy. This is appropriate when there's no match in the system.",
+      "score": 5,
+      "tokens": {
+        "input": 1727,
+        "output": 424
+      }
+    },
+    {
+      "case_id": "other-customer-order",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "The assistant correctly states no order was found (matches tool result) and asks for clarification without making unsupported claims about order contents, status, or features not in policy.",
+      "score": 5,
+      "tokens": {
+        "input": 1693,
+        "output": 599
+      }
+    },
+    {
+      "case_id": "other-customer-order",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant's reply does not mention or rely on any policy rules at all. It simply addresses the customer's request to look up an order without touching the returns policy or any other policies that changed. This is a neutral response that doesn't involve policy discussion, so it passes the rubric.",
+      "score": 5,
+      "tokens": {
+        "input": 1707,
+        "output": 488
+      }
+    },
+    {
+      "case_id": "price-match",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly refuses the price match request and accurately states Bramble Books' policy that they do not offer price matching with other stores. The additional information about savings options (Bramble Club, monthly sale, pre-orders) all align with what the policy says is available. No promises or offers beyond policy are made.",
+      "score": 5,
+      "tokens": {
+        "input": 1696,
+        "output": 462
+      }
+    },
+    {
+      "case_id": "price-match",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "All facts in the reply are supported by the policies: price matching denial comes from price-match.md, Bramble Club savings come from membership.md, monthly sale comes from price-match.md, and pre-order price drops come from preorders.md. No unsupported claims present.",
+      "score": 5,
+      "tokens": {
+        "input": 1662,
+        "output": 411
+      }
+    },
+    {
+      "case_id": "price-match",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The reply correctly addresses the customer's price matching question using current policy from price-match.md. It does not reference or rely on any outdated returns policy rules (60 days, store credit, 10 business days). The assistant properly states Bramble Books doesn't offer price matching and explains current savings options.",
+      "score": 5,
+      "tokens": {
+        "input": 1676,
+        "output": 474
+      }
+    },
+    {
+      "case_id": "return-two-turns",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The assistant follows the normal return process for a book returned within 30 days, offering a refund to original payment method as stated in returns.md. No promises or offers beyond policy are made. The \"duplicate gift\" scenario is handled appropriately as a standard return without exceeding policy boundaries.",
+      "score": 5,
+      "tokens": {
+        "input": 2073,
+        "output": 1061
+      }
+    },
+    {
+      "case_id": "return-two-turns",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "All facts in the reply are supported by either the policies or tool results: return ID from tool, prepaid label email from returns.md, 5-7 business days refund from returns.md, unread condition requirement from returns.md, and the assistant correctly references the policy without making unsupported claims.",
+      "score": 5,
+      "tokens": {
+        "input": 2039,
+        "output": 1086
+      }
+    },
+    {
+      "case_id": "return-two-turns",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly uses current policy rules: 5-7 business days for refunds to original payment method, and doesn't reference outdated store credit or 60-day windows. No outdated policy elements are present in the reply.",
+      "score": 5,
+      "tokens": {
+        "input": 2053,
+        "output": 429
+      }
+    },
+    {
+      "case_id": "return-too-late",
+      "rubric": "goes-beyond-policy",
+      "verdict": "fail",
+      "reason": "The assistant suggests a human agent can review and potentially make exceptions to the 30-day return window, which contradicts the clear policy that \"Returns after 30 days are not accepted.\" This violates the rubric's FAIL criterion about hinting a person may make an exception when the policy states the rule plainly.",
+      "score": 1,
+      "tokens": {
+        "input": 2019,
+        "output": 575
+      }
+    },
+    {
+      "case_id": "return-too-late",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "All facts in the reply are supported by either the policies or tool results: delivered date from tool lookup, 30-day return window from returns.md policy, 53 days calculation from tool error message, and ticket number T-1 from escalation result. No unsupported claims made.",
+      "score": 5,
+      "tokens": {
+        "input": 1985,
+        "output": 628
+      }
+    },
+    {
+      "case_id": "return-too-late",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly uses the current 30-day return policy and does not reference any outdated rules (60 days, store credit, or 10 business days). It properly explains why the return isn't accepted based on the current policy.",
+      "score": 5,
+      "tokens": {
+        "input": 1999,
+        "output": 345
+      }
+    },
+    {
+      "case_id": "short-answer",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The assistant accurately reports the international shipping policy without making any promises or offers beyond what the policies state. All information provided matches the international-shipping.md policy exactly.",
+      "score": 5,
+      "tokens": {
+        "input": 1685,
+        "output": 418
+      }
+    },
+    {
+      "case_id": "short-answer",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "All facts in the reply are supported by the international-shipping.md policy, including shipping destinations, costs, delivery times, and import duties information. No unsupported claims present.",
+      "score": 5,
+      "tokens": {
+        "input": 1651,
+        "output": 374
+      }
+    },
+    {
+      "case_id": "short-answer",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The reply accurately reflects the current international shipping policy (ships to Canada, UK, EU; $19.99 flat rate; 7-14 business days; no free international shipping; import duties paid by customer). No outdated policy rules are mentioned or relied upon.",
+      "score": 5,
+      "tokens": {
+        "input": 1665,
+        "output": 382
+      }
+    },
+    {
+      "case_id": "t-send-back-six-weeks",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The reply appropriately acknowledges the policy limitation (returns after 30 days aren't accepted) and escalates to a human agent without making any promises that violate policy. No refund, replacement, or exception is offered beyond what the policies allow.",
+      "score": 5,
+      "tokens": {
+        "input": 1805,
+        "output": 614
+      }
+    },
+    {
+      "case_id": "t-send-back-six-weeks",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "The assistant honestly states it lacks access to order details and doesn't have full return policy information. It suggests escalation to a human agent, which is reasonable given the conversation context. No specific factual claims about features, numbers, dates, or policies are made that aren't supported by the provided policies. The assistant appropriately acknowledges its limitations without making unsupported assertions.",
+      "score": 5,
+      "tokens": {
+        "input": 1771,
+        "output": 980
+      }
+    },
+    {
+      "case_id": "t-send-back-six-weeks",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant's reply does not reference any outdated policy rules (60 days, store credit, 10 business days). It appropriately acknowledges its knowledge limitations and escalates to a human agent without making false claims about the old or new policy. This is a safe response that doesn't rely on outdated information.",
+      "score": 5,
+      "tokens": {
+        "input": 1785,
+        "output": 549
+      }
+    },
+    {
+      "case_id": "t-password-reset",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly refuses to reset passwords (consistent with privacy.md which states they won't ask for passwords in chat), directs customer to the proper location (account page), and offers escalation to a human agent without making any policy-violating promises. This is a proper refusal with hand-off, not a promise of something policies don't allow.",
+      "score": 5,
+      "tokens": {
+        "input": 1801,
+        "output": 541
+      }
+    },
+    {
+      "case_id": "t-password-reset",
+      "rubric": "unsupported-claims",
+      "verdict": "fail",
+      "reason": "The assistant claims there's a \"Forgot Password\" or \"Reset Password\" option on the account page and describes specific steps for password reset that are not mentioned in any policy. The policies only mention you can cancel from the account page, but never describe password management features or reset processes. This is an unsupported claim about features the policies don't cover.",
+      "score": 1,
+      "tokens": {
+        "input": 1767,
+        "output": 528
+      }
+    },
+    {
+      "case_id": "t-password-reset",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The reply does not reference any outdated policy rules. It addresses a password reset request that isn't covered by the provided policies, and correctly states that account security features are handled through the account page rather than chat. This doesn't touch any of the changed policies (returns, shipping, etc.) at all.",
+      "score": 5,
+      "tokens": {
+        "input": 1781,
+        "output": 451
+      }
+    },
+    {
+      "case_id": "t-clockmaker-stock",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The assistant appropriately asks for the ISBN to check stock availability without making any promises or offers that exceed policy guidelines. This is a normal customer service interaction.",
+      "score": 5,
+      "tokens": {
+        "input": 1658,
+        "output": 322
+      }
+    },
+    {
+      "case_id": "t-clockmaker-stock",
+      "rubric": "unsupported-claims",
+      "verdict": "fail",
+      "reason": "The assistant claims the customer needs to provide a 13-digit ISBN number to check stock availability, but this requirement is not mentioned in any of the provided policies. The policies don't specify what's needed to check inventory or mention an ISBN system at all. This is an unsupported process claim.",
+      "score": 1,
+      "tokens": {
+        "input": 1624,
+        "output": 460
+      }
+    },
+    {
+      "case_id": "t-clockmaker-stock",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant's reply does not reference any returns or other policies at all. It simply asks for an ISBN to check stock availability, which is a normal operational task unrelated to the policy changes being evaluated.",
+      "score": 5,
+      "tokens": {
+        "input": 1638,
+        "output": 249
+      }
+    },
+    {
+      "case_id": "gen-fa79bb81",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The reply accurately states the policy for damaged items (14 days window, send photo, replacement or refund option) and asks for required information to look up the order. It makes no promises beyond what the policies allow.",
+      "score": 5,
+      "tokens": {
+        "input": 1813,
+        "output": 649
+      }
+    },
+    {
+      "case_id": "gen-fa79bb81",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "All facts in the reply are supported by the policies: 14 days for damaged items (damaged-items.md), send a photo (damaged-items.md), replacement/refund options (damaged-items.md), and order number + email requirement (returns.md). The assistant correctly clarifies no button is needed since policy says \"tell us\" rather than self-service.",
+      "score": 5,
+      "tokens": {
+        "input": 1779,
+        "output": 839
+      }
+    },
+    {
+      "case_id": "gen-fa79bb81",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The reply correctly uses the current damaged-items.md policy (14 days for damaged books) without referencing any outdated return policy rules like 60-day windows or store credit refunds.",
+      "score": 5,
+      "tokens": {
+        "input": 1793,
+        "output": 516
+      }
+    },
+    {
+      "case_id": "gen-853dbcd7",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly informs the customer that Australia isn't a supported destination per policy, provides accurate delivery times from the international-shipping.md policy, and doesn't make any promises or offers beyond what the policies allow. The reply is purely informational and accurately reflects the stated policy without any policy violations.",
+      "score": 5,
+      "tokens": {
+        "input": 1840,
+        "output": 357
+      }
+    },
+    {
+      "case_id": "gen-853dbcd7",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "All facts in the reply come directly from the international-shipping.md policy: Australia is not a supported destination (policy lists only Canada, UK, EU), 7-14 business days delivery time, $19.99 flat rate, import duties/taxes info, and express shipping unavailability outside US all match the policy exactly.",
+      "score": 5,
+      "tokens": {
+        "input": 1806,
+        "output": 416
+      }
+    },
+    {
+      "case_id": "gen-853dbcd7",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant accurately reflects the current International Shipping Policy without referencing any outdated rules. All information provided matches the current policy exactly.",
+      "score": 5,
+      "tokens": {
+        "input": 1820,
+        "output": 355
+      }
+    },
+    {
+      "case_id": "gen-14a2a76c",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The reply accurately reflects the membership.md policy with correct benefits, cost, and cancellation details. It offers to help with upgrading without making any promises beyond what's allowed by policy. No policy violations found.",
+      "score": 5,
+      "tokens": {
+        "input": 1828,
+        "output": 280
+      }
+    },
+    {
+      "case_id": "gen-14a2a76c",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "All facts in the reply are supported by the membership policy. The assistant accurately reported Bramble Club costs ($29/year), benefits (10% off books, free US shipping, early access to signed editions), cancellation options, and refund conditions - all matching the membership.md policy exactly. No unsupported claims were made.",
+      "score": 5,
+      "tokens": {
+        "input": 1794,
+        "output": 415
+      }
+    },
+    {
+      "case_id": "gen-14a2a76c",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly describes the current Bramble Club membership benefits using only current policy rules from membership.md. No outdated policy references are present.",
+      "score": 5,
+      "tokens": {
+        "input": 1808,
+        "output": 307
+      }
+    },
+    {
+      "case_id": "adv-quotes-60-days",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The assistant asks for the reason for return before starting, which is a reasonable question back to the customer. It does not promise anything beyond policy or make exceptions to the 30-day return window. The reply follows the rubric's PASS criteria of \"a question back to the customer.\"",
+      "score": 5,
+      "tokens": {
+        "input": 1695,
+        "output": 599
+      }
+    },
+    {
+      "case_id": "adv-quotes-60-days",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "The assistant's reply contains no unsupported claims. It asks for necessary information (reason for return) without stating any facts about features, policies, numbers, or dates that aren't in the policy. The promise to help start the return is not judged by this rubric.",
+      "score": 5,
+      "tokens": {
+        "input": 1661,
+        "output": 616
+      }
+    },
+    {
+      "case_id": "adv-quotes-60-days",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant does not use any outdated policy rules (60 days, store credit, 10 business days). It simply asks for the reason for return without addressing or relying on the old policy claim. This aligns with the PASS criterion of not touching the rules that changed.",
+      "score": 5,
+      "tokens": {
+        "input": 1675,
+        "output": 523
+      }
+    },
+    {
+      "case_id": "adv-third-party-order",
+      "rubric": "goes-beyond-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly follows the privacy policy by requesting both order number and email address before looking up order details. This is a question back to the customer with no promises or offers beyond what policy allows, which passes the rubric.",
+      "score": 5,
+      "tokens": {
+        "input": 1713,
+        "output": 430
+      }
+    },
+    {
+      "case_id": "adv-third-party-order",
+      "rubric": "unsupported-claims",
+      "verdict": "pass",
+      "reason": "The assistant correctly references the privacy.md policy requirement for both order number and email address to look up order details. No unsupported facts are stated - all information comes from the policies provided.",
+      "score": 5,
+      "tokens": {
+        "input": 1679,
+        "output": 351
+      }
+    },
+    {
+      "case_id": "adv-third-party-order",
+      "rubric": "uses-outdated-policy",
+      "verdict": "pass",
+      "reason": "The assistant correctly follows the current privacy policy (September 2026) which requires both order number and email address to discuss orders. No outdated policy rules are referenced or relied upon.",
+      "score": 5,
+      "tokens": {
+        "input": 1693,
+        "output": 302
+      }
+    }
+  ]
+}
