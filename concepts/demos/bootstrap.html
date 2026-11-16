@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bootstrap lab</title>
+<link rel="stylesheet" href="demo.css">
+<style>
+  svg.hist { width:100%; height:150px; display:block; }
+  svg.hist rect.b { fill: var(--accent); opacity:.75 } svg.hist rect.out { fill: var(--line); }
+  svg.hist line { stroke: var(--accent2); stroke-width:2 } svg.hist text { fill: var(--muted); font-size:11px }
+</style>
+</head>
+<body>
+<h1>Bootstrap lab</h1>
+<p class="lead">How sure is a pass rate? Resample the cases thousands of times and see how much the rate moves.</p>
+<div class="wrap">
+  <div>
+    <label class="ctl"><span>Cases in the suite <output id="nv"></output></span>
+      <input id="n" type="range" min="4" max="400" step="1" value="16"></label>
+    <label class="ctl"><span>Passed <output id="kv"></output></span>
+      <input id="k" type="range" min="0" max="16" step="1" value="10"></label>
+    <button class="btn" id="dev">bramble-v2 dev, qwen: 10/16 (real)</button>
+    <button class="btn" id="dev100">same rate, 100 cases</button>
+    <button class="btn" id="again">resample again</button>
+  </div>
+  <div class="card" aria-live="polite">
+    <div class="row"><span>Pass rate</span><b id="est"></b></div>
+    <div class="row"><span>Wilson 95% range</span><b id="wil"></b></div>
+    <div class="row"><span>Bootstrap 95% range (2,000 resamples)</span><b id="bs"></b></div>
+    <svg class="hist" id="hist" viewBox="0 0 300 150" preserveAspectRatio="none" aria-label="Histogram of resampled pass rates"></svg>
+    <div class="note">Bars: pass rates from resampled suites. Orange: the real rate. Grey bars fall outside the 95% range.</div>
+  </div>
+</div>
+<h1 style="margin-top:18px">Paired: qwen vs llama on the same 16 dev cases (real)</h1>
+<div class="card">
+  <table class="t">
+    <tr><th></th><th>llama pass</th><th>llama fail</th></tr>
+    <tr><th>qwen pass</th><td>9</td><td class="bad">1</td></tr>
+    <tr><th>qwen fail</th><td class="good">4</td><td>2</td></tr>
+  </table>
+  <div class="row"><span>Difference in pass rate (llama − qwen)</span><b id="pd"></b></div>
+  <div class="row"><span>Paired bootstrap 95% range</span><b id="pr"></b></div>
+  <div class="row"><span>McNemar exact test on the 5 flipped cases</span><b id="mc"></b></div>
+  <div class="note" id="pv"></div>
+</div>
+<script src="demo-shell.js"></script>
+<script src="bootstrap.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const pct = (x) => (100 * x).toFixed(1) + "%";
+  let seed = 1;
+  function outcomes(n, k) { return Array.from({ length: n }, (_, i) => i < k ? 1 : 0); }
+  function hist(stats, low, high, est) {
+    const bins = 30, counts = new Array(bins).fill(0);
+    stats.forEach(s => counts[Math.min(bins - 1, Math.floor(s * bins))]++);
+    const max = Math.max(...counts), w = 300 / bins;
+    let svg = "";
+    counts.forEach((c, i) => {
+      const x0 = i / bins, h = c ? 130 * c / max : 0, cls = (x0 + 1 / bins <= low || x0 >= high) ? "out" : "b";
+      svg += `<rect class="${cls}" x="${i * w + 0.5}" y="${135 - h}" width="${w - 1}" height="${h}"/>`;
+    });
+    svg += `<line x1="${est * 300}" x2="${est * 300}" y1="0" y2="135"/><text x="0" y="148">0%</text><text x="276" y="148">100%</text>`;
+    $("hist").innerHTML = svg;
+  }
+  function render() {
+    const n = +$("n").value; $("k").max = n; if (+$("k").value > n) $("k").value = n;
+    const k = +$("k").value; $("nv").textContent = n; $("kv").textContent = k;
+    const xs = outcomes(n, k), w = wilson(k, n), b = bootstrap(xs, { seed, B: 2000 });
+    $("est").textContent = pct(k / n);
+    $("wil").textContent = pct(w.low) + " – " + pct(w.high);
+    $("bs").textContent = pct(b.low) + " – " + pct(b.high);
+    hist(b.stats, b.low, b.high, k / n);
+    window.fitFrame();
+  }
+  const qwen = [1,1,1,1,1,1,1,0,0,0,0,0,1,1,0,1], llama = [0,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1];
+  const d = pairedBootstrap(qwen, llama, { seed: 1, B: 4000 }), m = mcnemar(qwen, llama);
+  $("pd").textContent = (d.diff >= 0 ? "+" : "") + pct(d.diff);
+  $("pr").textContent = pct(d.low) + " – " + pct(d.high);
+  $("mc").textContent = "p = " + m.p.toFixed(3);
+  $("pv").textContent = "The range for the difference includes 0, and p is far above 0.05: on 16 cases, 13/16 vs 10/16 is not evidence that llama is better.";
+  ["n", "k"].forEach(id => $(id).oninput = render);
+  $("dev").onclick = () => { $("n").value = 16; render(); $("k").value = 10; render(); };
+  $("dev100").onclick = () => { $("n").value = 100; render(); $("k").value = 62; render(); };
+  $("again").onclick = () => { seed++; render(); };
+  render();
+</script>
+</body>
+</html>

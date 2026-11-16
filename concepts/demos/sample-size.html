@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planning a run</title>
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<h1>How many cases? How many tries?</h1>
+<p class="lead">Left: cases needed for a pass rate you can quote to ±margin. Right: what repeated tries do to "it works".</p>
+<div class="wrap">
+  <div class="card">
+    <label class="ctl"><span>Margin you want (±) <output id="mv"></output></span>
+      <input id="m" type="range" min="0.02" max="0.25" step="0.01" value="0.10"></label>
+    <label class="ctl"><span>Expected pass rate <output id="pv"></output></span>
+      <input id="p" type="range" min="0.05" max="0.95" step="0.05" value="0.5"></label>
+    <div class="big" id="need"></div>
+    <div class="note" id="have"></div>
+  </div>
+  <div class="card">
+    <label class="ctl"><span>Tries per case, n <output id="tv"></output></span>
+      <input id="t" type="range" min="1" max="20" step="1" value="10"></label>
+    <label class="ctl"><span>Tries that passed, c <output id="cv"></output></span>
+      <input id="c" type="range" min="0" max="10" step="1" value="7"></label>
+    <table class="t" id="tbl"></table>
+    <div class="note">pass@k: at least one of k tries passes (good for "can it ever do this?"). pass^k: all k pass (good for "will a customer get it right every time?").</div>
+  </div>
+</div>
+<script src="demo-shell.js"></script>
+<script src="sample-size.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const pct = (x) => x === null ? "–" : (100 * x).toFixed(1) + "%";
+  function render() {
+    const m = +$("m").value, p = +$("p").value;
+    $("mv").textContent = "±" + Math.round(m * 100) + "%"; $("pv").textContent = Math.round(p * 100) + "%";
+    $("need").textContent = nFor(m, p) + " cases";
+    $("have").textContent = "bramble-v2 dev has 16 cases: at a " + Math.round(p * 100) + "% pass rate that's about ±" + Math.round(100 * marginFor(16, p)) + "%.";
+    const n = +$("t").value; $("c").max = n; if (+$("c").value > n) $("c").value = n;
+    const c = +$("c").value; $("tv").textContent = n; $("cv").textContent = c;
+    let rows = "<tr><th>k</th><th>pass@k</th><th>pass^k</th></tr>";
+    [1, 2, 3, 5, 10].filter(k => k <= n).forEach(k => rows += `<tr><td>${k}</td><td>${pct(passAtK(n, c, k))}</td><td>${pct(passHatK(n, c, k))}</td></tr>`);
+    $("tbl").innerHTML = rows;
+    window.fitFrame();
+  }
+  ["m", "p", "t", "c"].forEach(id => $(id).oninput = render);
+  render();
+</script>
+</body>
+</html>

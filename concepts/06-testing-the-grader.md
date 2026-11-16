@@ -1,6 +1,6 @@
 # 06 · Testing the grader
 
-**[← Concepts](README.md)** · **Previous: [05 LLM as a grader](05-llm-as-a-grader.md)** · **Next: 07 Statistics for evals →** *(coming)* · **In the course:** week 6
+**[← Concepts](README.md)** · **Previous: [05 LLM as a grader](05-llm-as-a-grader.md)** · **Next: [07 Statistics for evals →](07-statistics-for-evals.md)** · **In the course:** week 6
 
 An LLM grader is a classifier: it reads a reply and says pass or fail. Like any classifier it makes mistakes, and you can't see them by reading its reasons, which always sound convincing. **Testing the grader** means giving the same replies to a person and to the grader, counting where they agree and where they don't, and turning those counts into numbers you can act on: Cohen's kappa for overall agreement, and precision and recall for the failures you care about.
 
@@ -159,7 +159,7 @@ On these numbers binary wins, and the 1-5 grader's extra fail looks like a false
 The ranking flipped. Three lessons in one table:
 
 1. **Disagreements are where you learn.** Read each one before deciding who was wrong. Sometimes it's the label.
-2. **Small counts swing hard.** One label out of 48 moved kappa by 0.14 (binary) and 0.21 (1-5). With 3 or 4 real failures, no ranking here is safe; page 07 puts ranges on numbers like these.
+2. **Small counts swing hard.** One label out of 48 moved kappa by 0.14 (binary) and 0.21 (1-5). With 3 or 4 real failures, no ranking here is safe; [page 07](07-statistics-for-evals.md) puts ranges on numbers like these.
 3. **Both graders miss `adv-quotes-60-days`.** That's a rubric problem, not a scale problem: both read "acts on the customer's claim" too narrowly. Fix the rubric text, then re-test.
 
 ## 9. Correcting a pass rate with an imperfect grader
@@ -208,7 +208,7 @@ Kappa from a small sample is a rough estimate. An approximate 95% range for κ w
 | 200 | ± 0.11 |
 | 400 | ± 0.08 |
 
-At 20 labels a "substantial" kappa of 0.60 could be anything from about 0.25 to 0.95. A common practical target is 100 or more labels per rubric, with enough real failures among them: precision and recall of "fail" are computed from the failures only, and 3 failures give a recall of 0, 0.33, 0.67 or 1, and nothing in between. Page 07 shows how to compute ranges like these yourself with the bootstrap.
+At 20 labels a "substantial" kappa of 0.60 could be anything from about 0.25 to 0.95. A common practical target is 100 or more labels per rubric, with enough real failures among them: precision and recall of "fail" are computed from the failures only, and 3 failures give a recall of 0, 0.33, 0.67 or 1, and nothing in between. [Page 07](07-statistics-for-evals.md) shows how to compute ranges like these yourself with the bootstrap.
 
 ## 12. The whole page in one picture
 
