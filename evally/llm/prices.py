@@ -9,7 +9,7 @@ from __future__ import annotations
 
 PRICES: dict[str, tuple[float, float]] = {
     "qwen3.5:4b": (0.0, 0.0),  # local, Ollama
-    "mistral:latest": (0.0, 0.0),  # local, Ollama
+    "llama3.2:3b": (0.0, 0.0),  # local, Ollama
 }
 
 

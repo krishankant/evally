@@ -1,0 +1,63 @@
+{
+ "request": {
+  "messages": [
+   {
+    "role": "user",
+    "text": "Customer message:\nHi, I'm trying to place an order from Bramble Books but I'm confused about your International Shipping Policy. Does it charge extra for delivery to Australia? And what are the estimated delivery times listed on your page?\n\nReply A:\nHello! I'd be happy to help clarify our International Shipping Policy for Australia.\n\nAccording to our policy, we do not ship to Australia. We only ship to Canada, the UK, and the EU. If you're looking to order a book from Australia, I recommend checking with other online bookstores that ship internationally.\n\nReply B:\nBased on our International Shipping Policy, I can clarify your questions:\n\n**Australia**: Unfortunately, we do not ship to Australia. Our international shipping destinations are limited to **Canada, the UK, and the EU only**. If you're in Australia, you won't be able to place an order with us.\n\n**Estimated delivery times**: International orders take **7-14 business days** to deliver. This applies to all our international shipping destinations (Canada, UK, and EU).\n\n**Additional notes**:\n- International shipping is a flat **$19.99 per order** (there's no free international shipping)\n- Import duties and taxes are charged by your country's customs on delivery and paid by the customer\n- Express shipping isn't available outside the US\n\nIf you're interested in purchasing from us, you'd need to be located in one of our supported countries. Would you like me to help you with anything else regarding your order or account?",
+    "tool_calls": [],
+    "tool_results": []
+   }
+  ],
+  "model": "llama3.2:3b",
+  "system": "You compare two replies from Bramble Books' customer support assistant to the same customer message.\n\nThe better reply answers the customer correctly and helpfully, following the policies below. The policies are the only truth.\n\n## damaged-items.md\n\n# Damaged or wrong items\n\nUpdated: September 2026\n\nIf a book arrives damaged, or we sent the wrong book, tell us within **14 days of delivery** and send a photo. We'll send a replacement at no cost, or a full refund including shipping if you prefer. You don't need to send the damaged book back.\n\nAfter 14 days, damaged items are handled as normal returns (see the returns policy).\n\n## gift-cards.md\n\n# Gift cards\n\nUpdated: June 2026\n\nBramble Books gift cards come in any amount from $10 to $200 and **never expire**. They can be used for books and memberships.\n\nGift cards **can't be exchanged for cash or refunded**, except where the law requires it. A lost card can be replaced if you have the purchase receipt or the card number.\n\nIf you pay with a gift card and return the book, the refund goes back onto a gift card.\n\n## international-shipping.md\n\n# International shipping\n\nUpdated: October 2026\n\nWe ship to Canada, the UK and the EU. International shipping is a flat **$19.99** per order and takes **7-14 business days**. There's no free international shipping.\n\nImport duties and taxes are charged by your country's customs on delivery and are paid by the customer. We can't estimate them.\n\nExpress shipping isn't available outside the US.\n\n## membership.md\n\n# Bramble Club membership\n\nUpdated: August 2026\n\nBramble Club costs **$29 a year**. Members get:\n\n- 10% off every book (not gift cards)\n- free standard shipping on every US order, with no minimum\n- early access to signed editions\n\nYou can cancel any time from your account page. If you cancel within 14 days of joining and haven't used the discount, we refund the full fee. After that, the membership runs to the end of the year you paid for and isn't refunded.\n\n## preorders.md\n\n# Pre-orders\n\nUpdated: July 2026\n\nYou can pre-order books up to 6 months before release. We charge your card when the book ships, not when you order. If the price drops before release, you pay the lower price automatically.\n\nYou can cancel a pre-order any time before it ships, from your account page or by asking support.\n\n## price-match.md\n\n# Price matching\n\nUpdated: May 2026\n\nBramble Books **does not offer price matching** with other stores or websites, and we don't adjust the price of an order after it has been placed.\n\nOur ways to save are Bramble Club (10% off every book) and our monthly sale, announced in our newsletter. Pre-orders automatically get any price drop before release.\n\n## privacy.md\n\n# Privacy and order security\n\nUpdated: September 2026\n\nSupport will only discuss or change an order when you give **both the order number and the email address on that order**. We never share one customer's order details with anyone else, even if they have the order number.\n\nWe don't store full card numbers and will never ask for your password or card number in chat.\n\n## returns.md\n\n# Returns and refunds\n\nUpdated: September 2026\n\nYou can return any book within **30 days of delivery**. Books must be unread and in the condition you received them. Gift cards and e-books can't be returned.\n\nTo start a return, give us your order number and the email on the order. We'll email a prepaid return label.\n\nOnce the book reaches our warehouse, we refund the original payment method within **5-7 business days**. Original shipping costs aren't refunded unless the book arrived damaged or we sent the wrong item.\n\nReturns after 30 days are not accepted.\n\n## shipping.md\n\n# Shipping\n\nUpdated: October 2026\n\n| Option | Delivery time | Price |\n| --- | --- | --- |\n| Standard | 3-5 business days | $4.99, free on orders over $35 |\n| Express | 1-2 business days | $12.99 |\n\nOrders placed before 2 pm Eastern on a business day ship the same day. We ship to all 50 US states. Each order gets a tracking link by email when it ships.\n\nBooks that are out of stock ship when they come back in; we email you a date.\n\nAnswer only by calling the record_preference tool: your reason first, then the winner, A, B or tie.",
+  "tools": [
+   {
+    "description": "Record which reply is better.",
+    "name": "record_preference",
+    "parameters": {
+     "properties": {
+      "reason": {
+       "description": "One or two sentences: why.",
+       "type": "string"
+      },
+      "winner": {
+       "enum": [
+        "A",
+        "B",
+        "tie"
+       ],
+       "type": "string"
+      }
+     },
+     "required": [
+      "reason",
+      "winner"
+     ],
+     "type": "object"
+    }
+   }
+  ]
+ },
+ "response": {
+  "message": {
+   "role": "assistant",
+   "text": "",
+   "tool_calls": [
+    {
+     "arguments": {
+      "reason": "Reply B provides more detailed information about the International Shipping Policy, including the estimated delivery times and additional notes, which helps the customer understand the policy better.",
+      "winner": "B"
+     },
+     "id": "call_wu3edb4z",
+     "name": "record_preference"
+    }
+   ],
+   "tool_results": []
+  },
+  "stop_reason": "tool_use",
+  "usage": {
+   "input_tokens": 1445,
+   "output_tokens": 51
+  }
+ }
+}
