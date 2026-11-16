@@ -8,7 +8,7 @@ Weeks 1-5 of evally built the tools in code. From week 6 the course is these con
 
 | Page | Course week | What you'll be able to do |
 | --- | :---: | --- |
-| 05 LLM as a grader *(coming)* | 5 | write a rubric grader and measure its position, length and self-preference bias |
+| [05 LLM as a grader](05-llm-as-a-grader.md) | 5 | write a rubric grader and measure its position, length and self-preference bias |
 | [06 Testing the grader](06-testing-the-grader.md) | 6 | check a grader against human labels with kappa, precision and recall |
 | 07 Statistics for evals *(coming)* | 7 | put a range on a pass rate and tell a real improvement from noise |
 | 08 Side-by-side comparison *(coming)* | 8 | rank versions from pairwise votes with Elo and Bradley-Terry |

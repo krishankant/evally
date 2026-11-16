@@ -7,11 +7,13 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
+DEMOS = ["kappa", "position-bias"]
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
-def test_kappa_demo_maths():
-    out = subprocess.run(["node", str(ROOT / "tests/demos/check-kappa.js"), str(ROOT / "concepts/demos/kappa.js")],
+@pytest.mark.parametrize("name", DEMOS)
+def test_demo_maths(name):
+    out = subprocess.run(["node", str(ROOT / f"tests/demos/check-{name}.js"), str(ROOT / f"concepts/demos/{name}.js")],
                          capture_output=True, text=True)
     assert out.returncode == 0, out.stdout + out.stderr
     assert "all checks pass" in out.stdout

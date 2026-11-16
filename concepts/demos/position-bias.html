@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Position-bias simulator</title>
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<h1>Position-bias simulator</h1>
+<p class="lead">Two replies of <b>equal</b> quality. A judge picks whichever it sees first with probability <i>b</i>. Every pair is asked twice, order swapped. Any "winner" you see is the judge, not the replies.</p>
+<div class="wrap">
+  <div>
+    <label class="ctl"><span>Bias towards the first reply, <i>b</i> <output id="bv"></output></span>
+      <input id="b" type="range" min="0" max="1" step="0.05" value="0.6"></label>
+    <label class="ctl"><span>Pairs <output id="nv"></output></span>
+      <input id="n" type="range" min="5" max="200" step="5" value="15"></label>
+    <button class="btn" id="again">Run again (new random draw)</button>
+    <p class="note">Week 5's real runs used 15 pairs. qwen picked first 16/30 against llama; llama picked first 8/27.</p>
+  </div>
+  <div class="card" aria-live="polite">
+    <div class="row"><span>Picked the reply shown first</span><b id="pf"></b></div>
+    <div class="bar"><i id="pfbar"></i></div>
+    <div class="row"><span>Consistent pairs (same winner both orders)</span><b id="cons"></b></div>
+    <div class="row"><span>… of which "A wins" / "B wins"</span><b id="ab"></b></div>
+    <div class="row"><span>Expected consistent share, 2b(1−b)</span><b id="exp"></b></div>
+    <hr style="border:none;border-top:1px solid var(--line)">
+    <div class="row"><span>Distance from a fair 50%</span><b id="z"></b></div>
+    <div id="verdict" class="note"></div>
+  </div>
+</div>
+<script src="demo-shell.js"></script>
+<script src="position-bias.js"></script>
+<script>
+  let seed = 1;
+  const $ = (id) => document.getElementById(id);
+  function render() {
+    const b = +$("b").value, n = +$("n").value;
+    $("bv").textContent = b.toFixed(2); $("nv").textContent = n;
+    const r = simulate({ b, n, seed });
+    if (!r) { $("pf").textContent = "–"; return; }
+    $("pf").textContent = r.pickedFirst + " / " + r.calls + " (" + Math.round(100 * r.pickedFirst / r.calls) + "%)";
+    $("pfbar").style.width = (100 * r.pickedFirst / r.calls) + "%";
+    $("cons").textContent = r.consistent + " / " + n;
+    $("ab").textContent = r.winsA + " / " + r.winsB;
+    $("exp").textContent = Math.round(100 * expectedConsistent(b)) + "%";
+    const z = zScore(r.pickedFirst, r.calls);
+    $("z").textContent = (z >= 0 ? "+" : "") + z.toFixed(1) + " SE";
+    $("verdict").textContent = Math.abs(z) >= 2
+      ? "Far enough from 50% that a fair judge would rarely do this (|z| ≥ 2): this run would reveal the bias."
+      : "Within the noise of a fair judge (|z| < 2): with this many pairs you couldn't tell this judge from an unbiased one.";
+    window.fitFrame();
+  }
+  $("b").oninput = render; $("n").oninput = render;
+  $("again").onclick = () => { seed++; render(); };
+  render();
+</script>
+</body>
+</html>

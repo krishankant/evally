@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" role="img" aria-labelledby="t d">
+  <title id="t">Anatomy of an LLM grader</title>
+  <desc id="d">The grader gets a conversation, the current policies and one rubric, never the case id or the code verdict. It answers through a tool call with the reason before the verdict. Three biases were measured in week 5: position, length and self-preference, each with its mitigation.</desc>
+  <style>
+    .bg{fill:#ffffff}.card{fill:#f4f5f9;stroke:#d5d8e1}.ink{fill:#1f2330}.muted{fill:#5d6475}
+    .acc{fill:#3f51b5}.ok{fill:#e1f2ea}.okt{fill:#2e7d5b}.bad{fill:#fbe5e0}.badt{fill:#b3412e}.line{stroke:#9aa0b2}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#1e2129}.card{fill:#272b35;stroke:#3a3f4c}.ink{fill:#e8eaf0}.muted{fill:#a3a9b8}
+      .acc{fill:#8c9eff}.ok{fill:#1f3a2f}.okt{fill:#6fd3a3}.bad{fill:#432722}.badt{fill:#f2937f}.line{stroke:#6b7285}}
+    text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    .h{font-size:19px;font-weight:700}.s{font-size:14px}.xs{font-size:12.5px}.big{font-size:26px;font-weight:700}
+  </style>
+  <rect class="bg" width="960" height="440" rx="14"/>
+  <text class="ink h" x="30" y="40">An LLM grader: narrow in, structured out, biases measured.</text>
+
+  <!-- inputs -->
+  <rect class="card" x="30" y="64" width="250" height="200" rx="10"/>
+  <text class="acc h" x="46" y="94">It sees</text>
+  <rect class="ok" x="46" y="108" width="218" height="30" rx="6"/><text class="okt s" x="58" y="128">the conversation</text>
+  <rect class="ok" x="46" y="144" width="218" height="30" rx="6"/><text class="okt s" x="58" y="164">the current policies (reference)</text>
+  <rect class="ok" x="46" y="180" width="218" height="30" rx="6"/><text class="okt s" x="58" y="200">one rubric: PASS / FAIL in words</text>
+  <text class="muted xs" x="46" y="236">One failure category per rubric,</text>
+  <text class="muted xs" x="46" y="253">written from real failures.</text>
+
+  <rect class="card" x="30" y="276" width="250" height="140" rx="10"/>
+  <text class="badt h" x="46" y="306">It never sees</text>
+  <rect class="bad" x="46" y="318" width="218" height="26" rx="6"/><text class="badt xs" x="58" y="336">the case id (gives the answer away)</text>
+  <rect class="bad" x="46" y="348" width="218" height="26" rx="6"/><text class="badt xs" x="58" y="366">the code check's verdict (anchors)</text>
+  <rect class="bad" x="46" y="378" width="218" height="26" rx="6"/><text class="badt xs" x="58" y="396">the stale policy (poisons "supported")</text>
+
+  <path class="line" d="M286 200 h28" stroke-width="2" fill="none"/>
+  <!-- judge + output -->
+  <rect class="card" x="318" y="64" width="270" height="352" rx="10"/>
+  <text class="acc h" x="334" y="94">It answers</text>
+  <text class="ink s" x="334" y="122">with a tool call, reason first:</text>
+  <rect class="ok" x="334" y="134" width="238" height="96" rx="6"/>
+  <text class="ink xs" x="346" y="156">record_verdict(</text>
+  <text class="ink xs" x="358" y="176">reason: "hints at an exception</text>
+  <text class="ink xs" x="358" y="194">  the 30-day rule doesn't allow",</text>
+  <text class="ink xs" x="358" y="214">verdict: "fail" )</text>
+  <text class="ink s" x="334" y="262">Anything else → error,</text>
+  <text class="ink s" x="334" y="281">counted, never dropped.</text>
+  <text class="ink s" x="334" y="318">Pass/fail by default.</text>
+  <text class="muted xs" x="334" y="338">Week 5's 1-5 scale used only</text>
+  <text class="muted xs" x="334" y="355">1s and 5s, and flipped a verdict.</text>
+  <text class="muted xs" x="334" y="392">~500 output tokens a verdict;</text>
+  <text class="muted xs" x="334" y="409">G-Eval: 4,315-9,098.</text>
+
+  <path class="line" d="M594 200 h28" stroke-width="2" fill="none"/>
+  <!-- biases -->
+  <rect class="card" x="626" y="64" width="304" height="352" rx="10"/>
+  <text class="acc h" x="642" y="94">Its biases (week 5, real)</text>
+  <text class="ink s" x="642" y="126">Position</text>
+  <text class="badt big" x="642" y="158">19/27</text><text class="muted xs" x="730" y="150">small judge picked</text><text class="muted xs" x="730" y="166">the second reply</text>
+  <text class="okt xs" x="642" y="186">→ ask both orders; run a control</text>
+  <text class="ink s" x="642" y="222">Length</text>
+  <text class="badt big" x="642" y="254">6-0</text><text class="muted xs" x="730" y="246">padded reply beat</text><text class="muted xs" x="730" y="262">the same reply, unpadded</text>
+  <text class="okt xs" x="642" y="282">→ pad a copy and test the rubric</text>
+  <text class="ink s" x="642" y="318">Self-preference</text>
+  <text class="badt big" x="642" y="350">10-0</text><text class="muted xs" x="730" y="342">qwen judge chose</text><text class="muted xs" x="730" y="358">qwen's replies</text>
+  <text class="okt xs" x="642" y="378">→ judge from another model family;</text>
+  <text class="okt xs" x="654" y="395">check both directions</text>
+</svg>

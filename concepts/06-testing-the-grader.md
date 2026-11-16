@@ -1,6 +1,6 @@
 # 06 · Testing the grader
 
-**[← Concepts](README.md)** · **Previous: [Week 5: LLM as a grader](../lessons/week05-llm-graders.md)** · **Next: 07 Statistics for evals →** *(coming)* · **In the course:** week 6
+**[← Concepts](README.md)** · **Previous: [05 LLM as a grader](05-llm-as-a-grader.md)** · **Next: 07 Statistics for evals →** *(coming)* · **In the course:** week 6
 
 An LLM grader is a classifier: it reads a reply and says pass or fail. Like any classifier it makes mistakes, and you can't see them by reading its reasons, which always sound convincing. **Testing the grader** means giving the same replies to a person and to the grader, counting where they agree and where they don't, and turning those counts into numbers you can act on: Cohen's kappa for overall agreement, and precision and recall for the failures you care about.
 

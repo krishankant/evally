@@ -1,0 +1,34 @@
+/* Shared look for the concept demos: light/dark tokens, cards, controls. */
+:root { --bg:#ffffff; --fg:#1f2330; --muted:#5d6475; --line:#d9dce4; --card:#f5f6f9;
+        --good:#2e7d5b; --good-bg:#e3f3ec; --bad:#b3412e; --bad-bg:#fbe7e3; --accent:#3f51b5; --accent2:#c77700; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg:#1e2129; --fg:#e8eaf0; --muted:#a3a9b8; --line:#3a3f4c; --card:#272b35;
+        --good:#6fd3a3; --good-bg:#1f3a2f; --bad:#f2937f; --bad-bg:#432722; --accent:#8c9eff; --accent2:#ffb74d; }
+}
+:root[data-theme="dark"] { --bg:#1e2129; --fg:#e8eaf0; --muted:#a3a9b8; --line:#3a3f4c; --card:#272b35;
+        --good:#6fd3a3; --good-bg:#1f3a2f; --bad:#f2937f; --bad-bg:#432722; --accent:#8c9eff; --accent2:#ffb74d; }
+* { box-sizing: border-box; }
+body { margin:0; padding:16px; background:var(--bg); color:var(--fg);
+       font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+h1 { font-size:18px; margin:0 0 4px; }
+p.lead { margin:0 0 14px; color:var(--muted); }
+.wrap { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:16px; }
+@media (max-width: 640px) { .wrap { grid-template-columns: 1fr; } }
+.card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px; }
+.row { display:flex; justify-content:space-between; gap:8px; padding:3px 0; font-variant-numeric:tabular-nums; }
+.row b { font-size:17px; }
+.big { font-size:28px; font-weight:700; color:var(--accent); }
+.note { color:var(--muted); font-size:13px; margin-top:8px; }
+label.ctl { display:block; margin:0 0 12px; }
+label.ctl span { display:flex; justify-content:space-between; font-size:14px; }
+input[type=range] { width:100%; accent-color: var(--accent); }
+input[type=number], textarea, select { width:100%; background:var(--bg); color:var(--fg); border:1px solid var(--line);
+       border-radius:6px; padding:6px; font: inherit; }
+button.btn { border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:999px;
+       padding:6px 12px; font-size:13px; cursor:pointer; }
+.bar { height:8px; border-radius:4px; background:var(--line); overflow:hidden; margin:2px 0 8px; }
+.bar > i { display:block; height:100%; background:var(--accent); }
+.good { color:var(--good); } .bad { color:var(--bad); }
+table.t { border-collapse:collapse; width:100%; font-variant-numeric:tabular-nums; }
+table.t th, table.t td { border:1px solid var(--line); padding:5px 6px; text-align:center; }
+table.t th { color:var(--muted); font-weight:600; font-size:13px; }

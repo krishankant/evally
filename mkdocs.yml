@@ -57,4 +57,5 @@ nav:
       - "5 · LLM as a grader": lessons/week05-llm-graders.md
   - Concepts:
       - concepts/README.md
+      - "05 · LLM as a grader": concepts/05-llm-as-a-grader.md
       - "06 · Testing the grader": concepts/06-testing-the-grader.md
