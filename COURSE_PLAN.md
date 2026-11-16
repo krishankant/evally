@@ -37,7 +37,7 @@ For each week: check out its branch, read the lesson with the code open beside i
 | **11** | [Safety checks](concepts/11-safety-checks.md) | Prompt injection, data leaks, out-of-policy promises, over-refusal; `evally redteam` → then **promptfoo** / **DeepEval** red-teaming | ✅ concept page |
 | **12** | [Automatic checks on every change](concepts/12-ci-gates.md) | Smoke vs full suite; pass marks; regression gates; **promptfoo** + **GitHub Actions** | ✅ concept page |
 | **13** | [Production monitoring](concepts/13-monitoring.md) | Tracing (by hand, then **Langfuse** or **Phoenix**); grading live samples; feedback; drift | ✅ concept page |
-| **14** | Cost and speed | Quality, cost and latency together; quality per dollar; latency percentiles | concepts (coming) |
+| **14** | [Cost and speed](concepts/14-cost-and-speed.md) | Quality, cost and latency together; quality per dollar; latency percentiles | ✅ concept page |
 | **15** | Capstone | Baseline to best version with everything above; held-out test set as final judge | concepts (coming) |
 
 The order is fixed; a heavy week may split in two.

@@ -1,6 +1,6 @@
 # 13 · Production monitoring
 
-**[← Concepts](README.md)** · **Previous: [12 Evals on every change](12-ci-gates.md)** · **Next: 14 Cost and speed →** *(coming)* · **In the course:** week 13
+**[← Concepts](README.md)** · **Previous: [12 Evals on every change](12-ci-gates.md)** · **Next: [14 Cost and speed →](14-cost-and-speed.md)** · **In the course:** week 13
 
 Offline evals test the conversations you thought of. **Production monitoring** watches the ones you didn't: it records every conversation as a **trace**, runs cheap checks on all of them, grades a **sample** with the expensive graders, listens to user **feedback**, and watches for **drift**: the traffic, the documents or the model changing under you. Its most important output isn't a dashboard. It's new eval cases, so that tomorrow's offline suite covers today's failures.
 

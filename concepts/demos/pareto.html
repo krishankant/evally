@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pareto picker</title>
+<link rel="stylesheet" href="demo.css">
+<style>
+  svg.plot { width:100%; height:260px; display:block; }
+  svg.plot circle.on { fill: var(--accent); } svg.plot circle.off { fill: var(--line); }
+  svg.plot text { fill: var(--fg); font-size: 11px; } svg.plot .ax { stroke: var(--line); }
+  svg.plot polyline { fill: none; stroke: var(--accent2); stroke-width: 1.5; stroke-dasharray: 4 3; }
+  textarea { height: 130px; font-family: ui-monospace, Menlo, monospace; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>Pareto picker</h1>
+<p class="lead">One option per line: <code>name quality cost p95</code> (quality 0-1, cost in $ per 1,000 conversations, p95 latency in seconds). Blue points are on the Pareto front: nothing else is both better and cheaper.</p>
+<div class="wrap">
+  <div>
+    <textarea id="pts" aria-label="Options"></textarea>
+    <label class="ctl" style="margin-top:8px"><span>Max p95 latency you'll accept <output id="lv"></output></span>
+      <input id="lat" type="range" min="1" max="20" step="0.5" value="20"></label>
+    <label class="ctl"><span>Min quality you'll accept <output id="qv"></output></span>
+      <input id="q" type="range" min="0" max="1" step="0.05" value="0"></label>
+  </div>
+  <div class="card">
+    <svg class="plot" id="plot" viewBox="0 0 320 260" aria-label="Quality against cost"></svg>
+    <div class="note" id="pick"></div>
+  </div>
+</div>
+<script src="demo-shell.js"></script>
+<script src="pareto.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  $("pts").value = "big-model 0.86 9.0 6.5\nmid-model 0.81 2.4 3.1\nsmall-model 0.74 0.6 1.4\nsmall+cache 0.74 0.35 1.1\nmid-old-prompt 0.76 2.9 3.4\nrouter 0.83 3.0 4.2";
+  function render() {
+    const maxLat = +$("lat").value, minQ = +$("q").value;
+    $("lv").textContent = maxLat + " s"; $("qv").textContent = minQ.toFixed(2);
+    const all = $("pts").value.split("\n").map(l => l.trim().split(/\s+/)).filter(a => a.length >= 3 && !isNaN(+a[1]) && !isNaN(+a[2]))
+      .map(([name, q, c, l]) => ({ name, quality: +q, cost: +c, p95: l === undefined ? 0 : +l }));
+    const ok = all.filter(p => p.p95 <= maxLat && p.quality >= minQ);
+    const front = ok.length ? paretoFront(ok) : [];
+    const W = 320, H = 260, L = 34, B = 30;
+    const maxC = Math.max(1, ...all.map(p => p.cost)) * 1.1;
+    const x = (c) => L + (W - L - 10) * c / maxC, y = (q) => H - B - (H - B - 10) * q;
+    let svg = `<line class="ax" x1="${L}" y1="${H - B}" x2="${W - 5}" y2="${H - B}"/><line class="ax" x1="${L}" y1="5" x2="${L}" y2="${H - B}"/>` +
+      `<text x="${W - 90}" y="${H - 8}">cost →</text><text x="2" y="14">quality</text><text x="${L - 26}" y="${y(1) + 4}">1.0</text><text x="${L - 20}" y="${H - B}">0</text>`;
+    const sorted = front.slice().sort((a, b) => a.cost - b.cost);
+    if (sorted.length > 1) svg += `<polyline points="${sorted.map(p => x(p.cost) + "," + y(p.quality)).join(" ")}"/>`;
+    for (const p of all) {
+      const on = front.includes(p), dim = !ok.includes(p);
+      svg += `<circle class="${on ? "on" : "off"}" cx="${x(p.cost)}" cy="${y(p.quality)}" r="${on ? 6 : 4}" opacity="${dim ? 0.35 : 1}"/>` +
+             `<text x="${x(p.cost) + 7}" y="${y(p.quality) - 6}">${p.name}</text>`;
+    }
+    $("plot").innerHTML = svg;
+    if (!ok.length) $("pick").textContent = "Nothing meets both limits. Relax one.";
+    else {
+      const best = ok.slice().sort((a, b) => (qualityPerDollar(b) || 0) - (qualityPerDollar(a) || 0))[0];
+      $("pick").textContent = "On the front: " + sorted.map(p => p.name).join(", ") + ". Highest quality per dollar: " + best.name +
+        ". Off the front means some option is both at least as good and no more expensive.";
+    }
+    window.fitFrame();
+  }
+  ["pts", "lat", "q"].forEach(id => $(id).oninput = render);
+  render();
+</script>
+</body>
+</html>
