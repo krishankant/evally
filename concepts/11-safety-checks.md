@@ -1,6 +1,6 @@
 # 11 · Safety checks
 
-**[← Concepts](README.md)** · **Previous: [10 Agent and multi-turn checks](10-agent-checks.md)** · **Next: 12 Evals on every change →** *(coming)* · **In the course:** week 11
+**[← Concepts](README.md)** · **Previous: [10 Agent and multi-turn checks](10-agent-checks.md)** · **Next: [12 Evals on every change →](12-ci-gates.md)** · **In the course:** week 11
 
 **Safety checks** test what the app must never do, however it's asked: reveal one customer's data to another, leak its instructions, follow orders hidden in a document, promise what the policy forbids, take an action it shouldn't. They also test the opposite failure, **over-refusal**: declining harmless requests. Normal evals sample ordinary traffic. Safety evals sample *adversarial* traffic, on purpose and at volume. This practice is called **red-teaming**, and its headline number is the **attack success rate**, always reported next to the false-refusal rate.
 

@@ -35,7 +35,7 @@ For each week: check out its branch, read the lesson with the code open beside i
 | **9** | [RAG checks](concepts/09-rag-checks.md) | Recall@k, MRR, faithfulness, answer relevance, context precision → then **Ragas** | ✅ concept page |
 | **10** | [Agent and multi-turn checks](concepts/10-agent-checks.md) | Tool and argument accuracy; trajectory checks; a simulated customer; `evally simulate` | ✅ concept page |
 | **11** | [Safety checks](concepts/11-safety-checks.md) | Prompt injection, data leaks, out-of-policy promises, over-refusal; `evally redteam` → then **promptfoo** / **DeepEval** red-teaming | ✅ concept page |
-| **12** | Automatic checks on every change | Smoke vs full suite; pass marks; regression gates; **promptfoo** + **GitHub Actions** | concepts (coming) |
+| **12** | [Automatic checks on every change](concepts/12-ci-gates.md) | Smoke vs full suite; pass marks; regression gates; **promptfoo** + **GitHub Actions** | ✅ concept page |
 | **13** | Production monitoring | Tracing (by hand, then **Langfuse** or **Phoenix**); grading live samples; feedback; drift | concepts (coming) |
 | **14** | Cost and speed | Quality, cost and latency together; quality per dollar; latency percentiles | concepts (coming) |
 | **15** | Capstone | Baseline to best version with everything above; held-out test set as final judge | concepts (coming) |

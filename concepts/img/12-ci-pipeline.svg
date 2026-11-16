@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Evals on every change</title>
+  <desc id="d">On every pull request, replay a smoke suite from recordings: 16 cases in 1.2 seconds, free and deterministic. Gate on regressions against a committed baseline, not on pass rate: on real runs the pass rate went from 10 to 13 of 16 while return-window broke, so the gate fails. Nightly, run the full suite live to catch model drift, but never the held-out test set.</desc>
+  <style>
+    .bg{fill:#ffffff}.card{fill:#f4f5f9;stroke:#d5d8e1}.ink{fill:#1f2330}.muted{fill:#5d6475}
+    .acc{fill:#3f51b5}.ok{fill:#e1f2ea}.okt{fill:#2e7d5b}.bad{fill:#fbe5e0}.badt{fill:#b3412e}.line{stroke:#9aa0b2}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#1e2129}.card{fill:#272b35;stroke:#3a3f4c}.ink{fill:#e8eaf0}.muted{fill:#a3a9b8}
+      .acc{fill:#8c9eff}.ok{fill:#1f3a2f}.okt{fill:#6fd3a3}.bad{fill:#432722}.badt{fill:#f2937f}.line{stroke:#6b7285}}
+    text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    .h{font-size:19px;font-weight:700}.s{font-size:14px}.xs{font-size:12.5px}.big{font-size:26px;font-weight:700}
+  </style>
+  <rect class="bg" width="960" height="420" rx="14"/>
+  <text class="ink h" x="30" y="40">A run reports. A gate decides. Gate on regressions, every change.</text>
+  <rect class="card" x="30" y="64" width="290" height="330" rx="10"/>
+  <text class="acc h" x="46" y="94">1 · Every pull request</text>
+  <text class="ink s" x="46" y="124">Smoke suite, replayed</text>
+  <text class="acc big" x="46" y="160">1.2 s</text><text class="muted xs" x="126" y="152">16 dev cases,</text><text class="muted xs" x="126" y="168">no key, $0 (real)</text>
+  <text class="ink s" x="46" y="204">Same input → same output.</text>
+  <text class="ink s" x="46" y="232">Prompt changed? Cache miss →</text>
+  <text class="ink s" x="46" y="251">case ERROR → re-record live,</text>
+  <text class="ink s" x="46" y="270">review the new replies.</text>
+  <rect class="bad" x="46" y="296" width="258" height="56" rx="6"/>
+  <text class="badt xs" x="58" y="318">evally run exits 0 with 6/16 failing:</text>
+  <text class="badt xs" x="58" y="338">a run is not a gate.</text>
+  <rect class="card" x="336" y="64" width="300" height="330" rx="10"/>
+  <text class="acc h" x="352" y="94">2 · The gate (real runs)</text>
+  <text class="ink s" x="352" y="124">baseline qwen → change llama</text>
+  <rect class="ok" x="352" y="138" width="268" height="40" rx="6"/><text class="okt s" x="364" y="163">pass rate 10/16 → 13/16 ↑</text>
+  <rect class="bad" x="352" y="186" width="268" height="40" rx="6"/><text class="badt s" x="364" y="211">regression: return-window</text>
+  <text class="badt big" x="352" y="262">GATE: FAIL</text>
+  <text class="ink xs" x="352" y="292">must-pass cases · no net regressions</text>
+  <text class="ink xs" x="352" y="310">· floor on the Wilson lower bound</text>
+  <text class="muted xs" x="352" y="344">Baseline committed: changing expected</text>
+  <text class="muted xs" x="352" y="362">behaviour is a reviewed diff.</text>
+  <rect class="card" x="652" y="64" width="278" height="330" rx="10"/>
+  <text class="acc h" x="668" y="94">3 · Nightly</text>
+  <text class="ink s" x="668" y="124">Full suite, live model</text>
+  <text class="muted xs" x="668" y="144">minutes, costs money, catches drift</text>
+  <text class="ink s" x="668" y="184">Flaky or regressed?</text>
+  <text class="muted xs" x="668" y="204">re-run failures 5×: 5/5 regressed,</text>
+  <text class="muted xs" x="668" y="222">1/5 flaky → pass^k, not the gate</text>
+  <text class="ink s" x="668" y="262">Overrides: named owner,</text>
+  <text class="ink s" x="668" y="281">a reason, and they expire.</text>
+  <rect class="bad" x="668" y="306" width="246" height="56" rx="6"/>
+  <text class="badt xs" x="680" y="328">Never the held-out test set:</text>
+  <text class="badt xs" x="680" y="346">opened once, at the end.</text>
+</svg>
