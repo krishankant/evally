@@ -14,7 +14,7 @@ Weeks 1-5 of evally built the tools in code. From week 6 the course is these con
 | [08 Side-by-side comparison](08-side-by-side.md) | 8 | rank versions from pairwise votes with Elo and Bradley-Terry |
 | [09 RAG checks](09-rag-checks.md) | 9 | measure retrieval and faithfulness separately |
 | [10 Agent and multi-turn checks](10-agent-checks.md) | 10 | grade tool use, trajectories and whole conversations |
-| 11 Safety checks *(coming)* | 11 | test for prompt injection, data leaks and over-refusal |
+| [11 Safety checks](11-safety-checks.md) | 11 | test for prompt injection, data leaks and over-refusal |
 | 12 Evals on every change *(coming)* | 12 | gate a pull request on eval results |
 | 13 Production monitoring *(coming)* | 13 | trace, sample and grade live traffic, and spot drift |
 | 14 Cost and speed *(coming)* | 14 | choose a model on quality, cost and latency together |

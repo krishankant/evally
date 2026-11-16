@@ -1,6 +1,6 @@
 # 10 · Agent and multi-turn checks
 
-**[← Concepts](README.md)** · **Previous: [09 RAG checks](09-rag-checks.md)** · **Next: 11 Safety checks →** *(coming)* · **In the course:** week 10
+**[← Concepts](README.md)** · **Previous: [09 RAG checks](09-rag-checks.md)** · **Next: [11 Safety checks →](11-safety-checks.md)** · **In the course:** week 10
 
 An **agent** doesn't just answer: it decides which tools to call, with which arguments, in what order, reads the results and keeps going, and some of those calls change things (start a return, issue a refund). A **multi-turn** conversation adds the customer's side: questions, missing details, follow-ups. Grading only the final reply misses most of what can go wrong. This page covers the checks that look inside: tool choice, arguments, the whole **trajectory**, the **end state**, budgets, and how to test conversations with a **simulated customer**.
 

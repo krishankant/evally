@@ -63,3 +63,4 @@ nav:
       - "08 · Side-by-side comparison": concepts/08-side-by-side.md
       - "09 · RAG checks": concepts/09-rag-checks.md
       - "10 · Agent and multi-turn checks": concepts/10-agent-checks.md
+      - "11 · Safety checks": concepts/11-safety-checks.md
