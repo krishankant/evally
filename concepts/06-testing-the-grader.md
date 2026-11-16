@@ -149,7 +149,7 @@ Week 5 can be tested this way, with one caveat about where the labels come from.
 | Binary | 2 | 0 | 1 | 45 | 0.979 | **0.79** | 1.00 | 0.67 |
 | 1-5 | 2 | 1 | 1 | 44 | 0.958 | **0.64** | 0.67 | 0.67 |
 
-On these numbers binary wins, and the 1-5 grader's extra fail looks like a false alarm. Now **read the disagreement** instead of just counting it. The 1-5 grader's "false alarm" is `t-clockmaker-stock`, where the app told the customer it needs "the 13-digit ISBN" to check stock. No policy says that; the app made the process up. The week 5 lesson argues that the 1-5 grader got it right. **The label was wrong**: the person missed a failure while labelling. Fix the label and recount:
+On these numbers binary wins, and the 1-5 grader's extra fail looks like a false alarm. Now **read the disagreement** instead of just counting it. The 1-5 grader's "false alarm" is `t-clockmaker-stock`, where the app told the customer it needs "the 13-digit ISBN" to check stock. Is that an unsupported claim? It's true of the system: the app's `check_stock` tool only accepts an ISBN. But no policy says so, and the grader sees policies, not tool definitions. The rubric fails a claim that "isn't supported by the policies or tool results", so by its letter this is a fail and **the label missed it**; by its intent (catch made-up facts) it's a pass. That isn't a grader error or a labelling slip. It's **a gap in the rubric**, and only the disagreement revealed it. Decide it once, write the decision into the labelling guide, and recount. If "true but undocumented" counts as unsupported:
 
 | Grader | TP | FP | FN | TN | κ | Recall |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -158,7 +158,7 @@ On these numbers binary wins, and the 1-5 grader's extra fail looks like a false
 
 The ranking flipped. Three lessons in one table:
 
-1. **Disagreements are where you learn.** Read each one before deciding who was wrong. Sometimes it's the label.
+1. **Disagreements are where you learn.** Read each one before deciding who was wrong. Sometimes it's the label, sometimes the rubric, as here.
 2. **Small counts swing hard.** One label out of 48 moved kappa by 0.14 (binary) and 0.21 (1-5). With 3 or 4 real failures, no ranking here is safe; [page 07](07-statistics-for-evals.md) puts ranges on numbers like these.
 3. **Both graders miss `adv-quotes-60-days`.** That's a rubric problem, not a scale problem: both read "acts on the customer's claim" too narrowly. Fix the rubric text, then re-test.
 
@@ -234,7 +234,7 @@ At 20 labels a "substantial" kappa of 0.60 could be anything from about 0.25 to 
 
 > **Pitfall: tuning and reporting on the same labels.** The number goes up; the grader doesn't get better. Split the labels once (section 10).
 
-> **Pitfall: assuming the label is right.** Read every disagreement. Section 8's ranking flipped when one label turned out to be wrong.
+> **Pitfall: assuming the label is right.** Read every disagreement. Section 8's ranking flipped when one debatable label was settled the other way.
 
 > **Pitfall: one kappa for all rubrics.** Each rubric is its own classifier. A grader can be excellent on one rubric and blind on another (`uses-outdated-policy` found 0 of 1).
 
@@ -304,9 +304,9 @@ Not 0.82, if those 60 labels are the ones you tuned on: the rubric now fits thos
 <details>
 <summary>5. The grader and the person disagree on a reply. Name two possible causes besides "the grader is wrong".</summary>
 
-The label is wrong (the person missed something, like `t-clockmaker-stock` in section 8), or the rubric is ambiguous and the two read it differently (both graders' reading of "acts on it" for `adv-quotes-60-days`). Each points to a different fix: correct the label and guide, or rewrite the rubric.
+The label is wrong (the person missed something), or the rubric is ambiguous or silent (`t-clockmaker-stock` in section 8: is a true but undocumented claim "unsupported"?), or the two read the rubric differently (both graders' reading of "acts on it" for `adv-quotes-60-days`). Each points to a different fix: correct the label and guide, or rewrite the rubric.
 </details>
 
 ## 18. In one minute
 
-An LLM grader is a classifier, so test it like one: label replies by hand, blind, using the same rubric; count TP, FP, FN and TN with "fail" as the positive class; report **kappa** (agreement beyond chance; accuracy is fooled by rare failures) and **precision and recall of "fail"** (false alarms vs missed failures, which cost different things). Read every disagreement, because sometimes the label is wrong: in week 5's data, fixing one label flipped which grader looked better. Tune the rubric on dev labels, report on test labels once, and label enough: at 20 labels a kappa of 0.60 is really "somewhere between 0.25 and 0.95".
+An LLM grader is a classifier, so test it like one: label replies by hand, blind, using the same rubric; count TP, FP, FN and TN with "fail" as the positive class; report **kappa** (agreement beyond chance; accuracy is fooled by rare failures) and **precision and recall of "fail"** (false alarms vs missed failures, which cost different things). Read every disagreement, because sometimes the label or the rubric is wrong: in week 5's data, settling one ambiguous label flipped which grader looked better. Tune the rubric on dev labels, report on test labels once, and label enough: at 20 labels a kappa of 0.60 is really "somewhere between 0.25 and 0.95".

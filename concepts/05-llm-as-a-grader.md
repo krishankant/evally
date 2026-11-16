@@ -69,7 +69,7 @@ What the grader must **not** see matters as much. Week 5's grader never sees the
 
 ## 6. Pass/fail or a score?
 
-Week 5 asked the same grader both ways. Asked for 1-5, it used only 1s and 5s across all 48 verdicts. It changed one verdict: on `t-clockmaker-stock` (the app invents a "13-digit ISBN" requirement) binary said pass and 1-5 said 1.
+Week 5 asked the same grader both ways. Asked for 1-5, it used only 1s and 5s across all 48 verdicts. It changed one verdict: on `t-clockmaker-stock` (the app asks for a "13-digit ISBN": its stock tool really needs one, but no policy the grader sees says so) binary said pass and 1-5 said 1.
 
 | | Pass/fail | 1-5 (or 1-10) |
 | --- | --- | --- |
