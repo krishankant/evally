@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Production monitoring</title>
+  <desc id="d">Trace every conversation with versions. Run cheap code checks on all traffic, LLM graders on a random sample for rates and a targeted sample for failures, and treat feedback as a pointer. Watch inputs, retrieval, outputs and the model for drift. Turn every production failure into an eval case.</desc>
+  <style>
+    .bg{fill:#ffffff}.card{fill:#f4f5f9;stroke:#d5d8e1}.ink{fill:#1f2330}.muted{fill:#5d6475}
+    .acc{fill:#3f51b5}.ok{fill:#e1f2ea}.okt{fill:#2e7d5b}.bad{fill:#fbe5e0}.badt{fill:#b3412e}.line{stroke:#9aa0b2}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#1e2129}.card{fill:#272b35;stroke:#3a3f4c}.ink{fill:#e8eaf0}.muted{fill:#a3a9b8}
+      .acc{fill:#8c9eff}.ok{fill:#1f3a2f}.okt{fill:#6fd3a3}.bad{fill:#432722}.badt{fill:#f2937f}.line{stroke:#6b7285}}
+    text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    .h{font-size:19px;font-weight:700}.s{font-size:14px}.xs{font-size:12.5px}.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px}
+  </style>
+  <rect class="bg" width="960" height="420" rx="14"/>
+  <text class="ink h" x="30" y="40">Watch the traffic you didn't imagine. Turn what you find into tests.</text>
+  <rect class="card" x="30" y="64" width="290" height="330" rx="10"/>
+  <text class="acc h" x="46" y="94">1 · Trace everything</text>
+  <text class="mono ink" x="46" y="122">invoke_agent bramble-support</text>
+  <text class="mono ink" x="58" y="142">retrieve [returns, returns-2023…]</text>
+  <text class="mono ink" x="58" y="162">chat qwen3.5:4b → lookup_order</text>
+  <text class="mono badt" x="58" y="182">execute_tool start_return ✗</text>
+  <text class="mono ink" x="58" y="202">execute_tool escalate_to_human</text>
+  <text class="ink s" x="46" y="236">+ tokens, latency, errors</text>
+  <text class="ink s" x="46" y="256">+ versions: prompt, model,</text>
+  <text class="ink s" x="46" y="275">  docs, grader, rubric</text>
+  <text class="muted xs" x="46" y="310">OpenTelemetry GenAI conventions</text>
+  <text class="muted xs" x="46" y="328">(status: development, pin them)</text>
+  <text class="badt xs" x="46" y="362">Redact personal data first.</text>
+  <rect class="card" x="336" y="64" width="300" height="330" rx="10"/>
+  <text class="acc h" x="352" y="94">2 · Check and grade</text>
+  <rect class="ok" x="352" y="108" width="268" height="56" rx="6"/>
+  <text class="okt s" x="364" y="130">100%: code checks</text>
+  <text class="ink xs" x="364" y="150">grounded args · stale doc · canary · budgets</text>
+  <rect class="card" x="352" y="172" width="268" height="56" rx="6"/>
+  <text class="ink s" x="364" y="194">Random sample: LLM graders</text>
+  <text class="ink xs" x="364" y="214">rates with ranges (100/day ≈ ±10 pts)</text>
+  <rect class="bad" x="352" y="236" width="268" height="56" rx="6"/>
+  <text class="badt s" x="364" y="258">Targeted sample: find failures</text>
+  <text class="ink xs" x="364" y="278">thumbs-down · errors · escalations</text>
+  <text class="muted xs" x="352" y="316">Never compute a rate on a targeted sample.</text>
+  <text class="muted xs" x="352" y="336">Feedback points at traces; it isn't a score.</text>
+  <rect class="card" x="652" y="64" width="278" height="330" rx="10"/>
+  <text class="acc h" x="668" y="94">3 · Drift → new cases</text>
+  <text class="ink s" x="668" y="124">inputs   topic mix, wording</text>
+  <text class="ink s" x="668" y="146">retrieval  stale-doc rate</text>
+  <text class="ink s" x="668" y="168">outputs  length, refusals</text>
+  <text class="ink s" x="668" y="190">model    nightly live suite</text>
+  <text class="ink s" x="668" y="230">failure → read the trace →</text>
+  <text class="ink s" x="668" y="250">error analysis (week 2) →</text>
+  <text class="ink s" x="668" y="270">eval case (week 3) →</text>
+  <text class="ink s" x="668" y="290">regression gate (page 12)</text>
+  <text class="okt s" x="668" y="330">Tested forever after</text>
+  <text class="okt s" x="668" y="350">it's fixed.</text>
+</svg>

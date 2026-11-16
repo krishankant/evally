@@ -1,6 +1,6 @@
 # 12 · Evals on every change
 
-**[← Concepts](README.md)** · **Previous: [11 Safety checks](11-safety-checks.md)** · **Next: 13 Production monitoring →** *(coming)* · **In the course:** week 12
+**[← Concepts](README.md)** · **Previous: [11 Safety checks](11-safety-checks.md)** · **Next: [13 Production monitoring →](13-monitoring.md)** · **In the course:** week 12
 
 An eval suite you run by hand when you remember is a diagnostic. One that runs on **every proposed change** and can **block the merge** is a safety net. This page covers turning evals into a CI **gate**: what to run when (a fast smoke suite on every pull request, a full live suite nightly), how to make CI runs free and repeatable (record and replay), what the gate should check (no regressions, not just "pass rate above X"), and how to deal with flaky results and overrides.
 
