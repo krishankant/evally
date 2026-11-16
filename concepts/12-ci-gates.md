@@ -11,7 +11,7 @@ An eval suite you run by hand when you remember is a diagnostic. One that runs o
 Prompts, models and retrieval settings change often, and every change can break something the last change fixed. Two real facts about evally set up this page:
 
 - **Replaying the 16-case dev suite takes 1.2 seconds** and costs nothing (`uv run evally run --suite bramble-v2-dev`, measured): every model reply is recorded in `evals/cache/`. The full offline test suite takes 5.6 seconds. Speed and cost are no excuse here.
-- **`evally run` exits with code 0 even when 6 of 16 cases fail.** It reports; it doesn't judge. CI only fails a build on a non-zero exit, so as it stands this suite can never stop a merge. A run is not a gate.
+- **`evally run` exits with code 0 even when 6 of 16 cases fail.** It reports; it doesn't judge. CI only fails a build on a non-zero exit, so a run alone can never stop a merge. A run is not a gate: `evally gate` (section 4) is.
 
 ## 2. The idea in one picture
 
@@ -44,12 +44,14 @@ flowchart TB
 "Pass rate ≥ 60%" is the obvious gate and a weak one. Run the gate on real runs: qwen's dev run as the baseline, llama's as the new version (both real):
 
 ```
-$ python gate.py evals/runs/bramble-v2-dev-qwen3.5-4b.json evals/runs/bramble-v2-dev-llama3.2-3b.json 0.6
-pass rate 10/16 -> 13/16
+$ uv run evally gate bramble-v2-dev-qwen3.5-4b bramble-v2-dev-llama3.2-3b --floor 0.5
+pass rate 10/16 -> 13/16   (Wilson lower bound 57.0%, floor 50.0%)
 fixed: gen-fa79bb81, short-answer, t-clockmaker-stock, t-password-reset
 regressions: return-window
 GATE: FAIL
 ```
+
+(exit code 1)
 
 The pass rate went **up** from 10/16 to 13/16, and a case that used to pass, `return-window` ("How long do I have to return a book?", the most basic question the bot gets), now fails. A pass-rate gate waves this through. A **regression gate** stops it. Page 07's paired view applies directly: the flips are the evidence, not the totals.
 
@@ -98,7 +100,7 @@ A gate that's overridden every week is measuring the wrong thing. Fix the gate.
 
 ## 8. A GitHub Actions workflow
 
-Smoke on every pull request, full nightly (illustrative, but linted: actionlint **1.7.12** reports no errors). `scripts/gate.py` is the script in section 11, and `evals/baseline/` the committed baseline from section 5:
+Smoke on every pull request, full nightly (illustrative, but linted: actionlint **1.7.12** reports no errors). `evals/baseline/` is the committed baseline from section 5, and `evally gate` is section 11's command:
 
 ```yaml
 name: evals
@@ -116,7 +118,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - run: uv run pytest -q
       - run: uv run evally run --suite bramble-v2-dev           # replay: no key, no spend
-      - run: python scripts/gate.py evals/baseline/bramble-v2-dev.json evals/runs/bramble-v2-dev-qwen3.5-4b.json 0.6
+      - run: uv run evally gate evals/baseline/bramble-v2-dev.json evals/runs/bramble-v2-dev-qwen3.5-4b.json --floor 0.35
 
   full:                  # slow, costs money, catches drift in the real model
     if: github.event_name == 'schedule'
@@ -139,7 +141,7 @@ Note what the nightly job does **not** run: the held-out test set. Week 3's rule
 
 ## 10. Pitfalls
 
-> **Pitfall: a run command as a gate.** `evally run` exits 0 with 6 of 16 failing. Something must compare and exit non-zero.
+> **Pitfall: a run command as a gate.** `evally run` exits 0 with 6 of 16 failing. Something must compare and exit non-zero: `evally gate`.
 
 > **Pitfall: live model calls on every pull request.** Slow, costly and flaky, so people stop waiting for it. Replay on pull requests; go live nightly.
 
@@ -151,34 +153,28 @@ Note what the nightly job does **not** run: the held-out test set. Week 3's rule
 
 > **Pitfall: silently updated baselines.** A baseline refreshed by a bot accepts every regression. Baseline changes go through review with the change that caused them.
 
-## 11. The gate script
+## 11. In evally: `evally gate`
 
-The script that produced section 4's output, run on the real saved runs for this page (plain Python, no dependencies):
+The command that produced section 4's output:
 
-```python
-"""Fail the build if any case that passed on the baseline fails now, or the pass rate drops below a floor."""
-import json, sys
-
-def results(path):
-    return {c["id"]: c["status"] == "PASS" for c in json.load(open(path))["cases"]}
-
-baseline, current = results(sys.argv[1]), results(sys.argv[2])
-floor = float(sys.argv[3]) if len(sys.argv) > 3 else 0.0
-
-regressions = sorted(cid for cid, ok in baseline.items() if ok and not current.get(cid, False))
-fixed = sorted(cid for cid, ok in current.items() if ok and not baseline.get(cid, False))
-rate = sum(current.values()) / len(current)
-
-print(f"pass rate {sum(baseline.values())}/{len(baseline)} -> {sum(current.values())}/{len(current)}")
-print(f"fixed: {', '.join(fixed) or 'none'}")
-print(f"regressions: {', '.join(regressions) or 'none'}")
-if regressions or rate < floor:
-    print("GATE: FAIL")
-    sys.exit(1)
-print("GATE: PASS")
+```
+uv run evally gate <baseline-run> <current-run> [--floor F] [--allow CASE ...]
 ```
 
-Run against the same run twice it prints `GATE: PASS` and exits 0; against llama's run, `GATE: FAIL` and exits 1. For a real gate, add the Wilson lower bound from page 07 in place of the raw rate, and a must-pass list.
+- **Fails (exit 1)** when a case that passed on the baseline doesn't pass now. FAIL, ERROR (a replay miss) and a case missing from the current run all count, unless the case is named with `--allow`.
+- **Fails** when the Wilson lower bound of the current pass rate (page 07) is below `--floor`. On 16 cases at 62.5% the lower bound is 38.6%, so a floor of 0.6 would fail every run; set floors against the lower bound, not the rate.
+- **`--allow CASE`** accepts a known regression. It's printed as an override, so the decision is visible in the CI log:
+
+```
+$ uv run evally gate bramble-v2-dev-qwen3.5-4b bramble-v2-dev-llama3.2-3b --allow return-window
+pass rate 10/16 -> 13/16   (Wilson lower bound 57.0%, floor 0.0%)
+fixed: gen-fa79bb81, short-answer, t-clockmaker-stock, t-password-reset
+regressions: none
+allowed regressions (override): return-window
+GATE: PASS
+```
+
+(exit code 0.) The logic is in `evally/evals_core/compare.py`, about 40 lines, with tests in `tests/test_compare.py`. Must-pass groups and expiring overrides (section 7) are left as an exercise.
 
 **In a library: promptfoo.** promptfoo publishes a GitHub Action, [`promptfoo/promptfoo-action@v1`](https://www.promptfoo.dev/docs/integrations/github-action/), that runs its evals in CI from a config like page 11's. Its documented inputs include `config`, `prompts`, `github-token` and `cache-path`. Caching provider responses (`cache-path`) is its version of record and replay.
 
@@ -224,4 +220,4 @@ Every look at the test set influences decisions, which makes it a dev set over t
 
 ## 14. In one minute
 
-Turn evals into a gate. On every pull request, replay a smoke suite from recordings: it's seconds, free and deterministic (evally replays 16 cases in 1.2 s), and a changed prompt is a cache miss that forces a reviewed re-record. Nightly, run the full suite live to catch model drift, but never the held-out test set. Gate on regressions against a committed baseline, not on a pass rate: on real runs, 10 → 13 passing hid a newly broken basic returns question. Make the gate exit non-zero (`evally run` alone doesn't), keep flaky cases out of it, and make overrides named, reasoned and temporary.
+Turn evals into a gate. On every pull request, replay a smoke suite from recordings: it's seconds, free and deterministic (evally replays 16 cases in 1.2 s), and a changed prompt is a cache miss that forces a reviewed re-record. Nightly, run the full suite live to catch model drift, but never the held-out test set. Gate on regressions against a committed baseline, not on a pass rate: on real runs, 10 → 13 passing hid a newly broken basic returns question. Make the gate exit non-zero (`evally gate` does; `evally run` alone doesn't), keep flaky cases out of it, and make overrides named, reasoned and temporary.

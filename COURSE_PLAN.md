@@ -10,7 +10,7 @@ The whole course evaluates one small app, the **Bramble Books** support assistan
 
 ## How this course works
 
-- **Weeks 1-5 are code; weeks 6-15 are concept tutorials.** From week 6 on, each topic is an in-depth concept page in `concepts/` on `main` (diagrams, worked examples, interactive demos, videos) instead of new code. The app and the week 1-5 tooling stay as the running example.
+- **Weeks 1-5 are code; weeks 6-15 are concept tutorials.** From week 6 on, each topic is an in-depth concept page in `concepts/` on `main` (diagrams, worked examples, interactive demos, videos) instead of new code. The app and the week 1-5 tooling stay as the running example, plus two commands from the concept weeks: `evally compare` (week 7's paired comparison) and `evally gate` (week 12's regression gate).
 - **The code is already written.** No exercise stubs, no `solutions/` folder. Each week adds working code and a lesson that explains the idea, why it's built this way, the trade-offs, what goes wrong without it, and the numbers before and after.
 - **By hand first, then the library.** Where a popular library exists (DeepEval, Ragas, promptfoo, Langfuse or Phoenix), the week builds the idea in plain Python first, then does the same job with the library and compares the two.
 - **Principles over volume.** Each concept is shown with one or two worked cases. Suites stay small (about 10-20 cases), and lessons say plainly when numbers are too small to prove much.

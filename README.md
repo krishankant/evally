@@ -56,6 +56,8 @@ Check types for a case's `checks`: `contains`, `not_contains`, `regex`, `not_reg
 | `uv run evally deepeval <run> --suite S --case ID` | run a recorded case's checks in DeepEval too, side by side |
 | `uv run evally grade <run>` | grade every reply against every rubric in `evals/rubrics/` (pass/fail with a reason); `--scale 1-5` for scores, `--rubric NAME`, `--case ID` to look at one case without saving |
 | `uv run evally pad <run>` | copy a run with one sentence of filler added to every reply (for the length-bias demo) |
+| `uv run evally compare <run-a> <run-b>` | two runs on the same cases: pass rates with Wilson ranges, the cases that flipped, McNemar's test and a paired range ([concept 07](concepts/07-statistics-for-evals.md)) |
+| `uv run evally gate <baseline> <current>` | exit 1 if a case that passed on the baseline no longer passes, or the pass rate's lower bound is under `--floor`; `--allow CASE` accepts a known regression ([concept 12](concepts/12-ci-gates.md)) |
 | `uv run evally bias <run-a> <run-b>` | which reply is better, asked twice with the order swapped; prints consistency and position counts |
 | `uv run evally geval <run> --rubric NAME --case ID` | the same rubric through DeepEval's G-Eval, side by side with our grader |
 | `--grader-provider P --grader-model M` | override the grader's model (`EVALLY_GRADER_PROVIDER`, `EVALLY_GRADER_MODEL` in `.env`) for one command |

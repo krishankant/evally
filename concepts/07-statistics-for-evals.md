@@ -97,7 +97,7 @@ P(a split at least as lopsided as 4-1 in 5 fair flips) = 2 × P(≤ 1 of 5 go on
 
 A 4-1 split happens more than a third of the time with *no* real difference. Not evidence.
 
-**The paired bootstrap** gives the size of the difference with a range: resample *cases* (keeping each case's qwen result and llama result together), compute llama's pass rate minus qwen's each time. The observed difference is +18.8 points, and the 95% range is **−6 to +44 points** (real, from the demo below). It includes zero.
+**The paired bootstrap** (both are built into `evally compare`, section 13) gives the size of the difference with a range: resample *cases* (keeping each case's qwen result and llama result together), compute llama's pass rate minus qwen's each time. The observed difference is +18.8 points, and the 95% range is **−6 to +44 points** (real, from the demo below). It includes zero.
 
 > **Pitfall: a 19-point jump on 16 cases.** Four flips decided it. A paired test on the flips is the honest reading. To see a real 10-point difference reliably you need many more cases, and above all many more *flips*.
 
@@ -183,8 +183,30 @@ Compare two versions on 20 rubrics or 20 categories at the 5% level and you shou
 
 > **Pitfall: significance is not size.** A tiny difference can be "significant" on 10,000 cases and useless in practice. Report the difference *and* its range, not just p.
 
-## 13. In a library: scipy
+## 13. In evally, and in scipy
 
+**In evally.** `evally compare` runs this page's paired comparison on two saved runs:
+
+```
+$ uv run evally compare bramble-v2-dev-qwen3.5-4b bramble-v2-dev-llama3.2-3b
+A = bramble-v2-dev-qwen3.5-4b
+B = bramble-v2-dev-llama3.2-3b
+shared cases: 16
+
+  A  10/16 = 62.5%   Wilson 95%: 38.6% - 81.5%
+  B  13/16 = 81.2%   Wilson 95%: 57.0% - 93.4%
+
+  better in B (4): gen-fa79bb81, short-answer, t-clockmaker-stock, t-password-reset
+  worse in B (1): return-window
+
+difference B - A: +18.8%   paired bootstrap 95%: -6.2% to 43.8%
+McNemar exact test on the 5 flipped cases: p = 0.375
+reading: the range for the difference includes 0: not evidence of a difference
+```
+
+It compares only the cases both runs share and warns about the rest. The bootstrap uses a fixed seed, so the same runs always print the same range.
+
+**In scipy.** 
 The page's numbers, with [scipy](https://scipy.org/) **1.18.1** and numpy **2.5.5** (run against those versions for this page):
 
 ```python
@@ -215,7 +237,7 @@ qwen bootstrap 95%: 0.375-0.875
 flipped: 1 one way, 4 the other; McNemar exact p = 0.375
 ```
 
-The same numbers as sections 4-6. `binomtest(...).proportion_ci(method="wilson")` is the Wilson interval; McNemar's exact test is a binomial test on the flips.
+The same numbers as sections 4-6 and as `evally compare`. `binomtest(...).proportion_ci(method="wilson")` is the Wilson interval; McNemar's exact test is a binomial test on the flips.
 
 ## 14. Read and watch
 
