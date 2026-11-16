@@ -100,7 +100,7 @@ The same grader asked for a 1-5 score (`--scale 1-5`, where 3 and above counts a
 Two things to see:
 
 - **The scale collapses to two values.** 48 scores, and every one is a 1 or a 5. The model was offered five levels and used two. The extra levels added nothing but a threshold to argue about.
-- **The one disagreement is the interesting case.** `t-clockmaker-stock` asks the customer for "the 13-digit ISBN" before it will check stock. Binary said pass ("it only asks for information"); 1-5 said 1 ("this requirement is not mentioned in any of the provided policies"). The 1-5 reading is the right one: the app invented a process. Same model, same rubric, same reply, different verdict, because the wording of the question changed.
+- **The one disagreement is the interesting case.** `t-clockmaker-stock` asks the customer for "the 13-digit ISBN" before it will check stock. Binary said pass ("it only asks for information"); 1-5 said 1 ("this requirement is not mentioned in any of the provided policies"). Which is right? The claim is true of the system: the app's `check_stock` tool only accepts an ISBN, and there's no way to search by title. But no policy says so, and the grader sees the policies, not the tool definitions. The rubric never said whether "true, but nothing the grader can see supports it" counts as unsupported, so both verdicts can be argued. Same model, same rubric, same reply, different verdict, because the wording of the question changed and the rubric left room for both. (The customer's real problem, not being able to ask by title, is week 2's `cant-find-book-by-title` failure, and a code check already catches it.)
 
 That second point is the real lesson. **A grader's verdict depends on how you ask.** You find out which way of asking is right only by checking verdicts against a person, which is week 6. Until then, binary is the default: a pass/fail verdict with a reason is easier to check against a person than a number nobody agreed on.
 
@@ -125,7 +125,7 @@ The code check is right and the grader is wrong, by the rubric's own text: "acts
 
 So neither grader wins. On dev this week:
 
-- **Only the LLM grader caught** `return-too-late` (a hinted exception) and `t-clockmaker-stock` (an invented ISBN rule, on 1-5 only).
+- **Only the LLM grader caught** `return-too-late` (a hinted exception) and, on 1-5 only, `t-clockmaker-stock` (an ISBN requirement no policy mentions; section 5 explains why that verdict is debatable).
 - **Only the code check caught** `adv-quotes-60-days` (a missing correction).
 - **Both caught** `t-password-reset` (the invented "Forgot Password" option): code with `not_contains`, the grader as an unsupported claim.
 
@@ -232,4 +232,4 @@ Everything this week, recorded once and replayed for free: about 359,000 input a
 
 ## 13. In one minute
 
-Code checks see rules; an LLM grader sees meaning. On the dev set the grader caught a hinted exception and an invented ISBN rule that no code check could, and missed a silent "60 days" that a one-line code check caught. Asked for 1-5, the grader used only 1s and 5s and changed one verdict. Asked to compare, the unpadded reply never won a pair against the same reply plus filler, picked its own model's replies 10 to 0 over a run that passes more checks, and a smaller judge was mostly picking by position. Keep the code checks, add a narrow pass/fail grader per failure category, always swap order, and don't trust any of it until week 6 has checked it against a person.
+Code checks see rules; an LLM grader sees meaning. On the dev set the grader caught a hinted exception that no code check could, and missed a silent "60 days" that a one-line code check caught. Asked for 1-5, the grader used only 1s and 5s and changed one verdict. Asked to compare, the unpadded reply never won a pair against the same reply plus filler, picked its own model's replies 10 to 0 over a run that passes more checks, and a smaller judge was mostly picking by position. Keep the code checks, add a narrow pass/fail grader per failure category, always swap order, and don't trust any of it until week 6 has checked it against a person.
