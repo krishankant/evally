@@ -1,6 +1,6 @@
 # evally
 
-**[Course Plan](COURSE_PLAN.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)** · **[Week 2: Error analysis](lessons/week02-error-analysis.md)** · **[Week 3: Test datasets](lessons/week03-test-datasets.md)** · **[Week 4: Code-based graders](lessons/week04-code-graders.md)**
+**[Course Plan](COURSE_PLAN.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)** · **[Week 2: Error analysis](lessons/week02-error-analysis.md)** · **[Week 3: Test datasets](lessons/week03-test-datasets.md)** · **[Week 4: Code-based graders](lessons/week04-code-graders.md)** · **[Week 5: LLM as a grader](lessons/week05-llm-graders.md)**
 
 ---
 
@@ -16,7 +16,7 @@ No agent or RAG framework: plain Python plus the official model SDKs, so everyth
 
 ```bash
 uv sync
-uv run pytest                          # 173 tests (180 with the deepeval extra), offline, no keys
+uv run pytest                          # 208 tests (220 with the deepeval extra), offline, no keys
 uv run evally run --suite week01       # replay the recorded baseline: no key, no cost
 ```
 
@@ -54,6 +54,11 @@ Check types for a case's `checks`: `contains`, `not_contains`, `regex`, `not_reg
 | `uv run evally refusals <run>` | which saved replies the refusal detector flags, and the phrase it matched |
 | `uv sync --extra deepeval` | install the optional DeepEval extra (week 4) |
 | `uv run evally deepeval <run> --suite S --case ID` | run a recorded case's checks in DeepEval too, side by side |
+| `uv run evally grade <run>` | grade every reply against every rubric in `evals/rubrics/` (pass/fail with a reason); `--scale 1-5` for scores, `--rubric NAME`, `--case ID` to look at one case without saving |
+| `uv run evally pad <run>` | copy a run with one sentence of filler added to every reply (for the length-bias demo) |
+| `uv run evally bias <run-a> <run-b>` | which reply is better, asked twice with the order swapped; prints consistency and position counts |
+| `uv run evally geval <run> --rubric NAME --case ID` | the same rubric through DeepEval's G-Eval, side by side with our grader |
+| `--grader-provider P --grader-model M` | override the grader's model (`EVALLY_GRADER_PROVIDER`, `EVALLY_GRADER_MODEL` in `.env`) for one command |
 | `--provider ollama\|openai\|anthropic --model <id>` | override `.env` for one command |
 | `uv run pytest` | the offline test suite |
 
@@ -62,7 +67,8 @@ Check types for a case's `checks`: `contains`, `not_contains`, `regex`, `not_reg
 | `evally/app/` | the app under test: policies, BM25 retrieval, store, tools, the tool loop |
 | `evally/llm/` | one `Model` interface; Ollama/OpenAI, Anthropic and fake adapters; record/replay cache |
 | `evally/evals_core/` | cases, checks, runner, run report |
-| `evally/graders/` | the refusal detector; the DeepEval side-by-side |
+| `evally/graders/` | the refusal detector; the LLM grader and rubrics; pairwise bias tests; the DeepEval side-by-sides |
+| `evals/rubrics/` | one Markdown rubric per failure category the LLM grader checks |
 | `evally/datasets/` | dimensions, generation, review, dataset build, coverage |
 | `evals/suites/` | test cases (JSONL) |
 | `evals/traffic/` | unchecked conversations standing in for real traffic |
@@ -80,3 +86,4 @@ See [COURSE_PLAN.md](COURSE_PLAN.md) for all 15. Done so far:
 | 2 | [Error analysis](lessons/week02-error-analysis.md) | `week-02` |
 | 3 | [Test datasets](lessons/week03-test-datasets.md) | `week-03` |
 | 4 | [Code-based graders](lessons/week04-code-graders.md) | `week-04` |
+| 5 | [LLM as a grader](lessons/week05-llm-graders.md) | `week-05` |

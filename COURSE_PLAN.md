@@ -1,6 +1,6 @@
 # evally: course plan
 
-**[← Repository Home](README.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)** · **[Week 2: Error analysis](lessons/week02-error-analysis.md)**
+**[← Repository Home](README.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)** · **[Week 2: Error analysis](lessons/week02-error-analysis.md)** · **[Week 5: LLM as a grader](lessons/week05-llm-graders.md)**
 
 ---
 
@@ -10,6 +10,7 @@ The whole course evaluates one small app, the **Bramble Books** support assistan
 
 ## How this course works
 
+- **Weeks 1-5 are code; weeks 6-15 are concept tutorials.** From week 6 on, each topic is an in-depth concept page in `concepts/` on `main` (diagrams, worked examples, interactive demos, videos) instead of new code. The app and the week 1-5 tooling stay as the running example.
 - **The code is already written.** No exercise stubs, no `solutions/` folder. Each week adds working code and a lesson that explains the idea, why it's built this way, the trade-offs, what goes wrong without it, and the numbers before and after.
 - **By hand first, then the library.** Where a popular library exists (DeepEval, Ragas, promptfoo, Langfuse or Phoenix), the week builds the idea in plain Python first, then does the same job with the library and compares the two.
 - **Principles over volume.** Each concept is shown with one or two worked cases. Suites stay small (about 10-20 cases), and lessons say plainly when numbers are too small to prove much.
@@ -27,17 +28,17 @@ For each week: check out its branch, read the lesson with the code open beside i
 | **2** | [Error analysis](lessons/week02-error-analysis.md) | Full traces in every run; `evally traces`; `evally label` with notes, categories and a ranked report; 18 realistic conversations read and labelled (by the course author, marked as such). 10 of 18 fail, across six categories; week 1's checks partly cover two | ✅ `week-02` |
 | **3** | [Test datasets](lessons/week03-test-datasets.md) | Dimension tags validated at load; `evally generate` and `evally review`; `evally dataset build` (hash-based, category-stratified dev/test split, lock file) and `dataset stats`; `run --by`. `bramble-v1`: 26 cases from four sources, 16 dev / 10 test. 4 of 7 generated messages kept (57%); coverage finds no preorders case and no privacy case in test. Dev 11/16, test 4/10 | ✅ `week-03` |
 | **4** | [Code-based graders](lessons/week04-code-graders.md) | Regex, tool-argument (exact, shape, grounded) and refusal checks, validated at load; `run --by check`; `evally refusals`; `bramble-v2` (same cases, better checks, no model calls): dev 11/16 → 10/16 as a check catches an **invented order id** in a tool call, test 4/10 → 5/10 from a fixed check; refusal phrase list finds 3 of 7 refusals; then **DeepEval 4.3.2** side by side (fullmatch regex, whole-argument tool check, 0.5 default passes a wrong email) | ✅ `week-04` |
-| **5** | LLM as a grader | Rubric grader with structured output; pass/fail vs 1-5; grader biases → then **DeepEval G-Eval** | coming |
-| **6** | Testing the grader | Labels; accuracy, Cohen's kappa, precision/recall of "fail"; rubric tuning | coming |
-| **7** | Statistics | Bootstrap ranges; paired comparison; sample size; repeat runs; pass@k and pass^k; `evally compare` | coming |
-| **8** | Side-by-side comparison | Pairwise grading with order swapped; win/tie/loss; Elo/Bradley-Terry | coming |
-| **9** | RAG checks | Recall@k, MRR, faithfulness, answer relevance, context precision → then **Ragas** | coming |
-| **10** | Agent and multi-turn checks | Tool and argument accuracy; trajectory checks; a simulated customer; `evally simulate` | coming |
-| **11** | Safety checks | Prompt injection, data leaks, out-of-policy promises, over-refusal; `evally redteam` → then **promptfoo** / **DeepEval** red-teaming | coming |
-| **12** | Automatic checks on every change | Smoke vs full suite; pass marks; regression gates; **promptfoo** + **GitHub Actions** | coming |
-| **13** | Production monitoring | Tracing (by hand, then **Langfuse** or **Phoenix**); grading live samples; feedback; drift | coming |
-| **14** | Cost and speed | Quality, cost and latency together; quality per dollar; latency percentiles | coming |
-| **15** | Capstone | Baseline to best version with everything above; held-out test set as final judge | coming |
+| **5** | [LLM as a grader](lessons/week05-llm-graders.md) | Three rubrics and a pass/fail grader by tool call (reason first, never sees the case id); `evally grade` (binary and 1-5), `pad`, `bias`, `geval`; cost per command. On dev the grader catches a hinted exception and an invented ISBN rule no code check can, and misses a silent "60 days" a code check catches; 1-5 uses only 1s and 5s. Bias demos with the order swapped: padding never loses (6-0), qwen prefers its own replies 10-0, a llama judge picks the second reply 19/27; then **DeepEval 4.3.2 G-Eval** agrees on two cases at 8-18x the output tokens | ✅ `week-05` |
+| **6** | Testing the grader | Labels; accuracy, Cohen's kappa, precision/recall of "fail"; rubric tuning | concepts (coming) |
+| **7** | Statistics | Bootstrap ranges; paired comparison; sample size; repeat runs; pass@k and pass^k; `evally compare` | concepts (coming) |
+| **8** | Side-by-side comparison | Pairwise grading with order swapped; win/tie/loss; Elo/Bradley-Terry | concepts (coming) |
+| **9** | RAG checks | Recall@k, MRR, faithfulness, answer relevance, context precision → then **Ragas** | concepts (coming) |
+| **10** | Agent and multi-turn checks | Tool and argument accuracy; trajectory checks; a simulated customer; `evally simulate` | concepts (coming) |
+| **11** | Safety checks | Prompt injection, data leaks, out-of-policy promises, over-refusal; `evally redteam` → then **promptfoo** / **DeepEval** red-teaming | concepts (coming) |
+| **12** | Automatic checks on every change | Smoke vs full suite; pass marks; regression gates; **promptfoo** + **GitHub Actions** | concepts (coming) |
+| **13** | Production monitoring | Tracing (by hand, then **Langfuse** or **Phoenix**); grading live samples; feedback; drift | concepts (coming) |
+| **14** | Cost and speed | Quality, cost and latency together; quality per dollar; latency percentiles | concepts (coming) |
+| **15** | Capstone | Baseline to best version with everything above; held-out test set as final judge | concepts (coming) |
 
 The order is fixed; a heavy week may split in two.
 

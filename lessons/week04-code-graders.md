@@ -1,6 +1,6 @@
 # Week 4: Code-based graders
 
-**[← Week 3: Test datasets](week03-test-datasets.md)** · **[Course Plan](../COURSE_PLAN.md)** · **Week 5: LLM as a grader →** *(coming)*
+**[← Week 3: Test datasets](week03-test-datasets.md)** · **[Course Plan](../COURSE_PLAN.md)** · **[Week 5: LLM as a grader →](week05-llm-graders.md)**
 
 ---
 
