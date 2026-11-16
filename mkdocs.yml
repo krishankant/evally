@@ -67,3 +67,4 @@ nav:
       - "12 · Evals on every change": concepts/12-ci-gates.md
       - "13 · Production monitoring": concepts/13-monitoring.md
       - "14 · Cost and speed": concepts/14-cost-and-speed.md
+      - "15 · Capstone": concepts/15-capstone.md

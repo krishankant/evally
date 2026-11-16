@@ -1,6 +1,6 @@
 # 14 · Cost and speed
 
-**[← Concepts](README.md)** · **Previous: [13 Production monitoring](13-monitoring.md)** · **Next: 15 Capstone →** *(coming)* · **In the course:** week 14
+**[← Concepts](README.md)** · **Previous: [13 Production monitoring](13-monitoring.md)** · **Next: [15 Capstone →](15-capstone.md)** · **In the course:** week 14
 
 Quality is one of three numbers that decide which version ships. The other two are **cost** (tokens × price, per conversation and per *successful* conversation) and **speed** (latency, read as percentiles, never as an average). This page shows how to measure each, why the grader's own cost belongs in the bill, and how to choose between options with a **Pareto front** instead of a single blended score.
 

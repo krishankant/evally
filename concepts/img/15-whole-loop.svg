@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">The capstone loop</title>
+  <desc id="d">Freeze a baseline, read the failures, build dev cases that can show them, check with code first and validated LLM graders second, change one thing at a time, compare paired with ranges, gate every fixed failure, log every decision, and open the held-out test set once at the end.</desc>
+  <style>
+    .bg{fill:#ffffff}.card{fill:#f4f5f9;stroke:#d5d8e1}.ink{fill:#1f2330}.muted{fill:#5d6475}
+    .acc{fill:#3f51b5}.ok{fill:#e1f2ea}.okt{fill:#2e7d5b}.bad{fill:#fbe5e0}.badt{fill:#b3412e}.line{stroke:#9aa0b2}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#1e2129}.card{fill:#272b35;stroke:#3a3f4c}.ink{fill:#e8eaf0}.muted{fill:#a3a9b8}
+      .acc{fill:#8c9eff}.ok{fill:#1f3a2f}.okt{fill:#6fd3a3}.bad{fill:#432722}.badt{fill:#f2937f}.line{stroke:#6b7285}}
+    text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    .h{font-size:19px;font-weight:700}.s{font-size:13.5px}.xs{font-size:12px}.n{font-size:15px;font-weight:700}
+  </style>
+  <rect class="bg" width="960" height="420" rx="14"/>
+  <text class="ink h" x="30" y="40">The capstone: the whole course as one loop, proved step by step.</text>
+  <g>
+    <rect class="card" x="30" y="66" width="168" height="92" rx="10"/><text class="acc n" x="44" y="90">1 Baseline</text><text class="ink s" x="44" y="112">frozen, replayable,</text><text class="ink s" x="44" y="130">versions in traces</text><text class="muted xs" x="44" y="148">pages 12, 13</text>
+    <rect class="card" x="214" y="66" width="168" height="92" rx="10"/><text class="acc n" x="228" y="90">2 Read failures</text><text class="ink s" x="228" y="112">label, categorise,</text><text class="ink s" x="228" y="130">rank by count</text><text class="muted xs" x="228" y="148">week 2</text>
+    <rect class="card" x="398" y="66" width="168" height="92" rx="10"/><text class="acc n" x="412" y="90">3 Dev cases</text><text class="ink s" x="412" y="112">each category, enough</text><text class="ink s" x="412" y="130">failures to move</text><text class="muted xs" x="412" y="148">week 3 · page 07</text>
+    <rect class="card" x="582" y="66" width="168" height="92" rx="10"/><text class="acc n" x="596" y="90">4 Checks</text><text class="ink s" x="596" y="112">code first; LLM</text><text class="ink s" x="596" y="130">graders where needed</text><text class="muted xs" x="596" y="148">week 4 · 05 · 09-11</text>
+    <rect class="card" x="766" y="66" width="164" height="92" rx="10"/><text class="acc n" x="780" y="90">5 Validate</text><text class="ink s" x="780" y="112">graders vs blind</text><text class="ink s" x="780" y="130">labels: kappa, recall</text><text class="muted xs" x="780" y="148">page 06</text>
+  </g>
+  <path class="line" d="M848 164 v28 H114 v28" stroke-width="2" fill="none"/>
+  <g>
+    <rect class="card" x="30" y="222" width="168" height="92" rx="10"/><text class="acc n" x="44" y="246">6 One change</text><text class="ink s" x="44" y="268">prompt, retrieval,</text><text class="ink s" x="44" y="286">a rule, a tool</text><text class="muted xs" x="44" y="304">F3 · page 09 · 10 · 11</text>
+    <rect class="card" x="214" y="222" width="168" height="92" rx="10"/><text class="acc n" x="228" y="246">7 Compare</text><text class="ink s" x="228" y="268">paired flips, range,</text><text class="ink s" x="228" y="286">cost, p95 latency</text><text class="muted xs" x="228" y="304">pages 07, 08, 14</text>
+    <rect class="ok" x="398" y="222" width="168" height="92" rx="10"/><text class="okt n" x="412" y="246">8 Gate + log</text><text class="ink s" x="412" y="268">regression set; keep</text><text class="ink s" x="412" y="286">or revert, with reasons</text><text class="muted xs" x="412" y="304">page 12 · decision log</text>
+    <rect class="card" x="582" y="222" width="168" height="92" rx="10"/><text class="acc n" x="596" y="246">9 Stress</text><text class="ink s" x="596" y="268">attacks + false</text><text class="ink s" x="596" y="286">refusals; simulated users</text><text class="muted xs" x="596" y="304">pages 10, 11</text>
+    <rect class="bad" x="766" y="222" width="164" height="92" rx="10"/><text class="badt n" x="780" y="246">10 Test, once</text><text class="ink s" x="780" y="268">final vs baseline,</text><text class="ink s" x="780" y="286">paired, with ranges</text><text class="muted xs" x="780" y="304">nothing changes after</text>
+  </g>
+  <path class="line" d="M482 316 v24 H114 v-24" stroke-width="2" fill="none" stroke-dasharray="4 3"/>
+  <text class="muted xs" x="180" y="356">loop back: every gated change starts the next round of error analysis</text>
+  <text class="ink s" x="30" y="392">One honest number, and the log that explains it: judging an LLM app with evidence instead of gut feel.</text>
+</svg>
