@@ -1,0 +1,4 @@
+/* Wide tables scroll inside themselves, never the page (phone widths). */
+.md-typeset table:not([class]) { display: block; overflow-x: auto; }
+/* Demos embedded with an iframe take the full content width. */
+.md-typeset iframe.demo { width: 100%; border: 1px solid var(--md-default-fg-color--lightest); border-radius: 6px; }

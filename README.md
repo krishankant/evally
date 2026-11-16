@@ -1,6 +1,6 @@
 # evally
 
-**[Course Plan](COURSE_PLAN.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)** · **[Week 2: Error analysis](lessons/week02-error-analysis.md)** · **[Week 3: Test datasets](lessons/week03-test-datasets.md)** · **[Week 4: Code-based graders](lessons/week04-code-graders.md)** · **[Week 5: LLM as a grader](lessons/week05-llm-graders.md)**
+**[Course website](https://krishankant.github.io/evally/)** · **[Course Plan](COURSE_PLAN.md)** · **[Week 1: Baseline](lessons/week01-baseline.md)** · **[Week 2: Error analysis](lessons/week02-error-analysis.md)** · **[Week 3: Test datasets](lessons/week03-test-datasets.md)** · **[Week 4: Code-based graders](lessons/week04-code-graders.md)** · **[Week 5: LLM as a grader](lessons/week05-llm-graders.md)**
 
 ---
 

@@ -13,6 +13,8 @@ dependencies = [
 [project.optional-dependencies]
 # week 4: the same code checks in DeepEval, for comparison (uv sync --extra deepeval)
 deepeval = ["deepeval==4.3.2"]
+# the course website (uv run --extra docs mkdocs serve)
+docs = ["mkdocs>=1.6,<2", "mkdocs-material>=9.5,<10"]
 
 [project.scripts]
 evally = "evally.cli:main"

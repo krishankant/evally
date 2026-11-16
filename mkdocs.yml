@@ -1,0 +1,57 @@
+site_name: evally
+site_description: Judge an LLM app with evidence instead of gut feel.
+site_url: https://krishankant.github.io/evally/
+repo_url: https://github.com/krishankant/evally
+repo_name: krishankant/evally
+edit_uri: edit/main/
+docs_dir: site
+site_dir: _site
+strict: true
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: amber
+      toggle: {icon: material/weather-night, name: Dark mode}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: amber
+      toggle: {icon: material/weather-sunny, name: Light mode}
+  features:
+    - navigation.sections
+    - navigation.footer
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+
+extra_css: [stylesheets/extra.css]
+hooks: [site_hooks/links.py]
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc: {permalink: true}
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Home: README.md
+  - Course plan: COURSE_PLAN.md
+  - Lessons:
+      - "1 · Baseline": lessons/week01-baseline.md
+      - "2 · Error analysis": lessons/week02-error-analysis.md
+      - "3 · Test datasets": lessons/week03-test-datasets.md
+      - "4 · Code-based graders": lessons/week04-code-graders.md
+      - "5 · LLM as a grader": lessons/week05-llm-graders.md
+  - Concepts:
+      - concepts/README.md
