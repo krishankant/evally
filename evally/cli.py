@@ -35,6 +35,7 @@ from evally.app.assistant import Assistant
 from evally.app.retrieval import Retriever
 from evally.app.store import Store
 from evally.evals_core.cases import load_cases
+from evally.evals_core.compare import compare_runs, format_compare, format_gate, gate
 from evally.evals_core.runner import format_table, load_run, run_suite, save_run, slug
 from evally.evals_core.labels import append_label, code_loop, format_report, label_loop, labels_path, load_labels
 from evally.evals_core.traces import format_case_list, format_conversation, run_path
@@ -316,6 +317,33 @@ def cmd_bias(args, cfg) -> int:
     return 0
 
 
+def cmd_compare(args, cfg) -> int:
+    run_a, run_b = _load_run(args.run_a, cfg), _load_run(args.run_b, cfg)
+    if run_a is None or run_b is None:
+        return 1
+    try:
+        result = compare_runs(run_a, run_b)
+    except ValueError as e:
+        print(e)
+        return 1
+    names = [run_path(n, cfg.runs_dir).stem for n in (args.run_a, args.run_b)]
+    print(format_compare(names[0], names[1], result))
+    return 0
+
+
+def cmd_gate(args, cfg) -> int:
+    base, cur = _load_run(args.baseline, cfg), _load_run(args.current, cfg)
+    if base is None or cur is None:
+        return 1
+    try:
+        result = gate(base, cur, floor=args.floor, allow=args.allow)
+    except ValueError as e:
+        print(e)
+        return 1
+    print(format_gate(result))
+    return 0 if result["passed"] else 1
+
+
 def cmd_geval(args, cfg) -> int:
     from evally.graders.deepeval_side import deepeval_installed
     if not deepeval_installed():
@@ -441,6 +469,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("run_a", help="run A (name in evals/runs or a .json path)")
     p.add_argument("run_b", help="run B, from the same suite")
     _add_grader_args(p, cfg)
+    p = sub.add_parser("compare", help="two runs on the same cases: ranges, flipped cases, paired test")
+    p.add_argument("run_a", help="run A, the baseline (name in evals/runs or a .json path)")
+    p.add_argument("run_b", help="run B, the change")
+    p = sub.add_parser("gate", help="exit 1 if a case that passed on the baseline no longer passes")
+    p.add_argument("baseline", help="baseline run (name in evals/runs or a .json path)")
+    p.add_argument("current", help="current run")
+    p.add_argument("--floor", type=float, default=0.0,
+                   help="also fail if the Wilson lower bound of the current pass rate is below this (0-1)")
+    p.add_argument("--allow", action="append", default=[], metavar="CASE",
+                   help="accept a known regression in this case (repeatable; printed as an override)")
     p = sub.add_parser("geval", help="one case, one rubric: our grader and DeepEval's G-Eval side by side")
     p.add_argument("run", help="run name in evals/runs or a .json path")
     p.add_argument("--rubric", required=True)
@@ -467,6 +505,10 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_traces(args, cfg)
     if args.cmd == "label":
         return cmd_label(args, cfg)
+    if args.cmd == "compare":
+        return cmd_compare(args, cfg)
+    if args.cmd == "gate":
+        return cmd_gate(args, cfg)
     try:
         if args.cmd == "generate":
             return cmd_generate(args, cfg)

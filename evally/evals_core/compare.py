@@ -85,7 +85,7 @@ def format_compare(name_a: str, name_b: str, r: dict) -> str:
     for label, k, rng in (("A", r["pass_a"], r["range_a"]), ("B", r["pass_b"], r["range_b"])):
         lines.append(f"  {label}  {k}/{n} = {_pct(k / n)}   Wilson 95%: {_pct(rng[0])} - {_pct(rng[1])}")
     lines += ["", f"  better in B ({len(r['better'])}): {', '.join(r['better']) or 'none'}",
-              f"  worse in B ({len(r['worse'])}):  {', '.join(r['worse']) or 'none'}", "",
+              f"  worse in B ({len(r['worse'])}): {', '.join(r['worse']) or 'none'}", "",
               f"difference B - A: {'+' if r['diff'] >= 0 else ''}{_pct(r['diff'])}   "
               f"paired bootstrap 95%: {_pct(r['diff_range'][0])} to {_pct(r['diff_range'][1])}",
               f"McNemar exact test on the {len(r['better']) + len(r['worse'])} flipped cases: p = {r['p']:.3f}"]
