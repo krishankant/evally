@@ -33,7 +33,7 @@ For each week: check out its branch, read the lesson with the code open beside i
 | **7** | [Statistics](concepts/07-statistics-for-evals.md) | Bootstrap ranges; paired comparison; sample size; repeat runs; pass@k and pass^k; `evally compare` | ✅ concept page |
 | **8** | [Side-by-side comparison](concepts/08-side-by-side.md) | Pairwise grading with order swapped; win/tie/loss; Elo/Bradley-Terry | ✅ concept page |
 | **9** | [RAG checks](concepts/09-rag-checks.md) | Recall@k, MRR, faithfulness, answer relevance, context precision → then **Ragas** | ✅ concept page |
-| **10** | Agent and multi-turn checks | Tool and argument accuracy; trajectory checks; a simulated customer; `evally simulate` | concepts (coming) |
+| **10** | [Agent and multi-turn checks](concepts/10-agent-checks.md) | Tool and argument accuracy; trajectory checks; a simulated customer; `evally simulate` | ✅ concept page |
 | **11** | Safety checks | Prompt injection, data leaks, out-of-policy promises, over-refusal; `evally redteam` → then **promptfoo** / **DeepEval** red-teaming | concepts (coming) |
 | **12** | Automatic checks on every change | Smoke vs full suite; pass marks; regression gates; **promptfoo** + **GitHub Actions** | concepts (coming) |
 | **13** | Production monitoring | Tracing (by hand, then **Langfuse** or **Phoenix**); grading live samples; feedback; drift | concepts (coming) |

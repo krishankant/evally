@@ -1,6 +1,6 @@
 # 09 · RAG checks
 
-**[← Concepts](README.md)** · **Previous: [08 Side-by-side comparison](08-side-by-side.md)** · **Next: 10 Agent and multi-turn checks →** *(coming)* · **In the course:** week 9
+**[← Concepts](README.md)** · **Previous: [08 Side-by-side comparison](08-side-by-side.md)** · **Next: [10 Agent and multi-turn checks →](10-agent-checks.md)** · **In the course:** week 9
 
 A RAG (retrieval-augmented generation) app answers in two stages: **retrieve** documents for the question, then **generate** an answer from them. When the answer is wrong, the fault is in one of the two, and the fix is completely different: better search, or a better prompt or model. **RAG checks** measure the stages separately. Retrieval metrics (recall@k, MRR, nDCG) ask *did the right documents come back, near the top?* Generation metrics (faithfulness, answer relevance) ask *did the answer stick to them, and answer the question?*
 
