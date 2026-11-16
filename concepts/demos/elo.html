@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elo playground</title>
+<link rel="stylesheet" href="demo.css">
+<style> textarea { height: 180px; font-family: ui-monospace, Menlo, monospace; font-size: 13px; } </style>
+</head>
+<body>
+<h1>Elo playground</h1>
+<p class="lead">One judged comparison per line: <code>A &gt; B</code> (A wins), <code>A = B</code> (tie). Shuffle the order: Elo moves, Bradley-Terry doesn't.</p>
+<div class="wrap">
+  <div>
+    <textarea id="games" aria-label="Games, one per line"></textarea>
+    <label class="ctl" style="margin-top:10px"><span>Elo K-factor <output id="kv"></output></span>
+      <input id="k" type="range" min="4" max="64" step="4" value="32"></label>
+    <button class="btn" id="shuffle">Shuffle the order</button>
+    <button class="btn" id="ex">Example: 3 versions</button>
+    <button class="btn" id="wk5">Week 5: qwen vs llama (qwen judge, real)</button>
+  </div>
+  <div class="card" aria-live="polite">
+    <table class="t" id="tbl"></table>
+    <div class="note" id="msg"></div>
+  </div>
+</div>
+<script src="demo-shell.js"></script>
+<script src="elo.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const EX = "A > B\nA > B\nB > C\nA > C\nC > A\nB = A\nC > B\nA > C";
+  const WK5 = Array(10).fill("qwen > llama").concat(Array(5).fill("qwen = llama")).join("\n");
+  function parse(text) {
+    const games = [], bad = [];
+    text.split("\n").map(l => l.trim()).filter(Boolean).forEach((l, i) => {
+      const m = l.match(/^(\S+)\s*([>=<])\s*(\S+)$/);
+      if (!m) { bad.push(i + 1); return; }
+      const [, a, op, b] = m;
+      games.push(op === ">" ? [a, b, 1] : op === "<" ? [a, b, 0] : [a, b, 0.5]);
+    });
+    return { games, bad };
+  }
+  function render() {
+    $("kv").textContent = $("k").value;
+    const { games, bad } = parse($("games").value);
+    if (!games.length) { $("tbl").innerHTML = ""; $("msg").textContent = "Add some games."; return window.fitFrame(); }
+    const elo = runElo(games, +$("k").value), bt = bradleyTerry(games, 2000);
+    const ps = Object.keys(elo).sort((a, b) => (bt ? bt[b] - bt[a] : elo[b] - elo[a]));
+    let rows = "<tr><th>Version</th><th>W–L–T</th><th>Elo (this order)</th><th>Bradley-Terry</th></tr>";
+    for (const p of ps) {
+      let w = 0, l = 0, t = 0;
+      games.forEach(([a, b, s]) => { if (a === p) { s === 1 ? w++ : s === 0 ? l++ : t++; } else if (b === p) { s === 0 ? w++ : s === 1 ? l++ : t++; } });
+      rows += `<tr><td>${p}</td><td>${w}–${l}–${t}</td><td>${Math.round(elo[p])}</td><td>${bt ? Math.round(btToElo(bt[p])) : "–"}</td></tr>`;
+    }
+    $("tbl").innerHTML = rows;
+    $("msg").textContent = (bad.length ? "Ignored line(s) " + bad.join(", ") + ". " : "") +
+      (bt ? games.length + " games. Bradley-Terry on an Elo-like scale (centred on 1500)."
+          : "Bradley-Terry can't be fitted: a version has no wins or no losses, so its strength runs to infinity. More (and mixed) comparisons needed.");
+    window.fitFrame();
+  }
+  $("games").value = EX;
+  $("games").oninput = render; $("k").oninput = render;
+  $("shuffle").onclick = () => {
+    const lines = $("games").value.split("\n").filter(l => l.trim());
+    for (let i = lines.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [lines[i], lines[j]] = [lines[j], lines[i]]; }
+    $("games").value = lines.join("\n"); render();
+  };
+  $("ex").onclick = () => { $("games").value = EX; render(); };
+  $("wk5").onclick = () => { $("games").value = WK5; render(); };
+  render();
+</script>
+</body>
+</html>

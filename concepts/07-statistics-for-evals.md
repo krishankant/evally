@@ -1,6 +1,6 @@
 # 07 · Statistics for evals
 
-**[← Concepts](README.md)** · **Previous: [06 Testing the grader](06-testing-the-grader.md)** · **Next: 08 Side-by-side comparison →** *(coming)* · **In the course:** week 7
+**[← Concepts](README.md)** · **Previous: [06 Testing the grader](06-testing-the-grader.md)** · **Next: [08 Side-by-side comparison →](08-side-by-side.md)** · **In the course:** week 7
 
 A pass rate from an eval suite is an **estimate**. Your 16 or 100 cases are a sample of the conversations your app will meet, and a different sample would give a different number. Statistics for evals is the small toolkit that answers three questions: *how sure is this number* (a range), *is version B really better than A* (a paired comparison), and *how many cases do I need* (sample size). With 16 cases the honest answers are often "not very", "can't tell" and "more". Knowing that is the point.
 

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Side-by-side comparison</title>
+  <desc id="d">Ask the judge in both orders and count only consistent verdicts; ties count half. In week 5 the qwen judge gave qwen an 83 percent win rate and the llama judge 50 percent. Elo depends on the order of games, Bradley-Terry does not: the same 8 games give version A 1538 or 1544 in Elo but 1628 in Bradley-Terry either way.</desc>
+  <style>
+    .bg{fill:#ffffff}.card{fill:#f4f5f9;stroke:#d5d8e1}.ink{fill:#1f2330}.muted{fill:#5d6475}
+    .acc{fill:#3f51b5}.ok{fill:#e1f2ea}.okt{fill:#2e7d5b}.bad{fill:#fbe5e0}.badt{fill:#b3412e}.line{stroke:#9aa0b2}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#1e2129}.card{fill:#272b35;stroke:#3a3f4c}.ink{fill:#e8eaf0}.muted{fill:#a3a9b8}
+      .acc{fill:#8c9eff}.ok{fill:#1f3a2f}.okt{fill:#6fd3a3}.bad{fill:#432722}.badt{fill:#f2937f}.line{stroke:#6b7285}}
+    text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    .h{font-size:19px;font-weight:700}.s{font-size:14px}.xs{font-size:12.5px}.big{font-size:26px;font-weight:700}
+  </style>
+  <rect class="bg" width="960" height="420" rx="14"/>
+  <text class="ink h" x="30" y="40">Compare side by side: swap, count consistent wins, rank with Bradley-Terry.</text>
+  <rect class="card" x="30" y="64" width="290" height="330" rx="10"/>
+  <text class="acc h" x="46" y="94">1 · Ask twice</text>
+  <rect class="card" x="46" y="110" width="120" height="40" rx="6"/><text class="ink s" x="58" y="135">A first → A</text>
+  <rect class="card" x="182" y="110" width="122" height="40" rx="6"/><text class="ink s" x="194" y="135">B first → A</text>
+  <rect class="ok" x="46" y="160" width="258" height="34" rx="6"/><text class="okt s" x="58" y="182">same winner → a win for A</text>
+  <rect class="card" x="46" y="208" width="120" height="40" rx="6"/><text class="ink s" x="58" y="233">A first → A</text>
+  <rect class="card" x="182" y="208" width="122" height="40" rx="6"/><text class="ink s" x="194" y="233">B first → B</text>
+  <rect class="bad" x="46" y="258" width="258" height="34" rx="6"/><text class="badt s" x="58" y="280">picks by position → a tie</text>
+  <text class="ink s" x="46" y="322">win rate = (W + T/2) / N</text>
+  <text class="muted xs" x="46" y="346">Blind: no version names.</text>
+  <text class="muted xs" x="46" y="364">Run a version-vs-itself control.</text>
+  <rect class="card" x="336" y="64" width="290" height="330" rx="10"/>
+  <text class="acc h" x="352" y="94">2 · The judge decides</text>
+  <text class="muted xs" x="352" y="118">Week 5, qwen vs llama, same 15 pairs (real)</text>
+  <text class="ink s" x="352" y="152">qwen judge</text>
+  <text class="ink xs" x="352" y="172">10 wins · 0 losses · 5 ties</text>
+  <text class="badt big" x="520" y="166">83%</text>
+  <text class="ink s" x="352" y="214">llama judge</text>
+  <text class="ink xs" x="352" y="234">2 wins · 2 losses · 11 ties</text>
+  <text class="okt big" x="520" y="228">50%</text>
+  <text class="ink s" x="352" y="282">Bradley-Terry gap:</text>
+  <text class="ink s" x="352" y="302">+280 points, or none.</text>
+  <text class="muted xs" x="352" y="340">Check the judge first (pages 05, 06).</text>
+  <text class="muted xs" x="352" y="358">"Better" never replaces the checks</text>
+  <text class="muted xs" x="352" y="376">for "good enough".</text>
+  <rect class="card" x="642" y="64" width="288" height="330" rx="10"/>
+  <text class="acc h" x="658" y="94">3 · Rank: order matters?</text>
+  <text class="muted xs" x="658" y="118">same 8 games, version A (illustrative)</text>
+  <text class="ink s" x="658" y="156">Elo, games in order</text><text class="badt s" x="866" y="156">1538</text>
+  <text class="ink s" x="658" y="182">Elo, games reversed</text><text class="badt s" x="866" y="182">1544</text>
+  <text class="ink s" x="658" y="222">Bradley-Terry, any order</text><text class="okt s" x="866" y="222">1628</text>
+  <text class="muted xs" x="658" y="262">Elo updates game by game (built for</text>
+  <text class="muted xs" x="658" y="280">players whose skill changes).</text>
+  <text class="muted xs" x="658" y="298">BT fits all games at once:</text>
+  <text class="ink xs" x="658" y="320">P(i beats j) = pᵢ / (pᵢ + pⱼ)</text>
+  <text class="muted xs" x="658" y="358">Chatbot Arena switched to BT</text>
+  <text class="muted xs" x="658" y="376">for this reason.</text>
+</svg>

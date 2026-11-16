@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-DEMOS = ["kappa", "position-bias", "bootstrap", "sample-size"]
+DEMOS = ["kappa", "position-bias", "bootstrap", "sample-size", "elo"]
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
