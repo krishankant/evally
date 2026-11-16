@@ -1,0 +1,14 @@
+const k = require(process.argv[2]);
+const eq = (a, b, msg) => { if (!(a === b || (a !== null && b !== null && Math.abs(a - b) < 1e-9))) { console.log("FAIL", msg, a, b); process.exitCode = 1; } };
+eq(k.kappa({tp:4,fp:2,fn:1,tn:13}), 0.625, "worked example");
+eq(k.kappa({tp:0,fp:0,fn:2,tn:18}), 0, "accuracy trap");
+eq(k.kappa({tp:0,fp:0,fn:0,tn:20}), null, "everyone agrees on one label");
+const c = k.confusion(["fail","fail","pass","pass"], ["fail","pass","fail","pass"]);
+eq(c.tp,1,"tp"); eq(c.fn,1,"fn"); eq(c.fp,1,"fp"); eq(c.tn,1,"tn");
+const pr = k.precisionRecall({tp:4,fp:2,fn:1,tn:13}); eq(pr.precision, 4/6, "precision"); eq(pr.recall, 0.8, "recall");
+const none = k.precisionRecall({tp:0,fp:0,fn:2,tn:18}); eq(none.precision, null, "precision undefined"); eq(none.recall, 0, "recall 0");
+eq(Math.round(k.kappa({tp:2,fp:0,fn:1,tn:45})*1000)/1000, 0.789, "week 5 binary");
+eq(Math.round(k.kappa({tp:2,fp:1,fn:1,tn:44})*1000)/1000, 0.644, "week 5 1-5");
+eq(Math.round(k.kappa({tp:2,fp:0,fn:2,tn:44})*1000)/1000, 0.647, "binary, labels fixed");
+eq(Math.round(k.kappa({tp:3,fp:0,fn:1,tn:44})*1000)/1000, 0.846, "1-5, labels fixed");
+if (!process.exitCode) console.log("all checks pass");

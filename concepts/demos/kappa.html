@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kappa lab</title>
+<style>
+  :root { --bg:#ffffff; --fg:#1f2330; --muted:#5d6475; --line:#d9dce4; --card:#f5f6f9;
+          --agree:#2e7d5b; --agree-bg:#e3f3ec; --disagree:#b3412e; --disagree-bg:#fbe7e3; --accent:#3f51b5; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg:#1e2129; --fg:#e8eaf0; --muted:#a3a9b8; --line:#3a3f4c; --card:#272b35;
+          --agree:#6fd3a3; --agree-bg:#1f3a2f; --disagree:#f2937f; --disagree-bg:#432722; --accent:#8c9eff; }
+  }
+  :root[data-theme="dark"] { --bg:#1e2129; --fg:#e8eaf0; --muted:#a3a9b8; --line:#3a3f4c; --card:#272b35;
+          --agree:#6fd3a3; --agree-bg:#1f3a2f; --disagree:#f2937f; --disagree-bg:#432722; --accent:#8c9eff; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:16px; background:var(--bg); color:var(--fg);
+         font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  h1 { font-size:18px; margin:0 0 4px; }
+  p.lead { margin:0 0 14px; color:var(--muted); }
+  .wrap { display:grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap:16px; }
+  @media (max-width: 640px) { .wrap { grid-template-columns: 1fr; } }
+  table.cm { border-collapse:collapse; width:100%; }
+  table.cm th, table.cm td { border:1px solid var(--line); padding:6px; text-align:center; }
+  table.cm th { font-weight:600; font-size:13px; color:var(--muted); }
+  td.agree { background:var(--agree-bg); } td.disagree { background:var(--disagree-bg); }
+  .cell-label { display:block; font-size:12px; color:var(--muted); }
+  .stepper { display:inline-flex; align-items:center; gap:6px; margin-top:4px; }
+  .stepper button { width:30px; height:30px; border-radius:6px; border:1px solid var(--line);
+                    background:var(--card); color:var(--fg); font-size:16px; cursor:pointer; }
+  .stepper output { min-width:2.2em; font-size:18px; font-weight:600; font-variant-numeric:tabular-nums; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:3px 0; font-variant-numeric:tabular-nums; }
+  .row b { font-size:17px; }
+  .big { font-size:30px; font-weight:700; color:var(--accent); }
+  .bar { height:8px; border-radius:4px; background:var(--line); overflow:hidden; margin:2px 0 8px; }
+  .bar > i { display:block; height:100%; background:var(--accent); }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 0; }
+  .presets button { border:1px solid var(--line); background:var(--card); color:var(--fg);
+                    border-radius:999px; padding:5px 10px; font-size:13px; cursor:pointer; }
+  .note { color:var(--muted); font-size:13px; margin-top:8px; }
+</style>
+</head>
+<body>
+<h1>Kappa lab</h1>
+<p class="lead">Change the counts. Watch accuracy and kappa move apart. "Fail" is the class the grader hunts for.</p>
+
+<div class="wrap">
+  <div>
+    <table class="cm" aria-label="Confusion matrix">
+      <tr><th></th><th>Grader: fail</th><th>Grader: pass</th></tr>
+      <tr><th>Person: fail</th>
+        <td class="agree"><span class="cell-label">both fail (TP)</span><span class="stepper" data-k="tp"></span></td>
+        <td class="disagree"><span class="cell-label">grader missed it (FN)</span><span class="stepper" data-k="fn"></span></td></tr>
+      <tr><th>Person: pass</th>
+        <td class="disagree"><span class="cell-label">false alarm (FP)</span><span class="stepper" data-k="fp"></span></td>
+        <td class="agree"><span class="cell-label">both pass (TN)</span><span class="stepper" data-k="tn"></span></td></tr>
+    </table>
+    <div class="presets">
+      <button data-p="4,2,1,13">Worked example</button>
+      <button data-p="0,0,2,18">Accuracy trap</button>
+      <button data-p="2,0,1,45">Week 5 grader (real)</button>
+      <button data-p="0,0,0,20">Everyone says pass</button>
+    </div>
+  </div>
+
+  <div class="card" aria-live="polite">
+    <div class="row"><span>Accuracy (observed agreement, p<sub>o</sub>)</span><b id="po"></b></div>
+    <div class="bar"><i id="po-bar"></i></div>
+    <div class="row"><span>Agreement expected by chance (p<sub>e</sub>)</span><b id="pe"></b></div>
+    <div class="bar"><i id="pe-bar"></i></div>
+    <div class="row"><span>Cohen's kappa = (p<sub>o</sub> − p<sub>e</sub>) / (1 − p<sub>e</sub>)</span></div>
+    <div class="big" id="kappa"></div>
+    <div id="band" class="note"></div>
+    <hr style="border:none;border-top:1px solid var(--line)">
+    <div class="row"><span>Precision of "fail"</span><b id="prec"></b></div>
+    <div class="row"><span>Recall of "fail"</span><b id="rec"></b></div>
+    <div class="note" id="n"></div>
+  </div>
+</div>
+
+<script>
+  // Embedded in the course site: follow its light/dark toggle, not only the OS setting.
+  try {
+    const body = window.parent !== window && window.parent.document.body;
+    if (body) {
+      const sync = () => document.documentElement.dataset.theme =
+        body.getAttribute("data-md-color-scheme") === "slate" ? "dark" : "light";
+      sync();
+      new MutationObserver(sync).observe(body, { attributes: true, attributeFilter: ["data-md-color-scheme"] });
+    }
+  } catch (e) { /* opened on its own, or cross-origin: keep the OS setting */ }
+</script>
+<script src="kappa.js"></script>
+<script>
+  const state = { tp: 4, fp: 2, fn: 1, tn: 13 };
+  const fmt = (x) => x === null ? "undefined" : x.toFixed(3);
+  const pct = (x) => (x * 100).toFixed(1) + "%";
+  function band(k) {
+    if (k === null) return "Undefined: both sides give one label to everything, so there is nothing to agree about beyond chance.";
+    if (k < 0) return "Worse than chance: the grader leans the opposite way to the person.";
+    if (k < 0.2) return "Slight (Landis & Koch). Agreement is mostly what chance would give.";
+    if (k < 0.4) return "Fair (Landis & Koch).";
+    if (k < 0.6) return "Moderate (Landis & Koch).";
+    if (k < 0.8) return "Substantial (Landis & Koch).";
+    return "Almost perfect (Landis & Koch). The bands are a convention, not a law.";
+  }
+  function render() {
+    document.querySelectorAll(".stepper").forEach(s => s.querySelector("output").textContent = state[s.dataset.k]);
+    const { n, po, pe } = parts(state);
+    if (n === 0) { ["po","pe","kappa","prec","rec"].forEach(id => document.getElementById(id).textContent = "–"); return; }
+    document.getElementById("po").textContent = pct(po);
+    document.getElementById("pe").textContent = pct(pe);
+    document.getElementById("po-bar").style.width = pct(po);
+    document.getElementById("pe-bar").style.width = pct(pe);
+    const k = kappa(state);
+    document.getElementById("kappa").textContent = "κ = " + fmt(k);
+    document.getElementById("band").textContent = band(k);
+    const { precision, recall } = precisionRecall(state);
+    document.getElementById("prec").textContent = fmt(precision);
+    document.getElementById("rec").textContent = fmt(recall);
+    document.getElementById("n").textContent = n + " replies graded by both. Real fails: " + (state.tp + state.fn) + ".";
+  }
+  document.querySelectorAll(".stepper").forEach(s => {
+    const k = s.dataset.k;
+    s.innerHTML = '<button aria-label="minus">−</button><output></output><button aria-label="plus">+</button>';
+    const [minus, , plus] = s.children;
+    minus.onclick = () => { state[k] = Math.max(0, state[k] - 1); render(); };
+    plus.onclick = () => { state[k] = Math.min(50, state[k] + 1); render(); };
+  });
+  document.querySelectorAll(".presets button").forEach(b => b.onclick = () => {
+    const [tp, fp, fn, tn] = b.dataset.p.split(",").map(Number);
+    Object.assign(state, { tp, fp, fn, tn }); render();
+  });
+  render();
+  // Embedded: grow the frame to fit, so phones never scroll inside it.
+  function fit() { try { if (window.frameElement) window.frameElement.style.height = (document.documentElement.scrollHeight + 4) + "px"; } catch (e) {} }
+  fit(); window.addEventListener("resize", fit);
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Testing the grader in four steps</title>
+  <desc id="d">Label replies by hand, count agreements in a confusion matrix, measure kappa, precision and recall, then decide whether to trust the grader or fix the rubric.</desc>
+  <style>
+    .bg{fill:#ffffff}.card{fill:#f4f5f9;stroke:#d5d8e1}.ink{fill:#1f2330}.muted{fill:#5d6475}
+    .acc{fill:#3f51b5}.ok{fill:#e1f2ea}.okt{fill:#2e7d5b}.bad{fill:#fbe5e0}.badt{fill:#b3412e}.line{stroke:#9aa0b2}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#1e2129}.card{fill:#272b35;stroke:#3a3f4c}.ink{fill:#e8eaf0}.muted{fill:#a3a9b8}
+      .acc{fill:#8c9eff}.ok{fill:#1f3a2f}.okt{fill:#6fd3a3}.bad{fill:#432722}.badt{fill:#f2937f}.line{stroke:#6b7285}}
+    text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    .h{font-size:19px;font-weight:700}.s{font-size:14px}.xs{font-size:12.5px}.big{font-size:30px;font-weight:700}
+  </style>
+  <rect class="bg" width="960" height="420" rx="14"/>
+  <text class="ink h" x="30" y="40">Is the grader right? Test it against a person.</text>
+
+  <!-- 1 label -->
+  <rect class="card" x="30" y="66" width="200" height="320" rx="10"/>
+  <text class="acc h" x="46" y="96">1 · Label</text>
+  <text class="ink s" x="46" y="124">A person labels each</text>
+  <text class="ink s" x="46" y="143">reply pass / fail,</text>
+  <text class="ink s" x="46" y="162">blind to the grader.</text>
+  <g class="xs">
+    <text class="muted" x="46" y="198">reply   person  grader</text>
+    <text class="ink" x="46" y="220">#1      fail    fail</text>
+    <text class="ink" x="46" y="240">#2      pass    pass</text>
+    <text class="badt" x="46" y="260">#3      pass    fail</text>
+    <text class="ink" x="46" y="280">#4      pass    pass</text>
+    <text class="badt" x="46" y="300">#5      fail    pass</text>
+    <text class="muted" x="46" y="320">…  50-100+ replies</text>
+  </g>
+  <text class="muted xs" x="46" y="356">Write a labelling guide.</text>
+  <text class="muted xs" x="46" y="373">Two people on a subset.</text>
+
+  <path class="line" d="M236 226 h16" stroke-width="2" fill="none"/>
+  <!-- 2 count -->
+  <rect class="card" x="256" y="66" width="230" height="320" rx="10"/>
+  <text class="acc h" x="272" y="96">2 · Count</text>
+  <text class="muted xs" x="330" y="128">grader fail</text><text class="muted xs" x="410" y="128">grader pass</text>
+  <rect class="ok" x="322" y="138" width="78" height="70" rx="6"/><rect class="bad" x="404" y="138" width="78" height="70" rx="6"/>
+  <rect class="bad" x="322" y="212" width="78" height="70" rx="6"/><rect class="ok" x="404" y="212" width="78" height="70" rx="6"/>
+  <text class="muted xs" x="266" y="178">person</text><text class="muted xs" x="266" y="194">fail</text>
+  <text class="muted xs" x="266" y="252">person</text><text class="muted xs" x="266" y="268">pass</text>
+  <text class="okt big" x="348" y="182">4</text><text class="okt xs" x="345" y="200">TP</text>
+  <text class="badt big" x="430" y="182">1</text><text class="badt xs" x="420" y="200">FN missed</text>
+  <text class="badt big" x="348" y="256">2</text><text class="badt xs" x="330" y="274">FP false alarm</text>
+  <text class="okt big" x="422" y="256">13</text><text class="okt xs" x="433" y="274">TN</text>
+  <text class="muted xs" x="272" y="318">Green = agree, red = disagree.</text>
+  <text class="muted xs" x="272" y="336">"Fail" is the class you hunt,</text>
+  <text class="muted xs" x="272" y="353">so it's the positive one.</text>
+  <text class="muted xs" x="272" y="373">(illustrative counts, n = 20)</text>
+
+  <path class="line" d="M492 226 h16" stroke-width="2" fill="none"/>
+  <!-- 3 measure -->
+  <rect class="card" x="512" y="66" width="200" height="320" rx="10"/>
+  <text class="acc h" x="528" y="96">3 · Measure</text>
+  <text class="ink s" x="528" y="126">accuracy p<tspan baseline-shift="sub" font-size="10">o</tspan> = 0.85</text>
+  <text class="ink s" x="528" y="150">by chance p<tspan baseline-shift="sub" font-size="10">e</tspan> = 0.60</text>
+  <text class="muted xs" x="528" y="180">κ = (p<tspan baseline-shift="sub" font-size="10">o</tspan> − p<tspan baseline-shift="sub" font-size="10">e</tspan>) / (1 − p<tspan baseline-shift="sub" font-size="10">e</tspan>)</text>
+  <text class="acc big" x="528" y="220">κ = 0.63</text>
+  <text class="ink s" x="528" y="256">precision 0.67</text>
+  <text class="muted xs" x="528" y="274">of its fails, how many real</text>
+  <text class="ink s" x="528" y="302">recall 0.80</text>
+  <text class="muted xs" x="528" y="320">of real fails, how many caught</text>
+  <text class="badt xs" x="528" y="352">Accuracy alone lies when</text>
+  <text class="badt xs" x="528" y="369">most replies pass.</text>
+
+  <path class="line" d="M718 226 h16" stroke-width="2" fill="none"/>
+  <!-- 4 decide -->
+  <rect class="card" x="738" y="66" width="192" height="320" rx="10"/>
+  <text class="acc h" x="754" y="96">4 · Decide</text>
+  <text class="ink s" x="754" y="126">Set the bar first,</text>
+  <text class="ink s" x="754" y="145">then look.</text>
+  <rect class="ok" x="754" y="164" width="160" height="78" rx="8"/>
+  <text class="okt s" x="766" y="188">Meets the bar</text>
+  <text class="ink xs" x="766" y="208">use the grader;</text>
+  <text class="ink xs" x="766" y="226">re-check each month</text>
+  <rect class="bad" x="754" y="252" width="160" height="96" rx="8"/>
+  <text class="badt s" x="766" y="276">Below the bar</text>
+  <text class="ink xs" x="766" y="296">read every disagreement,</text>
+  <text class="ink xs" x="766" y="314">fix rubric (or label),</text>
+  <text class="ink xs" x="766" y="332">re-grade on dev only</text>
+  <text class="muted xs" x="754" y="373">Test labels: once, at the end.</text>
+</svg>
