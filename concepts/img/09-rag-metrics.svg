@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">RAG checks</title>
+  <desc id="d">Measure retrieval and generation separately. Retrieval: recall at k, MRR and nDCG; on four real Bramble retrievals MRR is 0.50 and one returns question never retrieved the returns policy. Generation: faithfulness by claims, 4 of 4 for return-window and 4 of 5 for return-too-late. The stale policy was retrieved for 5 of 15 questions. Then diagnose which stage to fix.</desc>
+  <style>
+    .bg{fill:#ffffff}.card{fill:#f4f5f9;stroke:#d5d8e1}.ink{fill:#1f2330}.muted{fill:#5d6475}
+    .acc{fill:#3f51b5}.ok{fill:#e1f2ea}.okt{fill:#2e7d5b}.bad{fill:#fbe5e0}.badt{fill:#b3412e}.line{stroke:#9aa0b2}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#1e2129}.card{fill:#272b35;stroke:#3a3f4c}.ink{fill:#e8eaf0}.muted{fill:#a3a9b8}
+      .acc{fill:#8c9eff}.ok{fill:#1f3a2f}.okt{fill:#6fd3a3}.bad{fill:#432722}.badt{fill:#f2937f}.line{stroke:#6b7285}}
+    text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    .h{font-size:19px;font-weight:700}.s{font-size:14px}.xs{font-size:12.5px}.big{font-size:26px;font-weight:700}
+  </style>
+  <rect class="bg" width="960" height="420" rx="14"/>
+  <text class="ink h" x="30" y="40">RAG fails in one of two stages. Measure them separately.</text>
+  <rect class="card" x="30" y="64" width="290" height="330" rx="10"/>
+  <text class="acc h" x="46" y="94">1 · Retrieval</text>
+  <text class="muted xs" x="46" y="116">did the right docs come back, near the top?</text>
+  <text class="ink s" x="46" y="146">recall@k   share of relevant in top k</text>
+  <text class="ink s" x="46" y="168">MRR        1 / rank of first relevant</text>
+  <text class="ink s" x="46" y="190">nDCG       best docs first (graded)</text>
+  <text class="muted xs" x="46" y="222">4 real Bramble retrievals:</text>
+  <text class="acc big" x="46" y="256">MRR 0.50</text>
+  <rect class="bad" x="46" y="272" width="258" height="58" rx="6"/>
+  <text class="badt xs" x="58" y="292">"can i send back a book…" never</text>
+  <text class="badt xs" x="58" y="310">retrieved returns.md: send back ≠ return</text>
+  <text class="ink xs" x="46" y="352">Stale returns-2023.md retrieved for</text>
+  <text class="badt s" x="46" y="374">5 of 15 questions (planted flaw F1)</text>
+  <rect class="card" x="336" y="64" width="290" height="330" rx="10"/>
+  <text class="acc h" x="352" y="94">2 · Generation</text>
+  <text class="muted xs" x="352" y="116">did the answer stick to the context?</text>
+  <text class="ink s" x="352" y="146">Faithfulness = supported claims / claims</text>
+  <rect class="ok" x="352" y="160" width="258" height="56" rx="6"/>
+  <text class="okt s" x="364" y="182">return-window  4/4 = 1.0</text>
+  <text class="ink xs" x="364" y="202">30 days · unread · no gift cards · 5-7 days</text>
+  <rect class="bad" x="352" y="224" width="258" height="56" rx="6"/>
+  <text class="badt s" x="364" y="246">return-too-late  4/5 = 0.8</text>
+  <text class="ink xs" x="364" y="266">"exceptions we can make" ✗</text>
+  <text class="ink s" x="352" y="310">Answer relevance: does it</text>
+  <text class="ink s" x="352" y="330">answer the question asked?</text>
+  <text class="muted xs" x="352" y="368">Faithful ≠ correct: faithful to a</text>
+  <text class="muted xs" x="352" y="384">stale doc is still wrong.</text>
+  <rect class="card" x="642" y="64" width="288" height="330" rx="10"/>
+  <text class="acc h" x="658" y="94">3 · Diagnose</text>
+  <text class="muted xs" x="658" y="120">recall   faithful   fix</text>
+  <text class="ink xs" x="658" y="148">low      high       search</text>
+  <text class="muted xs" x="658" y="164">          query rewrite, hybrid, chunks</text>
+  <text class="ink xs" x="658" y="194">high     low        prompt / model</text>
+  <text class="muted xs" x="658" y="210">          "answer only from the docs"</text>
+  <text class="ink xs" x="658" y="240">high     high, wrong  documents</text>
+  <text class="muted xs" x="658" y="256">          remove or mark stale versions</text>
+  <text class="ink xs" x="658" y="286">low      low        start with search</text>
+  <text class="muted xs" x="658" y="330">Bramble has all three:</text>
+  <text class="muted xs" x="658" y="348">send-back (search), too-late</text>
+  <text class="muted xs" x="658" y="366">(generation), returns-2023 (docs).</text>
+</svg>

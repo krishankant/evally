@@ -61,3 +61,4 @@ nav:
       - "06 · Testing the grader": concepts/06-testing-the-grader.md
       - "07 · Statistics for evals": concepts/07-statistics-for-evals.md
       - "08 · Side-by-side comparison": concepts/08-side-by-side.md
+      - "09 · RAG checks": concepts/09-rag-checks.md

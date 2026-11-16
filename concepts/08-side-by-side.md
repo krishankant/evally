@@ -1,6 +1,6 @@
 # 08 · Side-by-side comparison
 
-**[← Concepts](README.md)** · **Previous: [07 Statistics for evals](07-statistics-for-evals.md)** · **Next: 09 RAG checks →** *(coming)* · **In the course:** week 8
+**[← Concepts](README.md)** · **Previous: [07 Statistics for evals](07-statistics-for-evals.md)** · **Next: [09 RAG checks →](09-rag-checks.md)** · **In the course:** week 8
 
 **Side-by-side** (pairwise) evaluation shows a judge two replies to the same message and asks *which is better?*, instead of scoring each one alone. It's how you compare a new prompt with the old one, two models, or ten versions at once, and it's how public leaderboards like Chatbot Arena rank models. This page covers the protocol (swap the order, count only consistent verdicts), the win rate and its uncertainty, and the two ways to turn many pairwise results into a ranking: **Elo**, which depends on the order of the games, and **Bradley-Terry**, which doesn't.
 

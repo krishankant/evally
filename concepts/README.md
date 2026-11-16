@@ -12,7 +12,7 @@ Weeks 1-5 of evally built the tools in code. From week 6 the course is these con
 | [06 Testing the grader](06-testing-the-grader.md) | 6 | check a grader against human labels with kappa, precision and recall |
 | [07 Statistics for evals](07-statistics-for-evals.md) | 7 | put a range on a pass rate and tell a real improvement from noise |
 | [08 Side-by-side comparison](08-side-by-side.md) | 8 | rank versions from pairwise votes with Elo and Bradley-Terry |
-| 09 RAG checks *(coming)* | 9 | measure retrieval and faithfulness separately |
+| [09 RAG checks](09-rag-checks.md) | 9 | measure retrieval and faithfulness separately |
 | 10 Agent and multi-turn checks *(coming)* | 10 | grade tool use, trajectories and whole conversations |
 | 11 Safety checks *(coming)* | 11 | test for prompt injection, data leaks and over-refusal |
 | 12 Evals on every change *(coming)* | 12 | gate a pull request on eval results |

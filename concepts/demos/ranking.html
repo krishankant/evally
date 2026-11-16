@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retrieval metrics</title>
+<link rel="stylesheet" href="demo.css">
+<style> textarea { height: 150px; font-family: ui-monospace, Menlo, monospace; font-size: 13px; } </style>
+</head>
+<body>
+<h1>Retrieval metrics calculator</h1>
+<p class="lead">One retrieved document per line, best first, with a relevance grade: <code>returns.md 2</code> (0 = irrelevant, 1 = partly, 2+ = relevant). Reorder the lines and watch which metrics care.</p>
+<div class="wrap">
+  <div>
+    <textarea id="list" aria-label="Ranked documents with grades"></textarea>
+    <p class="note" style="margin-top:4px">Lines not in this list but relevant: <input id="missing" type="number" min="0" max="10" value="0" style="width:4em"> (count them for recall)</p>
+    <label class="ctl"><span>k <output id="kv"></output></span><input id="k" type="range" min="1" max="10" value="3"></label>
+    <div>
+      <button class="btn" data-p="0">return-window</button>
+      <button class="btn" data-p="1">t-send-back-six-weeks</button>
+      <button class="btn" data-p="2">adv-quotes-60-days</button>
+      <button class="btn" data-p="3">free-shipping</button>
+    </div>
+  </div>
+  <div class="card" aria-live="polite">
+    <div class="row"><span>recall@k</span><b id="rec"></b></div>
+    <div class="row"><span>precision@k</span><b id="prec"></b></div>
+    <div class="row"><span>reciprocal rank (first relevant)</span><b id="rr"></b></div>
+    <div class="row"><span>average precision</span><b id="ap"></b></div>
+    <div class="row"><span>nDCG@k (uses the grades)</span><b id="ndcg"></b></div>
+    <div class="note" id="note"></div>
+  </div>
+</div>
+<script src="demo-shell.js"></script>
+<script src="ranking.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const PRESETS = [
+    ["returns.md 2\nreturns-2023.md 0\ngift-cards.md 1", 0, "Real retrieval for 'How long do I have to return a book?'. The stale policy came second."],
+    ["damaged-items.md 0\npreorders.md 0\ngift-cards.md 0", 1, "Real: 'can i send back a book i didnt like?' never retrieved returns.md. 'send back' ≠ 'return' for keyword search."],
+    ["returns-2023.md 0\nreturns.md 2\nshipping.md 0", 0, "Real: a customer quoting '60 days' pulled the stale 60-day policy to rank 1."],
+    ["international-shipping.md 0\nmembership.md 2\nshipping.md 2", 0, "Real: both docs that mention free shipping were found, at ranks 2 and 3."],
+  ];
+  const fmt = (x) => x === null ? "–" : x.toFixed(3);
+  function render() {
+    const k = +$("k").value; $("kv").textContent = k;
+    const rows = $("list").value.split("\n").map(l => l.trim()).filter(Boolean).map(l => {
+      const m = l.match(/^(\S+)(?:\s+(\d+))?$/); return m ? [m[1], +(m[2] || 0)] : null; }).filter(Boolean);
+    const ranked = rows.map(r => r[0]), gains = Object.fromEntries(rows.map(r => [r[0], r[1]]));
+    const missing = Math.max(0, +$("missing").value || 0);
+    const rel = new Set(rows.filter(r => r[1] >= 2).map(r => r[0]));
+    for (let i = 0; i < missing; i++) { rel.add("(missing-" + i + ")"); gains["(missing-" + i + ")"] = 2; }
+    $("rec").textContent = fmt(recallAtK(ranked, rel, k));
+    $("prec").textContent = fmt(precisionAtK(ranked, rel, k));
+    $("rr").textContent = rel.size ? fmt(reciprocalRank(ranked, rel)) : "–";
+    $("ap").textContent = fmt(averagePrecision(ranked, rel));
+    $("ndcg").textContent = fmt(ndcgAtK(ranked, gains, k));
+    if (!rel.size) $("note").textContent = "No relevant documents labelled: recall, AP and nDCG aren't defined. If a relevant doc exists but wasn't retrieved, count it above.";
+    window.fitFrame();
+  }
+  document.querySelectorAll("[data-p]").forEach(b => b.onclick = () => {
+    const [list, missing, note] = PRESETS[+b.dataset.p]; $("list").value = list; $("missing").value = missing; $("note").textContent = note; render();
+  });
+  ["list", "missing", "k"].forEach(id => $(id).oninput = () => { $("note").textContent = ""; render(); });
+  $("list").value = PRESETS[2][0]; $("note").textContent = PRESETS[2][2]; render();
+</script>
+</body>
+</html>
