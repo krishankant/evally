@@ -106,6 +106,20 @@ It finds the strengths that make the observed results most likely (maximum likel
 
 **Chatbot Arena switched from online Elo to Bradley-Terry** for exactly these reasons: order independence, more stable ratings, and better confidence intervals from bootstrapping the games ([LMSYS, Dec 2023](https://lmsys.org/blog/2023-12-07-leaderboard/)).
 
+### How sure is a ranking? Bootstrap the games
+
+A Bradley-Terry fit gives one number per version. To see how much it would move with different games, use page 07's bootstrap: resample the games with replacement, refit, repeat, and take the middle 95% of each version's ratings.
+
+Illustrative: three versions, 60 judged games, 20 per pair. A–B went 13-5 with 2 ties, B–C 11-7 with 2 ties, A–C 14-4 with 2 ties. Bradley-Terry gives A **1613**, B **1475**, C **1412**. Over 2,000 resamples (numpy, the same fit as section 13, seed 0):
+
+| Version | Rating | 95% range | Ranked above the next one in… |
+| --- | :---: | :---: | :---: |
+| A | 1613 | 1545 – 1702 | 99% of resamples (above B) |
+| B | 1475 | 1398 – 1546 | 85% (above C) |
+| C | 1412 | 1323 – 1481 | – |
+
+A is the best version: it beats B's rating in 99% of resamples, even though their ranges touch. B over C is likely but not settled: B's and C's ranges overlap heavily and their order flips in 15% of resamples. The honest summary is "A first; B and C not clearly separated". Chatbot Arena publishes bootstrapped confidence intervals next to its ratings for the same reason ([LMSYS, Dec 2023](https://lmsys.org/blog/2023-12-07-leaderboard/)).
+
 > **Pitfall: a version that never lost (or never won).** Its BT strength runs off to infinity: no finite number explains a perfect record. Week 5's qwen judge gave llama 0 consistent wins; only the ties (counted as half) keep the fit finite. A perfect record on 15 pairs says "needs more comparisons", not "infinitely better".
 
 ## 8. Week 5 as a ranking

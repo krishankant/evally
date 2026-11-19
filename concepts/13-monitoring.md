@@ -107,6 +107,29 @@ Something changes and the numbers move. Watch four places:
 
 Compare each week with a baseline window, with ranges (page 07): a refusal rate moving from 4% to 6% on 300 conversations is noise; on 30,000 it's a change. Alert on changes in the cheap 100% signals; investigate with traces.
 
+### Is it drift or noise? Test it
+
+**One rate, two periods.** The refusal rate went from 4% last week to 6% this week. A **two-proportion z-test** asks how surprising that gap is if nothing changed:
+
+*p̂* = (refusals both weeks) / (conversations both weeks), z = (*p*<sub>2</sub> − *p*<sub>1</sub>) / √( *p̂*(1 − *p̂*)(1/*n*<sub>1</sub> + 1/*n*<sub>2</sub>) )
+
+With 300 conversations a week: 12 and 18 refusals, *p̂* = 30/600 = 0.05, z = 0.02 / √(0.05 × 0.95 × 2/300) = 0.02 / 0.0178 = **1.12**, p = **0.26**: noise. With 30,000 a week: z = **11.2**, p < 0.0001: a real change. (statsmodels 0.15.0, `proportions_ztest`, gives the same numbers.)
+
+**A whole distribution.** For the topic mix, compare all the shares at once with the **population stability index** (PSI):
+
+PSI = Σ over topics (this week's share − baseline share) × ln(this week's share / baseline share)
+
+| Topic | Baseline | This week | Contribution |
+| --- | :---: | :---: | :---: |
+| Returns | 40% | 30% | 0.029 |
+| Shipping | 25% | 22% | 0.004 |
+| Orders | 15% | 15% | 0.000 |
+| Stock | 10% | 8% | 0.004 |
+| Membership | 10% | 25% | **0.137** |
+| **PSI** | | | **0.175** |
+
+(Illustrative shares.) A common rule of thumb, borrowed from credit scoring, reads PSI under 0.1 as stable, 0.1-0.25 as a moderate shift and over 0.25 as a major one. It's a convention, not a law. The per-topic contributions are the useful part: they point straight at membership questions, which more than doubled. Maybe a new membership offer launched, and the eval suite has almost no membership cases (page 07: add some before the next release).
+
 ## 8. Close the loop
 
 Monitoring that only produces charts decays. The valuable path is:

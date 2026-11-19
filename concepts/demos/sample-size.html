@@ -27,6 +27,15 @@
     <div class="note">pass@k: at least one of k tries passes (good for "can it ever do this?"). pass^k: all k pass (good for "will a customer get it right every time?").</div>
   </div>
 </div>
+<h1 style="margin-top:18px">How many cases to tell two versions apart?</h1>
+<div class="card">
+  <label class="ctl"><span>Cases that flip to <b>pass</b> in the new version <output id="bv"></output></span>
+    <input id="pb" type="range" min="0.01" max="0.40" step="0.01" value="0.10"></label>
+  <label class="ctl"><span>Cases that flip to <b>fail</b> <output id="wv"></output></span>
+    <input id="pw" type="range" min="0" max="0.40" step="0.01" value="0.05"></label>
+  <div class="big" id="np"></div>
+  <div class="note" id="npn"></div>
+</div>
 <script src="demo-shell.js"></script>
 <script src="sample-size.js"></script>
 <script>
@@ -42,9 +51,15 @@
     let rows = "<tr><th>k</th><th>pass@k</th><th>pass^k</th></tr>";
     [1, 2, 3, 5, 10].filter(k => k <= n).forEach(k => rows += `<tr><td>${k}</td><td>${pct(passAtK(n, c, k))}</td><td>${pct(passHatK(n, c, k))}</td></tr>`);
     $("tbl").innerHTML = rows;
+    const pb = +$("pb").value, pw = +$("pw").value, need = nPaired(pb, pw);
+    $("bv").textContent = Math.round(pb * 100) + "%"; $("wv").textContent = Math.round(pw * 100) + "%";
+    $("np").textContent = need === null ? "–" : need + " cases";
+    $("npn").textContent = need === null
+      ? "No net gain to detect: the new version must flip more cases to pass than to fail."
+      : "A real gain of " + Math.round((pb - pw) * 100) + " points, found 80% of the time at the 5% level (McNemar). Bramble's dev set has 16.";
     window.fitFrame();
   }
-  ["m", "p", "t", "c"].forEach(id => $(id).oninput = render);
+  ["m", "p", "t", "c", "pb", "pw"].forEach(id => $(id).oninput = render);
   render();
 </script>
 </body>

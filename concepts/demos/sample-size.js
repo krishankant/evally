@@ -23,4 +23,13 @@ function passHatK(n, c, k) {
   return choose(c, k) / choose(n, k);
 }
 
-if (typeof module !== "undefined") module.exports = { nFor, marginFor, passAtK, passHatK };
+// Two versions on the same cases: how many cases to detect a real gain, with McNemar's test
+// (two-sided alpha 0.05, power 0.8; normal approximation, Connor 1987).
+// pBetter / pWorse: expected share of cases that flip to pass / to fail.
+function nPaired(pBetter, pWorse, zA = 1.959963984540054, zB = 0.8416212335729143) {
+  const disc = pBetter + pWorse, d = pBetter - pWorse;
+  if (!(d > 0) || pWorse < 0 || disc > 1) return null;
+  return Math.ceil(Math.pow(zA * Math.sqrt(disc) + zB * Math.sqrt(disc - d * d), 2) / (d * d));
+}
+
+if (typeof module !== "undefined") module.exports = { nFor, marginFor, passAtK, passHatK, nPaired };

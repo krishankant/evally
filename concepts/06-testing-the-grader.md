@@ -115,6 +115,32 @@ Run the same steps on the `return "pass"` grader: p<sub>o</sub> = 0.90, p<sub>e<
 
 > **Pitfall: kappa punishes rare classes.** When failures are rare, p<sub>e</sub> is close to 1 and the denominator 1 − p<sub>e</sub> is tiny, so one or two mistakes move kappa a lot. Section 8's real example has 3 failures in 48 replies, and moving one label shifts kappa by 0.14-0.21. Always report the four counts next to kappa.
 
+### Scores, not verdicts: weighted kappa
+
+When a grader gives scores (1-5) instead of pass/fail, plain kappa treats every disagreement alike: a 4 against a 5 counts as completely wrong, exactly like a 1 against a 5. **Weighted kappa** gives partial credit by distance. With *k* score levels, a disagreement between scores *i* and *j* costs:
+
+- **linear** weights: |*i* − *j*| / (*k* − 1), so off by one on a 1-5 scale costs 0.25;
+- **quadratic** weights: ((*i* − *j*) / (*k* − 1))², so off by one costs 0.0625 and off by four costs 1.
+
+κ<sub>w</sub> = 1 − (Σ weight × observed count) / (Σ weight × count expected by chance), with the chance counts built from each side's score frequencies, as in step 3 above.
+
+An illustrative example: a person and two graders score the same 10 replies.
+
+| Reply | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+| --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| Person | 5 | 5 | 4 | 4 | 3 | 2 | 1 | 5 | 4 | 1 |
+| Grader A | 4 | 5 | 5 | 4 | 3 | 2 | 1 | 4 | 5 | 1 |
+| Grader B | **1** | 5 | 4 | 4 | 3 | 2 | **5** | 5 | 4 | 1 |
+
+| | Exact matches | Kappa | Linear weighted | Quadratic weighted |
+| --- | :---: | :---: | :---: | :---: |
+| Grader A (4 near misses) | 6 / 10 | 0.474 | **0.756** | **0.911** |
+| Grader B (2 far misses) | 8 / 10 | **0.737** | 0.512 | 0.286 |
+
+Plain kappa prefers B, which matches the person exactly more often. Weighted kappa prefers A, and so would a customer: B's two misses rate a perfect reply 1 and a broken reply 5, while A is never off by more than one point. Quadratic weights punish far misses hardest and are the usual choice for ordered scales.
+
+Weighted kappa only helps when the scale is actually used. Week 5's 1-5 grader gave only 1s and 5s, so its "scale" was really pass/fail, and weighted and plain kappa would tell the same story. In scikit-learn it's one argument: `cohen_kappa_score(person, grader, weights="quadratic")` (scikit-learn 1.9.1 gives the numbers above).
+
 ## 7. Precision and recall of "fail"
 
 Kappa is one number for everything. In practice the two kinds of mistakes cost different things, so measure them separately:

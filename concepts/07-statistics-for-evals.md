@@ -118,6 +118,29 @@ Turn the SE formula around. For a pass rate quoted to ±*m* with 95% confidence:
 
 This is why the course says suites stay small "and lessons say plainly when numbers are too small to prove much". A small suite is fine for finding failures (weeks 2-4). It's weak for measuring improvements.
 
+### How many cases to tell two versions apart?
+
+The table above is about one pass rate. Comparing two versions on the same cases is a different question: what matters is how many cases **flip** (section 6). That depends on two shares, *p*<sub>better</sub> (cases that go from fail to pass) and *p*<sub>worse</sub> (pass to fail). For McNemar's test at the 5% level with an 80% chance of detecting a real gain, a standard approximation (Connor, 1987) is:
+
+*n* = [ 1.96 √*p*<sub>d</sub> + 0.84 √(*p*<sub>d</sub> − Δ²) ]² / Δ²  where *p*<sub>d</sub> = *p*<sub>better</sub> + *p*<sub>worse</sub> and Δ = *p*<sub>better</sub> − *p*<sub>worse</sub>
+
+**Worked.** A new prompt fixes 10% of cases and breaks 5%: a real gain of Δ = 5 points, *p*<sub>d</sub> = 0.15.
+*n* = (1.96 × 0.387 + 0.84 × 0.384)² / 0.05² = (0.759 + 0.323)² / 0.0025 = 1.172 / 0.0025 ≈ **469 cases**. (A simulation with the exact test finds the gain 78% of the time at 469, close to the 80% target.)
+
+| Flip to pass | Flip to fail | Real gain | Cases needed |
+| :---: | :---: | :---: | :---: |
+| 15% | 5% | 10 points | 155 |
+| 10% | 5% | 5 points | 469 |
+| 6% | 1% | 5 points | 218 |
+| 25% | 20% | 5 points | 1,411 |
+
+Two lessons hide in that table:
+
+- **Churn is expensive.** The same 5-point gain needs 218 cases when only 7% of cases flip, and 1,411 when 45% do. A change that fixes many cases and breaks many others is much harder to prove than a clean fix.
+- **Pairing saves a lot.** Comparing 70% against 75% on two *separate* sets of cases needs about **1,251 cases per version** (a two-proportion test); the paired design above needs 469 for the same gain.
+
+Week 5's qwen → llama flips (4 of 16 better, 1 of 16 worse) would need about **68 cases** to be detected reliably, if those rates held. Bramble's 16 can only confirm very large changes. The planner demo below has this calculator.
+
 ## 8. Repeat runs: the same case, many times
 
 LLM output varies between runs (sampling temperature, provider-side changes), so one run of a case is itself a sample. Run each case *n* times and record how many of the tries passed (*c*). Then two different questions have two different answers:

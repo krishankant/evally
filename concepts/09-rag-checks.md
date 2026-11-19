@@ -86,6 +86,19 @@ Ideal [d1, d2, d3]: 3/1 + 2/1.585 + 0 = **4.262**. nDCG@3 = 2.893 / 4.262 = **0.
 
 Across the 15 single-turn dev cases (real, from the saved run's `docs` field), the stale `returns-2023.md` was retrieved **5 times** and ranked first once (`adv-quotes-60-days`). It came back for two questions that had nothing to do with returns (an international-shipping question and a membership question): keyword search matched ordinary shared words. The international-shipping question shares "order", "delivery" and "policy" with it; the membership question only "Bramble" and "books", and it still made the top 3 of ten documents. That's the flaw week 1 planted (F1 in `evally/app/FLAWS.md`), measured.
 
+### Chunking: what counts as a "document"
+
+Retrieval returns **chunks**, not files. Long documents are split into pieces (by length, paragraph or heading), each piece is indexed, and the top *k* pieces go into the prompt. Chunk size is a trade-off:
+
+| Chunks that are… | Good | Bad |
+| --- | --- | --- |
+| **Small** | Precise: the retrieved text is mostly relevant; cheaper prompts | An answer split across two chunks may come back half; less context around a fact |
+| **Large** | Whole answers, with context | Diluted: one relevant sentence among many irrelevant ones, and more tokens |
+
+Split Bramble's `returns.md` at its paragraphs and you get four chunks: (1) the 30-day window, the unread condition and the gift-card exclusion; (2) how to start a return; (3) the refund timing and shipping costs; (4) "Returns after 30 days are not accepted." *"How long does a refund take?"* needs only chunk 3. *"I got it six weeks ago, can I still return it?"* needs chunk 1 or chunk 4, and if *k* is small and only chunk 3 comes back, the answer is missing.
+
+**Why Bramble can't test chunk size.** Bramble indexes whole documents, and all ten are short: 57 to 95 words. A typical chunk is a few hundred tokens, so any common chunk size leaves every Bramble document in one piece. Comparing chunk sizes on this corpus would compare identical systems. Recall@k can't move, so the comparison can't decide anything (page 07: check that a measurement can move before you compare). To study chunking you need longer documents; the companion course's [chunking page](https://github.com/krishankant/raggy/blob/main/concepts/04-chunking.md) does.
+
 ## 5. Generation metrics
 
 Given the question, the retrieved context and the answer:
@@ -107,7 +120,21 @@ Faithfulness = **4/4 = 1.0**. `return-too-late`'s reply: delivered 20 September 
 
 ### Answer relevance
 
-*Does the answer address the question asked?* A faithful answer about shipping, given a returns question, scores 1.0 on faithfulness and fails here. Ragas measures it by generating questions from the answer and comparing them with the real question; a simpler grader just asks a model.
+*Does the answer address the question asked?* A faithful answer about shipping, given a returns question, scores 1.0 on faithfulness and fails here.
+
+Ragas measures it indirectly: an LLM writes a few questions that the *answer* would be a good reply to, an embedding model turns each into a vector, and the score is their average cosine similarity with the real question. A worked example with **illustrative** similarities, on `t-clockmaker-stock`'s real reply:
+
+> Question: "Do you have The Clockmaker's Apprentice in stock?"
+> Reply: "I'd be happy to check the stock … However, I need the 13-digit ISBN number to look up availability…"
+
+| Question generated from the reply | Similarity to the real question |
+| --- | :---: |
+| "Can you check whether The Clockmaker's Apprentice is available?" | 0.88 |
+| "What do you need from me to check a book's stock?" | 0.71 |
+| "Why do you need an ISBN to look up a book?" | 0.52 |
+| **Answer relevance (mean)** | **0.70** |
+
+A reply that answered ("Yes, we have 7 copies") would generate questions like "Is The Clockmaker's Apprentice in stock?", scoring near 1. The middle score is the point: the reply engages with the question but doesn't answer it. Two cautions. Relevance isn't correctness: "Yes, 7 copies" scores high even if the stock count is wrong. And both the question writer and the embedding model are models, so validate the metric on labelled examples (page 06) before trusting a threshold. A simpler alternative is a pass/fail rubric grader (page 05): "Does the reply answer the question asked, or say clearly why it can't?"
 
 ### Context precision and recall (Ragas's definitions)
 
