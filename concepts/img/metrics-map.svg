@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" role="img" aria-labelledby="t d">
+  <title id="t">Metrics map</title>
+  <desc id="d">Nine kinds of evaluation and the metrics that answer each: one version uses pass rate with a Wilson range and pass@k or pass^k; testing the grader uses the confusion matrix, kappa and precision and recall of fail; B versus A uses flips, McNemar, the paired bootstrap and regressions; many versions use win rate and Bradley-Terry with bootstrap ranges; RAG uses recall@k, MRR, nDCG, faithfulness and answer relevance; agents use tool, argument, trajectory and end-state checks with budgets; safety pairs attack success rate with false-refusal rate; production uses sampled pass rate, z-tests and PSI; cost and speed use cost per passing case, p50 and p95 latency and the Pareto front. Every metric: report the counts, give a range, compare on the same cases.</desc>
+  <style>
+    .bg{fill:#ffffff}.card{fill:#f4f5f9;stroke:#d5d8e1}.ink{fill:#1f2330}.muted{fill:#5d6475}.acc{fill:#3f51b5}.ok{fill:#e1f2ea}.okt{fill:#2e7d5b}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#1e2129}.card{fill:#272b35;stroke:#3a3f4c}.ink{fill:#e8eaf0}.muted{fill:#a3a9b8}.acc{fill:#8c9eff}.ok{fill:#1f3a2f}.okt{fill:#6fd3a3}}
+    text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    .h{font-size:19px;font-weight:700}.s{font-size:14px}.q{font-size:13.5px;font-style:italic}
+  </style>
+  <rect class="bg" width="960" height="620" rx="14"/>
+  <text class="ink h" x="30" y="40">Name the question first, then pick the metric that answers it.</text>
+  <rect class="card" x="30" y="62" width="290" height="150" rx="10"/>
+  <text class="acc h" x="46" y="92">1 · One version</text>
+  <text class="muted q" x="46" y="114">Is the output right?</text>
+  <text class="ink s" x="46" y="142">• Pass rate + n</text>
+  <text class="ink s" x="46" y="164">• Wilson range</text>
+  <text class="ink s" x="46" y="186">• pass@k · pass^k</text>
+  <rect class="card" x="335" y="62" width="290" height="150" rx="10"/>
+  <text class="acc h" x="351" y="92">2 · The grader</text>
+  <text class="muted q" x="351" y="114">Can I trust its verdicts?</text>
+  <text class="ink s" x="351" y="142">• Confusion matrix</text>
+  <text class="ink s" x="351" y="164">• Kappa (beyond chance)</text>
+  <text class="ink s" x="351" y="186">• Precision · recall of fail</text>
+  <rect class="card" x="640" y="62" width="290" height="150" rx="10"/>
+  <text class="acc h" x="656" y="92">3 · B vs A</text>
+  <text class="muted q" x="656" y="114">Is B really better?</text>
+  <text class="ink s" x="656" y="142">• Flips on same cases</text>
+  <text class="ink s" x="656" y="164">• McNemar · paired bootstrap</text>
+  <text class="ink s" x="656" y="186">• Regressions</text>
+  <rect class="card" x="30" y="226" width="290" height="150" rx="10"/>
+  <text class="acc h" x="46" y="256">4 · Many versions</text>
+  <text class="muted q" x="46" y="278">Which is best?</text>
+  <text class="ink s" x="46" y="306">• Win rate (ties = ½)</text>
+  <text class="ink s" x="46" y="328">• Bradley-Terry</text>
+  <text class="ink s" x="46" y="350">• Bootstrap ranges</text>
+  <rect class="card" x="335" y="226" width="290" height="150" rx="10"/>
+  <text class="acc h" x="351" y="256">5 · RAG</text>
+  <text class="muted q" x="351" y="278">Found it? Used it?</text>
+  <text class="ink s" x="351" y="306">• Recall@k · MRR · nDCG</text>
+  <text class="ink s" x="351" y="328">• Faithfulness</text>
+  <text class="ink s" x="351" y="350">• Answer relevance</text>
+  <rect class="card" x="640" y="226" width="290" height="150" rx="10"/>
+  <text class="acc h" x="656" y="256">6 · Agents</text>
+  <text class="muted q" x="656" y="278">Right actions, right way?</text>
+  <text class="ink s" x="656" y="306">• Tool + argument checks</text>
+  <text class="ink s" x="656" y="328">• Trajectory · end state</text>
+  <text class="ink s" x="656" y="350">• Budgets · pass^k</text>
+  <rect class="card" x="30" y="390" width="290" height="150" rx="10"/>
+  <text class="acc h" x="46" y="420">7 · Safety</text>
+  <text class="muted q" x="46" y="442">Safe and still useful?</text>
+  <text class="ink s" x="46" y="470">• Attack success rate</text>
+  <text class="ink s" x="46" y="492">• + false-refusal rate</text>
+  <text class="ink s" x="46" y="514">• per category</text>
+  <rect class="card" x="335" y="390" width="290" height="150" rx="10"/>
+  <text class="acc h" x="351" y="420">8 · Production</text>
+  <text class="muted q" x="351" y="442">Still working live?</text>
+  <text class="ink s" x="351" y="470">• Sampled pass rate</text>
+  <text class="ink s" x="351" y="492">• z-test · PSI</text>
+  <text class="ink s" x="351" y="514">• Feedback = pointer</text>
+  <rect class="card" x="640" y="390" width="290" height="150" rx="10"/>
+  <text class="acc h" x="656" y="420">9 · Cost &amp; speed</text>
+  <text class="muted q" x="656" y="442">Worth it?</text>
+  <text class="ink s" x="656" y="470">• Cost per passing case</text>
+  <text class="ink s" x="656" y="492">• p50 · p95, not mean</text>
+  <text class="ink s" x="656" y="514">• Pareto front</text>
+  <rect class="ok" x="30" y="556" width="900" height="44" rx="10"/>
+  <text class="okt s" x="480" y="583" text-anchor="middle" font-weight="700">Every metric: report the counts · give a range · compare on the same cases · check it can move</text>
+</svg>

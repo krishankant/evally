@@ -57,6 +57,7 @@ nav:
       - "5 · LLM as a grader": lessons/week05-llm-graders.md
   - Concepts:
       - concepts/README.md
+      - "Metrics map: which metric, when": concepts/metrics-map.md
       - "05 · LLM as a grader": concepts/05-llm-as-a-grader.md
       - "06 · Testing the grader": concepts/06-testing-the-grader.md
       - "07 · Statistics for evals": concepts/07-statistics-for-evals.md

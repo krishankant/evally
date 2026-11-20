@@ -6,6 +6,8 @@
 
 Weeks 1-5 of evally built the tools in code. From week 6 the course is these concept pages: each one explains a topic in depth with diagrams, a worked example you can compute by hand, an infographic, pitfalls, the library that does the job, a self-check, and links to videos worth watching. Numbers from weeks 1-5 are real measurements; any other number is marked *illustrative*.
 
+**Not sure which number to report?** Start with the **[Metrics map](metrics-map.md)**: every metric in the course, sorted by the kind of evaluation, with the question it answers, a worked number, when it misleads, and the page that covers it in depth.
+
 | Page | Course week | What you'll be able to do |
 | --- | :---: | --- |
 | [05 LLM as a grader](05-llm-as-a-grader.md) | 5 | write a rubric grader and measure its position, length and self-preference bias |
